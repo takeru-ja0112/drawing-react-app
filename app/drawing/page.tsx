@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from 'react';
 import DrawPage from "@/components/pages/DrawPage";
 
 export default function Page() {
-    return <DrawPage />
-
+    // テスト用のダミーroomId
+    const testRoomId = "test-room-" + Date.now();
+    
+    return <DrawPage roomId={testRoomId} />
 }

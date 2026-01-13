@@ -13,6 +13,7 @@ export default function DrawPage({ roomId }: DrawPageProps) {
     const [ count , setCount ] = useState(0);
     const [ isSaving, setIsSaving ] = useState(false);
     const [ saveMessage, setSaveMessage ] = useState<string>('');
+    const [ userName, setUserName ] = useState<string>('');
     const linesHistory = useRef<Array<number[][]>>([]);
     const circlesHistory = useRef<Array<Array<{x: number; y: number; radius: number}>>>([]);
     const historyStep = useRef(0);
@@ -25,10 +26,6 @@ export default function DrawPage({ roomId }: DrawPageProps) {
             radius: number;
         }>
     >([]);
-    const userName = getUsername();
-    if(!userName) {
-        throw new Error('ユーザー名が設定されていません。');
-    }
 
     const [ tool , setTool ] = useState<'pen' | 'circle'>('pen');
 
@@ -113,6 +110,12 @@ export default function DrawPage({ roomId }: DrawPageProps) {
         linesHistory.current = [[...lines]];
         circlesHistory.current = [[...circles]];
         historyStep.current = 0;
+
+        // クライアント側でユーザー名を取得
+        const name = getUsername();
+        if (name) {
+            setUserName(name);
+        }
 
         const handleGlobalMouseUp = () => {
             isDrawing.current = false;
