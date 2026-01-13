@@ -67,8 +67,8 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                 <div className="mb-8">
                     <Button
                         value={loading ? '作成中...' : 'ルームを作成'}
-                        onClick={createRoom}
-                        disabled={loading}
+                        // onClick={createRoom}
+                        // disabled={loading}
                     />
                 </div>
 
