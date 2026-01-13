@@ -42,7 +42,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     }
 
     return (
-        <div className="min-h-screen p-8">
+        <div className="min-h-screen p-8 bg-gray-200">
             <div className="max-w-4xl mx-auto">
                 <h1 className="text-3xl font-bold mb-8">Minimalist Drawer</h1>
 
@@ -65,13 +65,11 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                 </div>
 
                 <div className="mb-8">
-                    <button
+                    <Button
+                        value={loading ? '作成中...' : 'ルームを作成'}
                         onClick={createRoom}
                         disabled={loading}
-                        className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 disabled:opacity-50"
-                    >
-                        {loading ? '作成中...' : 'ルームを作成'}
-                    </button>
+                    />
                 </div>
 
                 <div className="space-y-4">
@@ -97,9 +95,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                                 <p className="text-sm">お題: {room.current_theme}</p>
                                             )}
                                         </div>
-                                        <Button>
-                                            参加
-                                        </Button>
+                                        <Button value="参加" />
                                     </div>
                                 </div>
                             ))}

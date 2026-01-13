@@ -9,7 +9,7 @@ export default function HomePage() {
 
     return (
         <div
-            className="min-h-screen bg-gradient-to-br from-orange-100 via-pink-50 to-yellow-100 flex items-center justify-center p-8 overflow-hidden"
+            className="min-h-screen bg-gray-200 flex items-center justify-center p-8 overflow-hidden"
         >
             <div className="max-w-2xl w-full relative z-10">
                 {/* メインコンテンツ */}
@@ -44,9 +44,9 @@ export default function HomePage() {
                         {/* メインボタン */}
                         <Link href="/lobby">
                             <motion.button
-                                whileHover={{ scale: 1.05, y: -5 }}
+                                whileHover={{ scale: 1.02, y: -5 }}
                                 whileTap={{ scale: 0.95 }}
-                                className="w-full bg-orange-500 text-white text-xl font-bold py-6 px-8 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300"
+                                className="w-full text-black bg-white border border-dotted border-6 text-xl font-bold py-6 px-8 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300"
                             >
                                 ロビーに移動
                             </motion.button>
@@ -57,9 +57,9 @@ export default function HomePage() {
                     <div className="">
                         <Link href="/drawing">
                             <motion.button
-                                whileHover={{ scale: 1.05, y: -5 }}
+                                whileHover={{ scale: 1.02, y: -5 }}
                                 whileTap={{ scale: 0.95 }}
-                                className="bg-white/80 backdrop-blur-sm text-pink-600 font-semibold py-4 px-6 rounded-xl shadow-md  border-2 border-pink-200 w-full"
+                                className="w-full text-black bg-white border border-dotted border-6 text-xl font-bold py-6 px-8 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300"
                             >
                                 描画テスト
                             </motion.button>

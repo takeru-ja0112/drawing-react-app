@@ -45,7 +45,7 @@ export default function RoomPage() {
     }
 
     return (
-        <div className="min-h-screen p-8">
+        <div className="min-h-screen p-8 bg-gray-200">
             <div className="max-w-4xl mx-auto">
                 <h1 className="text-2xl font-bold mb-4">ルーム: {roomId.slice(0, 8)}</h1>
                 {users.length > 0 && (
@@ -70,14 +70,10 @@ export default function RoomPage() {
 
                 <div className="border rounded-lg p-8 text-center text-gray-500">
                     <Link href={`/room/${roomId}/drawing`}>
-                        <Button>
-                            書く人に設定
-                        </Button>
+                        <Button value="書く人に設定" />
                     </Link>
-                    <Link href={`/room/${roomId}/answering`}>
-                        <Button>
-                            回答者に設定
-                        </Button>
+                    <Link href={`/room/${roomId}/answer`}>
+                        <Button value="回答者に設定" />
                     </Link>
                 </div>
             </div>
