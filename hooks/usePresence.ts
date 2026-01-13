@@ -1,29 +1,29 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
 type PresenceUser = {
+  user_id: string
   user_name: string
   joined_at: string
 }
 
-export const usePresence = (roomId: string, userName: string) => {
+export const usePresence = (roomId: string, userId: string, userName: string) => {
   const [users, setUsers] = useState<PresenceUser[]>([])
   const [isConnected, setIsConnected] = useState(false)
-  const userNameRef = useRef(userName)
-
-  // userNameが変更された時だけrefを更新
-  useEffect(() => {
-    userNameRef.current = userName
-  }, [userName])
 
   useEffect(() => {
-    if (!roomId || !userNameRef.current) return
+    if (!roomId || !userId || !userName) {
+      console.log('必要な情報が未設定:', { roomId, userId, userName })
+      return
+    }
+
+    console.log('チャンネル接続開始:', { roomId, userId, userName })
 
     // 1. 部屋ごとのチャンネルを作成
     const channel = supabase.channel(`room_${roomId}`, {
       config: { 
         presence: { 
-          key: userNameRef.current 
+          key: userId  // ユーザーIDをキーとして使用
         } 
       }
     })
@@ -44,13 +44,16 @@ export const usePresence = (roomId: string, userName: string) => {
         console.log('退出:', key, leftPresences)
       })
       .subscribe(async (status) => {
+        console.log('接続ステータス:', status)
         if (status === 'SUBSCRIBED') {
           setIsConnected(true)
           // 3. 自分の情報をトラック（送信）
           await channel.track({
-            user_name: userNameRef.current,
+            user_id: userId,
+            user_name: userName,
             joined_at: new Date().toISOString(),
           })
+          console.log('トラック完了:', { userId, userName })
         } else if (status === 'CHANNEL_ERROR') {
           console.error('チャンネル接続エラー')
           setIsConnected(false)
@@ -62,10 +65,11 @@ export const usePresence = (roomId: string, userName: string) => {
 
     // クリーンアップ（退出時に接続を切る）
     return () => {
+      console.log('チャンネル切断:', userName)
       channel.untrack()
       channel.unsubscribe()
     }
-  }, [roomId]) // userNameを依存配列から除外
+  }, [roomId, userId, userName]) // userIdとuserNameの両方を依存配列に追加
 
   return { users, isConnected }
 }

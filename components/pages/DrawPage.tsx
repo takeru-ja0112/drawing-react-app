@@ -1,10 +1,18 @@
 "use client";
 
 import { Layer, Rect, Stage, Line , Circle} from "react-konva";
-import { useEffect, useRef, useState } from 'react';
+import { use, useEffect, useRef, useState } from 'react';
+import { saveDrawing } from '@/app/room/[id]/drawing/action';
+import { getOrCreateUser , getUsername } from '@/lib/user';
 
-export default function DrawPage() {
+type DrawPageProps = {
+    roomId: string;
+};
+
+export default function DrawPage({ roomId }: DrawPageProps) {
     const [ count , setCount ] = useState(0);
+    const [ isSaving, setIsSaving ] = useState(false);
+    const [ saveMessage, setSaveMessage ] = useState<string>('');
     const linesHistory = useRef<Array<number[][]>>([]);
     const circlesHistory = useRef<Array<Array<{x: number; y: number; radius: number}>>>([]);
     const historyStep = useRef(0);
@@ -17,6 +25,10 @@ export default function DrawPage() {
             radius: number;
         }>
     >([]);
+    const userName = getUsername();
+    if(!userName) {
+        throw new Error('ユーザー名が設定されていません。');
+    }
 
     const [ tool , setTool ] = useState<'pen' | 'circle'>('pen');
 
@@ -40,7 +52,6 @@ export default function DrawPage() {
 
         if (isDrawing.current === false) return;
         const lastIdx = lines.length - 1;
-        console.log(lastIdx);
 
         const point = e.target.getStage().getPointerPosition();
 
@@ -114,13 +125,56 @@ export default function DrawPage() {
         }
     }, []);
 
+    const handleSave = async () => {
+        setIsSaving(true);
+        setSaveMessage('');
+
+        try {
+            // ユーザー情報を取得
+            const user = getOrCreateUser();
+
+            const canvasData = {
+                lines,
+                circles
+            };
+
+            const result = await saveDrawing(roomId, user.id, canvasData , userName);
+
+            if (result.success) {
+                const action = result.isUpdate ? '更新' : '保存';
+                setSaveMessage(`✅ ${action}成功！要素数: ${lines.length + circles.length}`);
+            } else {
+                setSaveMessage(`❌ 保存失敗: ${result.error}`);
+            }
+        } catch (error) {
+            setSaveMessage(`❌ エラー: ${error}`);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     return (
         <>
             <h1>{count}</h1>
-            <button onClick={handleUndo} className="border border-black px-2 py-1 mr-2 rounded">Undo</button>
-            <button onClick={handleRedo} className="border border-black px-2 py-1 rounded">Redo</button>
+            <div className="mb-4">
+                <button onClick={handleUndo} className="border border-black px-2 py-1 mr-2 rounded">Undo</button>
+                <button onClick={handleRedo} className="border border-black px-2 py-1 rounded">Redo</button>
+                <button 
+                    onClick={handleSave} 
+                    disabled={isSaving || (lines.length === 0 && circles.length === 0)}
+                    className="border border-green-600 bg-green-500 text-white px-4 py-1 rounded ml-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    {isSaving ? '保存中...' : '💾 保存'}
+                </button>
+            </div>
+            
+            {saveMessage && (
+                <div className="mb-4 p-2 bg-gray-100 rounded">
+                    {saveMessage}
+                </div>
+            )}
 
-            // Tool selection
+            {/* Tool selection */}
             <div className="mt-4">
                 <label className="mr-4">
                     <input 

@@ -1,0 +1,147 @@
+"use server";
+
+import { supabase } from '@/lib/supabase';
+
+// ルーム一覧を取得
+export async function getRooms() {
+  try {
+    const { data, error } = await supabase
+      .from('rooms')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Failed to fetch rooms:', error);
+      return { success: false, error: error.message, data: null };
+    }
+
+    return { success: true, error: null, data };
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return { success: false, error: 'Failed to fetch rooms', data: null };
+  }
+}
+
+// 特定のルームを取得
+export async function getRoom(roomId: string) {
+  try {
+    const { data, error } = await supabase
+      .from('rooms')
+      .select('*')
+      .eq('id', roomId)
+      .single();
+
+    if (error) {
+      console.error('Failed to fetch room:', error);
+      return { success: false, error: error.message, data: null };
+    }
+
+    return { success: true, error: null, data };
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return { success: false, error: 'Failed to fetch room', data: null };
+  }
+}
+
+// ルームを作成
+export async function createRoom() {
+  try {
+    // 短いルームIDを生成
+    const shortId = generateShortId();
+    
+    const { data, error } = await supabase
+      .from('rooms')
+      .insert({
+        short_id: shortId,
+        status: 'WAITING'
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Failed to create room:', error);
+      return { success: false, error: error.message, data: null };
+    }
+
+    return { success: true, error: null, data };
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return { success: false, error: 'Failed to create room', data: null };
+  }
+}
+
+// ルームのステータスを更新
+export async function updateRoomStatus(roomId: string, status: 'WAITING' | 'DRAWING' | 'ANSWERING' | 'RESULT') {
+  try {
+    const { data, error } = await supabase
+      .from('rooms')
+      .update({ status })
+      .eq('id', roomId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Failed to update room status:', error);
+      return { success: false, error: error.message, data: null };
+    }
+
+    return { success: true, error: null, data };
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return { success: false, error: 'Failed to update room status', data: null };
+  }
+}
+
+// 回答者を設定
+export async function setAnswerer(roomId: string, answererId: string) {
+  try {
+    const { data, error } = await supabase
+      .from('rooms')
+      .update({ answerer_id: answererId })
+      .eq('id', roomId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Failed to set answerer:', error);
+      return { success: false, error: error.message, data: null };
+    }
+
+    return { success: true, error: null, data };
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return { success: false, error: 'Failed to set answerer', data: null };
+  }
+}
+
+// お題を設定
+export async function setTheme(roomId: string, theme: string) {
+  try {
+    const { data, error } = await supabase
+      .from('rooms')
+      .update({ current_theme: theme })
+      .eq('id', roomId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Failed to set theme:', error);
+      return { success: false, error: error.message, data: null };
+    }
+
+    return { success: true, error: null, data };
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return { success: false, error: 'Failed to set theme', data: null };
+  }
+}
+
+// ヘルパー関数: 短いIDを生成
+function generateShortId(length = 6): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
