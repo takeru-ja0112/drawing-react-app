@@ -4,6 +4,7 @@ import { Stage, Layer, Line, Circle } from 'react-konva';
 import { useState , useEffect} from 'react';
 import Header from '@/components/organisms/Header';
 import { setdbAnswer } from '@/app/room/[id]/answer/action';
+import Button from '@/components/atoms/Button';
 
 type Drawing = {
     id: string;
@@ -59,13 +60,9 @@ export default function AnswerPage({ roomId, drawings }: AnswerPageProps) {
             <Header />
             <div className="flex flex-col items-center justify-center min-h-screen bg-gray-200 p-8">
                 <div className="max-w-4xl w-full bg-white rounded-2xl shadow-xl p-8">
-                    <h1 className="text-4xl font-bold mb-4 text-center bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent">
+                    <h1 className="text-4xl font-bold mb-4 text-center">
                         回答フェーズ
                     </h1>
-
-                    <p className="text-center text-gray-600 mb-6">
-                        Room ID: <span className="font-mono font-bold">{roomId}</span>
-                    </p>
 
                     {drawings.length === 0 ? (
                         <div className="text-center py-12">
@@ -114,7 +111,7 @@ export default function AnswerPage({ roomId, drawings }: AnswerPageProps) {
                                     value={answer}
                                     onChange={(e) => setAnswer(e.target.value)}
                                     placeholder="答えを入力してください"
-                                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-pink-400 text-lg"
+                                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none text-lg"
                                 />
                             </div>
 
@@ -128,11 +125,9 @@ export default function AnswerPage({ roomId, drawings }: AnswerPageProps) {
                                     ← 前へ
                                 </button>
 
-                                <button
-                                    className="px-8 py-3 bg-gradient-to-r from-orange-400 to-pink-400 text-white rounded-lg font-bold hover:shadow-lg transition"
-                                >
-                                    ✓ 回答する
-                                </button>
+                                <Button
+                                    value="✓ 回答する"
+                                />
 
                                 <button
                                     onClick={handleNext}

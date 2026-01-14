@@ -54,7 +54,6 @@ export default function DrawPage({ roomId , theme }: DrawPageProps) {
                         key={count}
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.1 }}
                         className="text-4xl font-bold mb-4 "
                     >
                         {count}
@@ -95,7 +94,7 @@ export default function DrawPage({ roomId , theme }: DrawPageProps) {
                                 boxShadow: tool === key ? '0 0 0 2px #08071cff' : '0 0 0 1px #d1d5db',
                                 backgroundColor: tool === key ? '#ffcd44ff' : '#fff',
                             }}
-                            className={`w-full flex flex-col items-center px-4 py-2 rounded-lg cursor-pointer border transition-all duration-150 ${tool === key ? 'border-red-500' : 'border-gray-300'}`}
+                            className={`w-full flex flex-col items-center px-4 py-2 rounded-lg cursor-pointer border transition-all duration-150 ${tool === key ? 'border-gray-500' : 'border-gray-300'}`}
                             >
                                 <input
                                     type="radio"
@@ -106,11 +105,11 @@ export default function DrawPage({ roomId , theme }: DrawPageProps) {
                                     className="hidden"
                                     />
                                 <span className="mb-1 text-xl">{icon}</span>
-                                <span className={`text-sm font-semibold ${tool === key ? 'text-red-500' : 'text-gray-700'}`}>{label}</span>
+                                <span className={`text-sm font-semibold ${tool === key ? 'text-gray-900' : 'text-gray-400'}`}>{label}</span>
                             </motion.label>
                         ))}
                     </div>
-                    <div className={`mx-auto mt-4 border bg-white border-4 border-red-500 w-[300px] h-[300px] touch-none rounded overflow-hidden`}>
+                    <div className={`mx-auto mt-4 border bg-white border-4 border-gray-400 w-[300px] h-[300px] touch-none rounded overflow-hidden`}>
                         <Stage width={w} height={h} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onTouchStart={handleMouseDown} onTouchMove={handleMouseMove} onTouchEnd={handleMouseUp}>
                             <Layer
                                 tension={0.5}
@@ -169,8 +168,8 @@ export default function DrawPage({ roomId , theme }: DrawPageProps) {
                     </Modal>
                 )}
                 <Modal isOpen={isThemeOpen} onClose={() => setIsThemeOpen(false)}>
-                    <h2 className="text-gray-200">お題</h2>
-                    <p className="font-bold text-xl text-gray-200 my-4">{theme}</p>
+                    <h2 >お題</h2>
+                    <p className="font-bold text-xl my-4">{theme}</p>
                     <Button
                         onClick={() => setIsThemeOpen(false)}
                         className="mt-2"
