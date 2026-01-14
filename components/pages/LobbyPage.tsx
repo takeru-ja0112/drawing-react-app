@@ -51,7 +51,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     return (
         <>
             <Header />
-            <div className="min-h-screen p-8 bg-gray-200">
+            <div className="p-8">
                 <div className="max-w-lg mx-auto">
 
                     {/* ユーザー名の管理 */}

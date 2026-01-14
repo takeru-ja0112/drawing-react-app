@@ -37,7 +37,7 @@ export default function RoomPage() {
     return (
         <div>
             <Header />
-            <div className="w-full min-h-screen p-8 bg-gray-200">
+            <div className="w-full p-8">
                 <div className="max-w-lg mx-auto">
                     <div
                         className="mb-4 p-4 bg-gray-100 rounded-lg shadow-md border border-dotted border-gray-300 border-4"

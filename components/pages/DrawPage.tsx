@@ -42,7 +42,7 @@ export default function DrawPage({ roomId , theme }: DrawPageProps) {
     return (
         <>
             <Header />
-            <div className="min-h-screen p-8 bg-gray-200">
+            <div className="p-8">
                 <div className="max-w-lg mx-auto text-center">
                     {/* お題 */}
                     <label className="block mb-2 font-semibold text-gray-700">
@@ -60,8 +60,8 @@ export default function DrawPage({ roomId , theme }: DrawPageProps) {
                     </motion.h1>
                     <div className="mb-4">
                         <IconContext.Provider value={{ size: '1.5em' }}>
-                            <Button onClick={handleUndo} className="border border-black px-2 py-1 mr-2 rounded" icon={<TbArrowBackUp />} value="戻る" />
-                            <Button onClick={handleRedo} className="border border-black px-2 py-1 mr-2 rounded" icon={<TbArrowForwardUp />} value="進む" />
+                            <Button onClick={handleUndo} className="border border-black px-2 py-1 mr-2 rounded" icon={<TbArrowBackUp />} value="" />
+                            <Button onClick={handleRedo} className="border border-black px-2 py-1 mr-2 rounded" icon={<TbArrowForwardUp />} value="" />
                             <Button onClick={handleReset} className="border border-black px-2 py-1 rounded" icon={<TbTrash />} value="リセット" />
                         </IconContext.Provider>
                     </div>
