@@ -6,6 +6,7 @@ import { usePresence } from '@/hooks/usePresence';
 import { getOrCreateUser, type UserInfo } from '@/lib/user';
 import Button from '@/components/atoms/Button';
 import Link from 'next/link';
+import Header from '@/components/organisms/Header';
 
 type Room = {
     id: string;
@@ -45,36 +46,37 @@ export default function RoomPage() {
     }
 
     return (
-        <div className="min-h-screen p-8 bg-gray-200">
-            <div className="max-w-4xl mx-auto">
-                <h1 className="text-2xl font-bold mb-4">ルーム: {roomId.slice(0, 8)}</h1>
-                {users.length > 0 && (
+        <div>
+            <Header />
+            <div className="min-h-screen p-8 bg-gray-200">
+                <div className="max-w-4xl mx-auto">
+                    <h1 className="text-2xl font-bold mb-4">ルーム: {roomId.slice(0, 8)}</h1>
+                    {users.length > 0 && (
+                        <div className="mb-4">
+                            <h2 className="text-lg font-semibold mb-2">参加者:</h2>
+                            <ul>
+                                {users.map((user, index) => (
+                                    <li key={index}>
+                                        <div className='w-full p-2 bg-gray-400 my-2 rounded-full text-center font-bold'>
+                                            {user.user_name}
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
                     <div className="mb-4">
-                        <h2 className="text-lg font-semibold mb-2">参加者:</h2>
-                        <ul>
-                            {users.map((user, index) => (
-                                <li key={index}>
-                                    <div className='w-full p-2 bg-gray-400 my-2 rounded-full text-center font-bold'>
-                                        {user.user_name}
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
+                        <p>ステータス: <span className="font-semibold">{room.status}</span></p>
+                        {room.current_theme && <p>お題: {room.current_theme}</p>}
                     </div>
-                )}
-
-                <div className="mb-4">
-                    <p>ステータス: <span className="font-semibold">{room.status}</span></p>
-                    {room.current_theme && <p>お題: {room.current_theme}</p>}
-                </div>
-
-                <div className="border rounded-lg p-8 text-center text-gray-500">
-                    <Link href={`/room/${roomId}/drawing`}>
-                        <Button value="書く人に設定" />
-                    </Link>
-                    <Link href={`/room/${roomId}/answer`}>
-                        <Button value="回答者に設定" />
-                    </Link>
+                    <div className="border rounded-lg p-8 text-center text-gray-500">
+                        <Link href={`/room/${roomId}/drawing`}>
+                            <Button value="書く人に設定" />
+                        </Link>
+                        <Link href={`/room/${roomId}/answer`}>
+                            <Button value="回答者に設定" />
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>

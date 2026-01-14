@@ -99,3 +99,24 @@ export async function getDrawingsByRoom(roomId: string) {
     return { success: false, error: 'Failed to fetch drawings', data: null };
   }
 }
+
+// ルームのお題を取得
+export async function getTheme(roomId: string) {
+  try{
+    const { data , error } = await supabase
+      .from('rooms')
+      .select('current_theme')
+      .eq('id', roomId)
+      .single();
+
+    if(error){
+      console.error('Failed to fetch theme:', error);
+      return { success: false, error: error.message, data: null };
+    }
+
+    return { success: true, error: null, data: data?.current_theme }; 
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return { success: false, error: 'Failed to fetch theme', data: null };
+  }
+}

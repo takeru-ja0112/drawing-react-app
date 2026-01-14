@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion, useMotionValue, useTransform, useSpring } from "motion/react";
 import { useState, useEffect } from "react";
+import Button from "@/components/atoms/Button";
 
 export default function HomePage() {
     const title = "Minimal Drawer";
@@ -43,26 +44,14 @@ export default function HomePage() {
                     <div className="mb-2">
                         {/* メインボタン */}
                         <Link href="/lobby">
-                            <motion.button
-                                whileHover={{ scale: 1.02, y: -5 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="w-full text-black bg-white border border-dotted border-6 text-xl font-bold py-6 px-8 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300"
-                            >
-                                ロビーに移動
-                            </motion.button>
+                            <Button value="ロビーに移動" className="text-xl w-full"/>
                         </Link>
                     </div>
 
                     {/* サブボタン */}
                     <div className="">
                         <Link href="/drawing">
-                            <motion.button
-                                whileHover={{ scale: 1.02, y: -5 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="w-full text-black bg-white border border-dotted border-6 text-xl font-bold py-6 px-8 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300"
-                            >
-                                描画テスト
-                            </motion.button>
+                            <Button value="描画テスト" className="text-xl w-full"/>
                         </Link>
                     </div>
                 </motion.div>
