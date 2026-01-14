@@ -10,3 +10,5 @@ export default async function Page() {
 
     return <LobbyPage rooms={rooms} />
 }
+
+export const dynamic = 'force-dynamic';
