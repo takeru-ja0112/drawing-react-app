@@ -7,6 +7,9 @@ import { getOrCreateUser, type UserInfo } from '@/lib/user';
 import Button from '@/components/atoms/Button';
 import Link from 'next/link';
 import Header from '@/components/organisms/Header';
+import { TbPencil, TbBallBowling } from 'react-icons/tb';
+import { IconContext } from 'react-icons';
+import { motion } from 'motion/react';
 
 type Room = {
     id: string;
@@ -18,7 +21,7 @@ type Room = {
 export default function RoomPage() {
     const params = useParams();
     const roomId = params.id as string;
-    const [room, setRoom] = useState<Room | null>(null);
+    // const [room, setRoom] = useState<Room | null>(null);
     const [user, setUser] = useState<UserInfo>({ id: '', username: '' });
     const { users } = usePresence(roomId, user.id, user.username);
 
@@ -31,51 +34,63 @@ export default function RoomPage() {
         console.log('ユーザー情報:', userInfo);
     }, []);
 
-    useEffect(() => {
-        const fetchRoom = async () => {
-            const res = await fetch(`/api/rooms/${roomId}`);
-            const data = await res.json();
-            setRoom(data);
-        };
-
-        fetchRoom();
-    }, [roomId]);
-
-    if (!room) {
-        return <div className="p-8">読み込み中...</div>;
-    }
-
     return (
         <div>
             <Header />
-            <div className="min-h-screen p-8 bg-gray-200">
-                <div className="max-w-4xl mx-auto">
-                    <h1 className="text-2xl font-bold mb-4">ルーム: {roomId.slice(0, 8)}</h1>
+            <div className="w-full min-h-screen p-8 bg-gray-200">
+                <div className="max-w-lg mx-auto">
                     {users.length > 0 && (
-                        <div className="mb-4">
-                            <h2 className="text-lg font-semibold mb-2">参加者:</h2>
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.1 }}
+                            className="mb-4 p-4 bg-gray-100 rounded-lg shadow-md border border-dotted border-gray-300 border-4"
+                        >
+                            <h2 className="text-lg text-gray-700 font-semibold mb-2">参加者</h2>
                             <ul>
                                 {users.map((user, index) => (
-                                    <li key={index}>
+                                    <motion.li
+                                        initial={{ opacity: 0 , x: 10 }}
+                                        animate={{ opacity: 1 , x: 0 }}
+                                        transition={{ delay: index * 0.2 }}
+                                        key={index}
+                                    >
                                         <div className='w-full p-2 bg-gray-400 my-2 rounded-full text-center font-bold'>
                                             {user.user_name}
                                         </div>
-                                    </li>
+                                    </motion.li>
                                 ))}
                             </ul>
-                        </div>
+                        </motion.div>
                     )}
-                    <div className="mb-4">
-                        <p>ステータス: <span className="font-semibold">{room.status}</span></p>
-                        {room.current_theme && <p>お題: {room.current_theme}</p>}
-                    </div>
-                    <div className="border rounded-lg p-8 text-center text-gray-500">
-                        <Link href={`/room/${roomId}/drawing`}>
-                            <Button value="書く人に設定" />
-                        </Link>
-                        <Link href={`/room/${roomId}/answer`}>
-                            <Button value="回答者に設定" />
-                        </Link>
+                    <div className="text-center">
+                        <IconContext.Provider value={{ size: '1.5em' }}>
+                            {/* 書く人用の説明 */}
+                            <div className="mb-4 bg-white p-4 rounded-lg shadow-md">
+                                <div className='my-4'>
+                                    <p>
+                                        <span className='font-bold'>Drawer</span>は制限時間内にお題を描こう
+                                    </p>
+                                </div>
+
+                                <Link href={`/room/${roomId}/drawing`}>
+                                    <Button value="Drawerになる" icon={<TbPencil />} />
+                                </Link>
+                            </div>
+
+                            {/* 回答者用の説明 */}
+                            <div className="mb-4 bg-white p-4 rounded-lg shadow-md">
+                                <div className='my-4'>
+                                    <p>
+                                        <span className='font-bold'>Answer</span>はDrawerの描いた絵を見てお題を当てよう
+                                    </p>
+                                </div>
+
+                                <Link href={`/room/${roomId}/answer`}>
+                                    <Button value="Answerになる" icon={<TbBallBowling />} />
+                                </Link>
+                            </div>
+                        </IconContext.Provider>
                     </div>
                 </div>
             </div>

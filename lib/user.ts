@@ -15,7 +15,7 @@ export const generateUser = () => {
     localStorage.setItem(USER_ID_KEY, userId);
   }
   if(!username){
-    username = `名無し`
+    username = ``
     localStorage.setItem(USERNAME_KEY, username);
   }
 }

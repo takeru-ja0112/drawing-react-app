@@ -1,5 +1,6 @@
 import RoomPage from '@/components/pages/RoomPage';
 
-export default function Page() {
-    return <RoomPage />
+export default async function Page() {
+
+    return <RoomPage/>
 }

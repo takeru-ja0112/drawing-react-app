@@ -7,6 +7,7 @@ import { setUsername, getUsername } from '@/lib/user';
 import type { Room } from '@/type/roomType';
 import { generateUser } from '@/lib/user';
 import Header from '@/components/organisms/Header';
+import Modal from '@/components/organisms/Modal';
 
 export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     const [loading, setLoading] = useState(false);
@@ -51,7 +52,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
         <>
             <Header />
             <div className="min-h-screen p-8 bg-gray-200">
-                <div className="max-w-4xl mx-auto">
+                <div className="max-w-lg mx-auto">
 
                     {/* ユーザー名の管理 */}
                     <div className='my-2'>
@@ -89,18 +90,12 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                 {rooms.map((room) => (
                                     <div
                                         key={room.id}
-                                        className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                                        className="bg-white border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
                                         onClick={() => handleIsusername({ roomId: room.id })}
                                     >
                                         <div className="flex justify-between items-center">
                                             <div>
                                                 <p className="font-mono text-sm text-gray-600">ID: {room.id.slice(0, 8)}</p>
-                                                <p className="text-sm">
-                                                    ステータス: <span className="font-semibold">{room.status}</span>
-                                                </p>
-                                                {room.current_theme && (
-                                                    <p className="text-sm">お題: {room.current_theme}</p>
-                                                )}
                                             </div>
                                             <Button value="参加" />
                                         </div>
@@ -113,39 +108,36 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
 
                 {/* 名前入力モーダル */}
                 {isUserModal && (
-                    <div className="fixed inset-0 bg-white/50 flex items-center justify-center">
-                        <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-                            <h2 className="text-xl font-semibold mb-4">ユーザー名を入力してください</h2>
-                            <input
-                                type="text"
-                                value={user}
-                                onChange={(e) => setUser(e.target.value)}
-                                placeholder="名前を入力"
-                                className="border rounded-lg p-2 w-full mb-4"
+                    <Modal isOpen={isUserModal} onClose={() => setIsUserModal(false)}>
+                        <h2 className="text-xl font-semibold mb-4">ユーザー名を入力してください</h2>
+                        <input
+                            type="text"
+                            value={user}
+                            onChange={(e) => setUser(e.target.value)}
+                            placeholder="名前を入力"
+                            className="border rounded-lg p-2 w-full mb-4"
+                        />
+                        <div className="flex justify-end">
+                            <button
+                                onClick={() => setIsUserModal(false)}
+                                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg mr-2"
+                            >
+                                キャンセル
+                            </button>
+                            <Button
+                                onClick={() => {
+                                    if (user) {
+                                        setUsername(user);
+                                        setIsUserModal(false);
+                                    } else {
+                                        alert('ユーザー名を入力してください');
+                                    }
+                                }}
+                                className=" px-4 py-2 rounded-lg"
+                                value='保存'
                             />
-                            <div className="flex justify-end">
-                                <button
-                                    onClick={() => setIsUserModal(false)}
-                                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg mr-2"
-                                >
-                                    キャンセル
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        if (user) {
-                                            setUsername(user);
-                                            setIsUserModal(false);
-                                        } else {
-                                            alert('ユーザー名を入力してください');
-                                        }
-                                    }}
-                                    className="bg-blue-500 text-white px-4 py-2 rounded-lg"
-                                >
-                                    保存
-                                </button>
-                            </div>
                         </div>
-                    </div>
+                    </Modal>
                 )
                 }
             </div>

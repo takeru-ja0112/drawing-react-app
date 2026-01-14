@@ -10,9 +10,10 @@ interface BtnProps {
     type?: "button" | "submit" | "reset";
     className?: string;
     [key: string]: any;
+    icon?: React.ReactNode;
 }
 
-export default function Btn({ value, className ,onClick, disabled, type = "button", ...props }: BtnProps) {
+export default function Btn({ value, className ,onClick, disabled, type = "button", icon, ...props }: BtnProps) {
     return (
         <motion.button
             whileHover={{ scale: 1.02, y: -5 }}
@@ -23,6 +24,7 @@ export default function Btn({ value, className ,onClick, disabled, type = "butto
             type={type}
             {...props}
         >
+            {icon && <span className="inline-block mr-2 align-middle">{icon}</span>}
             {value}
         </motion.button>
     );

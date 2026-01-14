@@ -20,8 +20,6 @@ export default function AccessMenu({
                     <IconContext.Provider value={{ size: "1.5em", className: "inline-block mr-2" }}>
                         <Link href="/"><li className="my-3 flex px-2 py-1 hover:bg-gray-200 transition duration-200 rounded-full"><TbHome />ホーム</li></Link>
                         <Link href="/lobby"><li className="my-3 flex px-3 py-1 hover:bg-gray-200 transition duration-200 rounded-full"><TbUsersGroup />ロビー</li></Link>
-                        <Link href="/settings"><li className="my-3 flex px-3 py-1 hover:bg-gray-200 transition duration-200 rounded-full"><TbSettings />設定</li></Link>
-                        <Link href="/help"><li className="my-3 flex px-3 py-1 hover:bg-gray-200 transition duration-200 rounded-full"><TbHelp />ヘルプ</li></Link>
                     </IconContext.Provider>
                 </ol>
             </div>
