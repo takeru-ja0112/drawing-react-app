@@ -1,11 +1,10 @@
-"use client";
-
-import { useParams } from 'next/navigation';
 import DrawPage from "@/components/pages/DrawPage";
+import { getTheme } from './action';
 
-export default function Page() {
-    const params = useParams();
-    const roomId = params.id as string;
-
-    return <DrawPage roomId={roomId} />;
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+    console.log('Drawing Page params:', id);
+    const res = await getTheme(id);
+    const theme = res.success && res.data ? res.data : 'お題が設定されていません';
+    return <DrawPage roomId={id} theme={theme} />;
 }

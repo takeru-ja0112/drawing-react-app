@@ -1,25 +1,6 @@
 import { supabase } from "@/lib/supabase";
 
-// 回答者の登録
-export async function setAnswer(roomId: string, userId: string) {
-    try{
-    const { data, error } = await supabase
-    .from('rooms')
-    .update({ answerer_id: userId })
-    .eq('id', roomId)
-    .select()
-    .single();
 
-    if (error) {
-        console.error('Failed to set answerer:', error);
-        return { success: false, error: error.message, data: null };
-    }
-    return { success: true, error: null, data };
-    } catch (error) {
-        console.error('Unexpected error:', error);
-        return { success: false, error: 'Failed to set answerer', data: null };
-    }
-}
 
 // export async function POST(request: Request, { params }: { params: { id: string } }) {
 //     const { id: roomId } = params;

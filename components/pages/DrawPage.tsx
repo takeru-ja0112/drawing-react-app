@@ -1,256 +1,122 @@
 "use client";
 
 import { Layer, Rect as KonvaRect, Stage, Line, Circle } from "react-konva";
-import { use, useEffect, useRef, useState } from 'react';
-import { saveDrawing } from '@/app/room/[id]/drawing/action';
-import { getOrCreateUser, getUsername } from '@/lib/user';
+import useDraw from '@/hooks/DrawPage/handleDraw';
 import Button from '@/components/atoms/Button';
+import Header from '@/components/organisms/Header';
+import { motion } from "motion/react";
+import { TbArrowForwardUp, TbArrowBackUp, TbTrash } from 'react-icons/tb';
+import { IconContext } from "react-icons";
+import { useState } from "react";
+import Modal from "@/components/organisms/Modal";
 
 type DrawPageProps = {
     roomId: string;
+    theme?: string;
 };
 
-export default function DrawPage({ roomId }: DrawPageProps) {
-    const [count, setCount] = useState(0);
-    const [isSaving, setIsSaving] = useState(false);
-    const [saveMessage, setSaveMessage] = useState<string>('');
-    const [userName, setUserName] = useState<string>('');
-    const linesHistory = useRef<Array<number[][]>>([]);
-    const circlesHistory = useRef<Array<Array<{ x: number; y: number; radius: number }>>>([]);
-    const rectsHistory = useRef<Array<Array<{ x: number; y: number; width: number; height: number; rotation: number }>>>([]);
-    const historyStep = useRef(0);
-    const isDrawing = useRef(false);
-    const [lines, setLines] = useState<number[][]>([]);
-    const [circles, setCircles] = useState<
-        Array<{
-            x: number;
-            y: number;
-            radius: number;
-        }>
-    >([]);
-    const [rects, setRects] = useState<
-        Array<{
-            x: number;
-            y: number;
-            width: number;
-            height: number;
-            rotation: number;
-        }>
-    >([]);
-
-    const [tool, setTool] = useState<'line' | 'circle' | 'rect'>('line');
-
-    const w = 300;
-    const h = 300;
-
-    const handleMouseDown = (e: any) => {
-        setCount((prev) => prev + 1);
-        const point = e.target.getStage()?.getPointerPosition();
-        isDrawing.current = true;
-
-        if (tool === 'line') {
-            // 直線の開始点と終了点（最初は同じ点）
-            setLines((prev) => [...prev, [point.x, point.y, point.x, point.y]]);
-        } else if (tool === 'circle') {
-            setCircles((prev) => [...prev, { x: point.x, y: point.y, radius: 0 }]);
-        } else if (tool === 'rect') {
-            setRects((prev) => [...prev, { x: point.x, y: point.y, width: 0, height: 0, rotation: 0 }]);
-        }
-    }
-
-    const handleMouseMove = (e: any) => {
-
-        if (isDrawing.current === false) return;
-
-        const point = e.target.getStage().getPointerPosition();
-
-        if (tool === 'line') {
-            const lastIdx = lines.length - 1;
-            // 直線の終了点のみを更新（開始点はそのまま）
-            const startX = lines[lastIdx][0];
-            const startY = lines[lastIdx][1];
-            setLines((prev) => [
-                ...prev.slice(0, lastIdx),
-                [startX, startY, point.x, point.y]
-            ]);
-        } else if (tool === 'circle') {
-            const lastCircleIdx = circles.length - 1;
-            const radius = Math.hypot(point.x - circles[lastCircleIdx].x, point.y - circles[lastCircleIdx].y);
-            setCircles((prev) => [
-                ...prev.slice(0, lastCircleIdx),
-                { ...circles[lastCircleIdx], radius }
-            ]);
-        } else if (tool === 'rect') {
-            const lastRectIdx = rects.length - 1;
-            const rect = rects[lastRectIdx];
-            const dx = point.x - rect.x;
-            const dy = point.y - rect.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            const width = Math.max(1, distance);
-            const height = Math.max(1, distance);
-            const rotation = Math.atan2(dy, dx) * (180 / Math.PI);
-            setRects((prev) => [
-                ...prev.slice(0, lastRectIdx),
-                { ...rect, width, height, rotation }
-            ]);
-        }
-    };
-
-    const handleMouseUp = () => {
-        isDrawing.current = false;
-
-        const newLinesHistory = linesHistory.current.slice(0, historyStep.current + 1);
-        const newCirclesHistory = circlesHistory.current.slice(0, historyStep.current + 1);
-        const newRectsHistory = rectsHistory.current.slice(0, historyStep.current + 1);
-
-        newLinesHistory.push([...lines]);
-        newCirclesHistory.push([...circles]);
-        newRectsHistory.push([...rects]);
-
-        linesHistory.current = newLinesHistory;
-        circlesHistory.current = newCirclesHistory;
-        rectsHistory.current = newRectsHistory;
-        historyStep.current = newLinesHistory.length - 1;
-    }
-
-    const handleUndo = () => {
-        if (historyStep.current === 0) return;
-        setCount((prev) => prev - 1);
-
-        historyStep.current -= 1;
-        const previousLines = linesHistory.current[historyStep.current];
-        const previousCircles = circlesHistory.current[historyStep.current];
-        const previousRects = rectsHistory.current[historyStep.current];
-        setLines(previousLines);
-        setCircles(previousCircles);
-        setRects(previousRects);
-    }
-
-    const handleRedo = () => {
-        if (historyStep.current === linesHistory.current.length - 1) return;
-        setCount((prev) => prev + 1);
-
-        historyStep.current += 1;
-        const nextLines = linesHistory.current[historyStep.current];
-        const nextCircles = circlesHistory.current[historyStep.current];
-        const nextRects = rectsHistory.current[historyStep.current];
-        setLines(nextLines);
-        setCircles(nextCircles);
-        setRects(nextRects);
-    }
-
-    useEffect(() => {
-        linesHistory.current = [[...lines]];
-        circlesHistory.current = [[...circles]];
-        rectsHistory.current = [[...rects]];
-        historyStep.current = 0;
-
-        // クライアント側でユーザー名を取得
-        const name = getUsername();
-        if (name) {
-            setUserName(name);
-        }
-
-        const handleGlobalMouseUp = () => {
-            isDrawing.current = false;
-        }
-
-        document.addEventListener('mouseup', handleGlobalMouseUp);
-
-        return () => {
-            document.removeEventListener('mouseup', handleGlobalMouseUp);
-        }
-    }, []);
-
-    const handleSave = async () => {
-        setIsSaving(true);
-        setSaveMessage('');
-
-        try {
-            // ユーザー情報を取得
-            const user = getOrCreateUser();
-
-            const canvasData = {
-                lines,
-                circles,
-                rects
-            };
-
-            const result = await saveDrawing(roomId, user.id, canvasData, userName);
-
-            if (result.success) {
-                const action = result.isUpdate ? '更新' : '保存';
-                setSaveMessage(`✅ ${action}成功！要素数: ${lines.length + circles.length + rects.length}`);
-            } else {
-                setSaveMessage(`❌ 保存失敗: ${result.error}`);
-            }
-        } catch (error) {
-            setSaveMessage(`❌ エラー: ${error}`);
-        } finally {
-            setIsSaving(false);
-        }
-    };
+export default function DrawPage({ roomId , theme }: DrawPageProps) {
+    const {
+        count,
+        isSaving,
+        saveMessage,
+        userName,
+        lines,
+        circles,
+        rects,
+        tool,
+        setTool,
+        handleMouseDown,
+        handleMouseMove,
+        handleMouseUp,
+        handleUndo,
+        handleRedo,
+        handleReset,
+        handleSave,
+        w,
+        h,
+    } = useDraw(roomId);
+    const [isSaveOpen, setIsSaveOpen] = useState(false);
+    const [ isThemeOpen, setIsThemeOpen ] = useState(true);
 
     return (
         <>
+            <Header />
             <div className="min-h-screen p-8 bg-gray-200">
-                <div className="max-w-4xl mx-auto text-center">
+                <div className="max-w-lg mx-auto text-center">
+                    {/* お題 */}
+                    <label className="block mb-2 font-semibold text-gray-700">
+                        お題
+                    </label>
+                    <h1 className="text-xl font-bold">{isThemeOpen ?  '' : theme}</h1>
 
-                    <h1>{count}</h1>
+                    <motion.h1
+                        key={count}
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.1 }}
+                        className="text-4xl font-bold mb-4 "
+                    >
+                        {count}
+                    </motion.h1>
                     <div className="mb-4">
-                        <button onClick={handleUndo} className="border border-black px-2 py-1 mr-2 rounded">Undo</button>
-                        <button onClick={handleRedo} className="border border-black px-2 py-1 rounded">Redo</button>
+                        <IconContext.Provider value={{ size: '1.5em' }}>
+                            <Button onClick={handleUndo} className="border border-black px-2 py-1 mr-2 rounded" icon={<TbArrowBackUp />} value="戻る" />
+                            <Button onClick={handleRedo} className="border border-black px-2 py-1 mr-2 rounded" icon={<TbArrowForwardUp />} value="進む" />
+                            <Button onClick={handleReset} className="border border-black px-2 py-1 rounded" icon={<TbTrash />} value="リセット" />
+                        </IconContext.Provider>
                     </div>
 
-                    {saveMessage && (
-                        <div className="mb-4 p-2 bg-gray-100 rounded">
-                            {saveMessage}
-                        </div>
-                    )}
 
-                    {/* Tool selection */}
-                    <div className="mt-4">
-                        <label className="mr-4">
-                            <input
-                                type="radio"
-                                name="tool"
-                                value="line"
-                                checked={tool === 'line'}
-                                onChange={() => setTool('line')}
-                                className="mr-1"
-                            />
-                            line
-                        </label>
-                        <label className="mr-4">
-                            <input
-                                type="radio"
-                                name="tool"
-                                value="circle"
-                                checked={tool === 'circle'}
-                                onChange={() => setTool('circle')}
-                                className="mr-1"
-                            />
-                            Circle
-                        </label>
-                        <label>
-                            <input
-                                type="radio"
-                                name="tool"
-                                value="rect"
-                                checked={tool === 'rect'}
-                                onChange={() => setTool('rect')}
-                                className="mr-1"
-                            />
-                            Rectangle
-                        </label>
+                    {/* Tool selection - カード風デザイン */}
+                    <div className="mt-4 flex gap-4 justify-center">
+                        {[
+                            {
+                                key: 'line', label: 'Line', icon: (
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><line x1="4" y1="20" x2="20" y2="4" stroke="currentColor" strokeWidth="2" /></svg>
+                                )
+                            },
+                            {
+                                key: 'circle', label: 'Circle', icon: (
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="2" /></svg>
+                                )
+                            },
+                            {
+                                key: 'rect', label: 'Rectangle', icon: (
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" strokeWidth="2" /></svg>
+                                )
+                            },
+                        ].map(({ key, label, icon }) => (
+                            <motion.label
+                            key={key}
+                            whileHover={{ scale: 1.08 }}
+                            whileTap={{ scale: 0.97 }}
+                            animate={{
+                                boxShadow: tool === key ? '0 0 0 2px #08071cff' : '0 0 0 1px #d1d5db',
+                                backgroundColor: tool === key ? '#ffcd44ff' : '#fff',
+                            }}
+                            className={`w-full flex flex-col items-center px-4 py-2 rounded-lg cursor-pointer border transition-all duration-150 ${tool === key ? 'border-red-500' : 'border-gray-300'}`}
+                            >
+                                <input
+                                    type="radio"
+                                    name="tool"
+                                    value={key}
+                                    checked={tool === key}
+                                    onChange={() => setTool(key as typeof tool)}
+                                    className="hidden"
+                                    />
+                                <span className="mb-1 text-xl">{icon}</span>
+                                <span className={`text-sm font-semibold ${tool === key ? 'text-red-500' : 'text-gray-700'}`}>{label}</span>
+                            </motion.label>
+                        ))}
                     </div>
-                    <div className={`mx-auto mt-4 border border-black w-[300px] h-[300px] touch-none rounded overflow-hidden`}>
+                    <div className={`mx-auto mt-4 border bg-white border-4 border-red-500 w-[300px] h-[300px] touch-none rounded overflow-hidden`}>
                         <Stage width={w} height={h} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onTouchStart={handleMouseDown} onTouchMove={handleMouseMove} onTouchEnd={handleMouseUp}>
                             <Layer
                                 tension={0.5}
                                 lineCap="round"
                                 lineJoin="round"
-                            >
+                                >
                                 {lines.map((line, i) => (
                                     <Line key={i} points={line} stroke="black" />
                                 ))}
@@ -265,15 +131,53 @@ export default function DrawPage({ roomId }: DrawPageProps) {
                     </div>
                     <div className="mt-3">
                         <Button
-                            onClick={handleSave}
+                            onClick={() => setIsSaveOpen(!isSaveOpen)}
                             disabled={isSaving || (lines.length === 0 && circles.length === 0 && rects.length === 0)}
-                            className="w-full border border-green-600 bg-green-500 text-white px-4 py-1 rounded ml-4 disabled:opacity-50 disabled:cursor-not-allowed"
-                            value={isSaving ? '保存中...' : '💾 保存'}
-                        />
+                            className="w-full border px-4 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                            value={isSaving ? '保存中...' : '保存'}
+                            />
                     </div>
                 </div>
+                {saveMessage && (
+                    <div className="mb-4 p-2 bg-gray-100 rounded">
+                        {saveMessage}
+                    </div>
+                )}
+                {isSaveOpen && (
+                    <Modal
+                    isOpen={true}
+                    onClose={() => setIsSaveOpen(false)}
+                    >
+                        <h2 className="text-xl font-semibold mb-4">保存しますか？</h2>
+                        <p>保存が完了次第、自動で回答ページに移動します。</p>
+                        <div className="flex justify-end gap-4">
+                            <button
+                                onClick={() => setIsSaveOpen(false)}
+                                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg mr-2"
+                                >
+                                キャンセル
+                            </button>
+                            <Button
+                                onClick={() => {
+                                    handleSave();
+                                    setIsSaveOpen(false);
+                                }}
+                                value={isSaving ? '保存中...' : '保存する'}
+                                disabled={isSaving}
+                                />
+                        </div>
+                    </Modal>
+                )}
+                <Modal isOpen={isThemeOpen} onClose={() => setIsThemeOpen(false)}>
+                    <h2 className="text-gray-200">お題</h2>
+                    <p className="font-bold text-xl text-gray-200 my-4">{theme}</p>
+                    <Button
+                        onClick={() => setIsThemeOpen(false)}
+                        className="mt-2"
+                        value="確認しました"
+                    />
+                </Modal>
             </div>
         </>
-    )
-
+    );
 }

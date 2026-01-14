@@ -79,26 +79,7 @@ export async function saveDrawing(
   }
 }
 
-// 特定ルームの描画データを取得（要素数昇順）
-export async function getDrawingsByRoom(roomId: string) {
-  try {
-    const { data, error } = await supabase
-      .from('drawings')
-      .select('*')
-      .eq('room_id', roomId)
-      .order('element_count', { ascending: true });
 
-    if (error) {
-      console.error('Failed to fetch drawings:', error);
-      return { success: false, error: error.message, data: null };
-    }
-
-    return { success: true, error: null, data };
-  } catch (error) {
-    console.error('Unexpected error:', error);
-    return { success: false, error: 'Failed to fetch drawings', data: null };
-  }
-}
 
 // ルームのお題を取得
 export async function getTheme(roomId: string) {
@@ -120,3 +101,5 @@ export async function getTheme(roomId: string) {
     return { success: false, error: 'Failed to fetch theme', data: null };
   }
 }
+
+// 回答者の

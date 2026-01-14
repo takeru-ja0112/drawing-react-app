@@ -55,48 +55,6 @@ export default function HomePage() {
                         </Link>
                     </div>
                 </motion.div>
-
-
-                {/* ゲーム説明 */}
-                <motion.div
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.9, duration: 0.6 }}
-                    className="mt-12 bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-lg"
-                >
-                    <h2 className="text-xl font-bold text-orange-600 mb-4 text-center">
-                        ゲームの流れ
-                    </h2>
-                    <div className="space-y-3 text-gray-700">
-                        <motion.div
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 1.1 }}
-                            className="flex items-start gap-3"
-                        >
-                            <span className="text-2xl">1️⃣</span>
-                            <p>お題に沿って、直線・長方形・円だけで描画</p>
-                        </motion.div>
-                        <motion.div
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 1.3 }}
-                            className="flex items-start gap-3"
-                        >
-                            <span className="text-2xl">2️⃣</span>
-                            <p>要素数が少ない順に回答者に公開される</p>
-                        </motion.div>
-                        <motion.div
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 1.5 }}
-                            className="flex items-start gap-3"
-                        >
-                            <span className="text-2xl">3️⃣</span>
-                            <p>シンプルに描くほど高得点のチャンス！</p>
-                        </motion.div>
-                    </div>
-                </motion.div>
             </div>
 
             {/* 背景装飾アニメーション */}
