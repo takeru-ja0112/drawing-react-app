@@ -70,7 +70,7 @@ export default function RoomPage() {
                             <div className="mb-4 bg-white p-4 rounded-lg shadow-md">
                                 <div className='my-4'>
                                     <p>
-                                        <span className='font-bold'>Drawer</span>は制限時間内にお題を描こう
+                                        <span className='font-bold'>Drawer</span>はお題を描こう
                                     </p>
                                 </div>
 

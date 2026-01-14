@@ -1,9 +1,9 @@
 "use client";
 
 import { Stage, Layer, Line, Circle } from 'react-konva';
-import { useState , useEffect} from 'react';
+import { useState, useEffect, use } from 'react';
 import Header from '@/components/organisms/Header';
-import { setdbAnswer } from '@/app/room/[id]/answer/action';
+import { setdbAnswer, checkAnswerRole } from '@/app/room/[id]/answer/action';
 import Button from '@/components/atoms/Button';
 
 type Drawing = {
@@ -27,6 +27,7 @@ type AnswerPageProps = {
 export default function AnswerPage({ roomId, drawings }: AnswerPageProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answer, setAnswer] = useState('');
+    const [isAnswerRole, setIsAnswerRole] = useState(false);
 
     const currentDrawing = drawings[currentIndex];
 
@@ -49,10 +50,24 @@ export default function AnswerPage({ roomId, drawings }: AnswerPageProps) {
         const registerAnswerer = async () => {
             const result = await setdbAnswer(roomId, userId); // 'current-user-id'は実際のユーザーIDに置き換えてください
             if (!result.success) {
-                console.error('Failed to set answerer:', result.error);
+                // console.error('Failed to set answerer:', result.error);
             }
         };
         registerAnswerer();
+    }, []);
+
+    useEffect(() => {
+        const userId = localStorage.getItem('drawing_app_user_id');
+        if (!userId) return;
+        const fetchAnswerRole = async () => {
+            const result = await checkAnswerRole(roomId, userId);
+            if (result.success) {
+                setIsAnswerRole(result.isAnswerRole);
+            } else {
+                console.error('Failed to check answer role:', result.error);
+            }
+        };
+        fetchAnswerRole();
     }, []);
 
     return (
@@ -105,29 +120,26 @@ export default function AnswerPage({ roomId, drawings }: AnswerPageProps) {
                             </div>
 
                             {/* 回答入力 */}
-                            <div className="mb-6">
-                                <input
-                                    type="text"
-                                    value={answer}
-                                    onChange={(e) => setAnswer(e.target.value)}
-                                    placeholder="答えを入力してください"
-                                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none text-lg"
-                                />
-                            </div>
+                            {isAnswerRole && (
+                                <div className="mb-6">
+                                    <input
+                                        type="text"
+                                        value={answer}
+                                        onChange={(e) => setAnswer(e.target.value)}
+                                        placeholder="答えを入力してください"
+                                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none text-lg"
+                                    />
+                                </div>
+                            )}
 
                             {/* ナビゲーションボタン */}
                             <div className="flex justify-between gap-4">
-                                <button
-                                    onClick={handlePrev}
-                                    disabled={currentIndex === 0}
-                                    className="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-400 transition"
-                                >
-                                    ← 前へ
-                                </button>
-
-                                <Button
-                                    value="✓ 回答する"
-                                />
+                                {isAnswerRole && (
+                                    <Button
+                                        value="回答する"
+                                        disabled={isAnswerRole}
+                                    />
+                                )}
 
                                 <button
                                     onClick={handleNext}
