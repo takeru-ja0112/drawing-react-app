@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## 1. コンセプト
 
-## Getting Started
+「少ない要素で、いかに伝えるか」を競う、戦略的ミニマルお絵描きクイズゲーム。
 
-First, run the development server:
+## 2. ゲームルール
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **基本構造**: 1人の「回答者」と、1人以上の「描き手」で構成。
+- **描画制限**: 使用できるのは **直線・長方形・円** の3種類のみ。
+- **進行のキモ**:
+    - 描き手は、構成要素（図形の数）が少ない順に絵を公開していく。
+    - 早く（＝少ない要素で）正解してもらえれば高いポイントが得られる。
+    - ただし、伝わらなければ次の（要素数が多い）描き手にヒントを与えることになってしまう駆け引きが発生する。
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 3. 画面遷移・UX
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **トップ/ロビー**: ルーム作成・入室、メンバー待機。
+2. **お題確認/役割分担**: 「回答者」か「描き手」かを決定。描き手にお題を表示。
+3. **描画フェーズ**:
+    - 制限時間内に3種の図形を使って描画。
+    - リアルタイムで要素数をカウント表示。
+    - 完了したらデータを送信して待機。
+4. **回答フェーズ（メイン）**:
+    - 要素数が少ない順に、1人ずつイラストを公開。
+    - 回答者が入力し、正解ならその時点で終了。不正解なら次の描き手の絵を重ねて表示（または並べて表示）。
+5. **リザルト**: スコア表示、MVP（最小要素正解者）の表彰。
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 4. 技術スタック
 
-## Learn More
+- **Frontend**: Next.js (React), Tailwind CSS
+- **Backend/DB**: Supabase (PostgreSQL + Realtime機能)
+- **Canvas Library**: Konva.js (React-Konva)
+- **Deployment**: Vercel
 
-To learn more about Next.js, take a look at the following resources:
+## 5. データ構造案 (Supabase)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| **カラム名** | **型** | **説明** |
+| --- | --- | --- |
+| `id` | uuid | 部屋の一意識別子 |
+| `status` | text | WAITING / DRAWING / ANSWERING / RESULT |
+| `current_theme` | text | 出題されているお題 |
+| `answerer_id` | uuid | 現在の回答者のID |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| **カラム名** | **型** | **説明** |
+| --- | --- | --- |
+| `room_id` | uuid | 紐づく部屋のID |
+| `user_id` | uuid | 描き手のユーザーID |
+| `canvas_data` | jsonb | 図形の座標・種類データの配列 |
+| `element_count` | int | 使用した図形の総数（ソート用） |
