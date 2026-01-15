@@ -17,6 +17,7 @@ type Drawing = {
     canvas_data: {
         lines: number[][];
         circles: Array<{ x: number; y: number; radius: number }>;
+        rects: Array<{ x: number; y: number; width: number; height: number; rotation: number }>;
     };
     element_count: number;
     created_at: string;
