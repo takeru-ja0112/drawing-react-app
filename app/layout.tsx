@@ -31,7 +31,7 @@ export default function RootLayout({
         <div className="pt-15">{children}</div>
       </body>
       <footer className="text-center p-4 text-gray-500">
-        Copyright &copy; 2026 Mini
+        &copy; 2026, Takeru
       </footer>
     </html>
   );

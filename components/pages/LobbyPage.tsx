@@ -24,6 +24,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     const [searchName, setSearchName] = useState('');
     const [searchError, setSearchError] = useState<string>('');
     const { setLocalRoom } = historyLocalRoom();
+    const [ roomError , setRoomError ] = useState<string>('');
 
     const handleCreateRoom = async () => {
         if (!user) {
@@ -33,15 +34,16 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
 
         setLoading(true);
         try {
-            const result = await createRoom();
+            const result = await createRoom(user);
             if (result.success && result.data) {
                 const roomId = result.data.id;
                 router.push(`/room/${roomId}`);
             } else {
                 console.error('Failed to create room:', result.error);
+                setRoomError('ルームの作成に失敗しました。');
             }
         } catch (error) {
-            console.error('Failed to create room:', error);
+            console.error('Error create room:', error);
         } finally {
             setLoading(false);
         }
@@ -119,6 +121,11 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                 onClick={handleCreateRoom}
                                 disabled={loading}
                             />
+                            {roomError && (
+                                <div className="mt-2">
+                                    <p className="text-red-500 font-semibold text-sm">{roomError}</p>
+                                </div>
+                            )}
                         </div>
                     </div>
 

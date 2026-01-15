@@ -44,7 +44,7 @@ export async function getRoom(roomId: string) {
 }
 
 // ルームを作成
-export async function createRoom() {
+export async function createRoom(username : string) {
   try {
     // 短いルームIDを生成
     const shortId = generateShortId();
@@ -53,6 +53,7 @@ export async function createRoom() {
       .from('rooms')
       .insert({
         short_id: shortId,
+        created_by_name: username,
       })
       .select()
       .single();
