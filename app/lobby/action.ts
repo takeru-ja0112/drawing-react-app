@@ -1,5 +1,6 @@
 "use server";
 
+import DOMPurify from 'dompurify';
 import { supabase } from '@/lib/supabase';
 
 // ルーム一覧を取得
@@ -44,7 +45,10 @@ export async function getRoom(roomId: string) {
 }
 
 // ルームを作成
-export async function createRoom(username : string) {
+export async function createRoomByUsername(username : string, roomName: string) {
+  const sanitizedRoomName = DOMPurify.sanitize(roomName);
+  const sanitizedUsername = DOMPurify.sanitize(username);
+  
   try {
     // 短いルームIDを生成
     const shortId = generateShortId();
@@ -53,7 +57,8 @@ export async function createRoom(username : string) {
       .from('rooms')
       .insert({
         short_id: shortId,
-        created_by_name: username,
+        created_by_name: sanitizedUsername,
+        room_name: sanitizedRoomName,
       })
       .select()
       .single();

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, use } from 'react';
+// サニタイズ用
+import DOMPurify from 'dompurify';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/atoms/Button';
 import { setUsername, getUsername } from '@/lib/user';
@@ -8,12 +10,18 @@ import type { Room } from '@/type/roomType';
 import { generateUser } from '@/lib/user';
 import Header from '@/components/organisms/Header';
 import { z } from 'zod';
-import { motion } from 'motion/react';
-import { createRoom } from '@/app/lobby/action';
+import { createRoomByUsername } from '@/app/lobby/action';
 import Input from '@/components/atoms/Input';
 import historyLocalRoom from '@/lib/hitoryLocalRoom';
+import Modal from '@/components/organisms/Modal';
 
-const usernameSchema = z.string().max(20);
+const forbiddenChars = /[<>&\/\\'"]/;
+const usernameSchema = z.string().max(20).refine((val) => !forbiddenChars.test(val), {
+    message: 'ユーザー名に使用できない文字が含まれています。',
+});
+const roomNameSchema = z.string().max(30).refine((val) => !forbiddenChars.test(val), {
+    message: 'ルーム名に使用できない文字が含まれています。',
+});
 
 export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     const [loading, setLoading] = useState(false);
@@ -24,17 +32,40 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     const [searchName, setSearchName] = useState('');
     const [searchError, setSearchError] = useState<string>('');
     const { setLocalRoom } = historyLocalRoom();
-    const [ roomError , setRoomError ] = useState<string>('');
+    const [roomName, setRoomName] = useState<string>('');
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [roomError, setRoomError] = useState<string>('');
 
-    const handleCreateRoom = async () => {
+    const handleCreateRoom = () => {
         if (!user) {
             setNameError('ユーザー名は必須です');
             return;
         }
 
+        setIsOpen(true);
+    }
+
+    const filteredRooms = rooms.filter((room) =>
+        room.room_name?.toLowerCase().includes(searchName.toLowerCase())
+    );
+
+    const createRoom = async () => {
+        const isValid = validateRoomName(roomName);
+        const sanitizedRoomName = DOMPurify.sanitize(roomName);
+
+        if (!sanitizedRoomName) {
+            setRoomError('ルーム名は必須です');
+            return;
+        } else if (!isValid) {
+            setRoomError('ルーム名は30文字以内です。');
+            return;
+        } else {
+            setRoomError('');
+        }
+
         setLoading(true);
         try {
-            const result = await createRoom(user);
+            const result = await createRoomByUsername(user, sanitizedRoomName);
             if (result.success && result.data) {
                 const roomId = result.data.id;
                 router.push(`/room/${roomId}`);
@@ -77,6 +108,11 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
         return parseResult.success;
     }
 
+    const validateRoomName = (name: string) => {
+        const parseResult = roomNameSchema.safeParse(name);
+        return parseResult.success;
+    }
+
     useEffect(() => {
         // 初回ユーザー生成
         generateUser();
@@ -91,7 +127,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                     <div className='bg-white p-4 mb-4 rounded-xl shadow-md'>
                         {/* ユーザー名の管理 */}
                         <div className='mb-2'>
-                            <label htmlFor="username" className='font-semibold'>ユーザー名</label>
+                            <label htmlFor="username" className='font-semibold text-gray-700'>ユーザー名</label>
                         </div>
                         <div className='my-2'>
                             <Input
@@ -121,24 +157,19 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                 onClick={handleCreateRoom}
                                 disabled={loading}
                             />
-                            {roomError && (
-                                <div className="mt-2">
-                                    <p className="text-red-500 font-semibold text-sm">{roomError}</p>
-                                </div>
-                            )}
                         </div>
                     </div>
 
                     <div className='bg-white p-4 rounded-xl shadow-md'>
                         <div className='mb-2'>
-                            <label htmlFor="username" className='font-semibold'>ルーム</label>
+                            <label htmlFor="username" className='font-semibold text-gray-700'>ルーム検索</label>
                         </div>
                         <div className='mb-5'>
                             <Input
                                 name="search"
                                 value={searchName}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchName(e.target.value)}
-                                placeholder="検索名を入力してください"
+                                placeholder="検索したいルーム名を入力してください"
                                 className={`w-full ${searchError ? 'border-red-500 border-2' : ''}`}
                             />
                         </div>
@@ -148,15 +179,17 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                 <p className="text-gray-500">まだルームがありません</p>
                             ) : (
                                 <div className="grid gap-4">
-                                    {rooms.map((room) => (
+                                    {filteredRooms.map((room) => (
                                         <div
                                             key={room.id}
-                                            className="border border-yellow-400 border-3 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                                            className="border border-gray-400 border-3 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
                                             onClick={() => handleIntoRoom({ roomId: room.id })}
                                         >
                                             <div className="flex justify-between items-center">
                                                 <div>
-                                                    <p className="font-mono text-sm text-gray-600">ID: {room.id.slice(0, 8)}</p>
+                                                    <label className="block text-gray-700 text-sm">ルーム名</label>
+                                                    <h3 className='font-semibold text-lg'>{room.room_name}</h3>
+                                                    <p className="font-mono text-sm text-gray-600">作成者：{room.created_by_name}</p>
                                                 </div>
                                                 <Button value="参加" />
                                             </div>
@@ -168,6 +201,37 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                     </div>
                 </div>
             </div>
+            {isOpen && (
+                <Modal
+                    isOpen={isOpen}
+                    onClose={() => setIsOpen(false)}
+                >
+                    <p className="font-semibold mb-2 text-gray-700">ルーム名の入力</p>
+                    <Input
+                        value={roomName}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRoomName(e.target.value)}
+                        className='w-full'
+                        placeholder='ルーム名を入力してください'
+                    />
+                    {roomError && (
+                        <div className="mt-2">
+                            <p className="text-red-500 font-semibold text-sm">{roomError}</p>
+                        </div>
+                    )}
+                    <div className='flex space-x-2 mt-4'>
+                        <Button
+                            value='キャンセル'
+                            onClick={() => setIsOpen(false)}
+                            disabled={loading}
+                        />
+                        <Button
+                            value={loading ? '作成中...' : 'ルームを作成'}
+                            onClick={createRoom}
+                            disabled={loading}
+                        />
+                    </div>
+                </Modal>
+            )}
         </>
     );
 }

@@ -28,11 +28,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-200`}
       >
         {/* ヘッダーの高さ分全体をさげる */}
-        <div className="pt-15">{children}</div>
+        <div className="pt-20">{children}</div>
+        <footer className="text-center p-4 text-gray-500 text-sm">
+          &copy; 2026, Takeru
+        </footer>
       </body>
-      <footer className="text-center p-4 text-gray-500">
-        &copy; 2026, Takeru
-      </footer>
     </html>
   );
 }
