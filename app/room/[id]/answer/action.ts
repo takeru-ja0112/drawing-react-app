@@ -54,7 +54,6 @@ export async function getDrawingsByRoom(roomId: string) {
             return { success: false, error: error.message, data: null };
         }
 
-        console.log('Fetched drawings:', data);
 
         return { success: true, error: null, data };
     } catch (error) {

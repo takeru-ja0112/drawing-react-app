@@ -30,6 +30,9 @@ export default function RootLayout({
         {/* ヘッダーの高さ分全体をさげる */}
         <div className="pt-15">{children}</div>
       </body>
+      <footer className="text-center p-4 text-gray-500">
+        Copyright &copy; 2026 Mini
+      </footer>
     </html>
   );
 }

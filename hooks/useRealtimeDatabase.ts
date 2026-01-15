@@ -40,7 +40,6 @@ export function useRoomRealtime(roomId: string) {
           filter: `id=eq.${roomId}` // 特定のルームのみ
         },
         (payload) => {
-          console.log('ルームが更新されました:', payload)
           
           if (payload.eventType === 'UPDATE') {
             setRoom(payload.new as Room)
@@ -91,7 +90,6 @@ export function useDrawingsRealtime(roomId: string) {
           filter: `room_id=eq.${roomId}`
         },
         (payload) => {
-          console.log('新しい描画が追加されました:', payload)
           setDrawings(prev => [...prev, payload.new].sort((a, b) => a.element_count - b.element_count))
         }
       )
@@ -104,7 +102,6 @@ export function useDrawingsRealtime(roomId: string) {
           filter: `room_id=eq.${roomId}`
         },
         (payload) => {
-          console.log('描画が削除されました:', payload)
           setDrawings(prev => prev.filter(d => d.id !== payload.old.id))
         }
       )

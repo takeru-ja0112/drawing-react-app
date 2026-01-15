@@ -6,6 +6,7 @@ import HamburgerMenu from "../molecules/HamburgerMenu";
 import Image from "next/image";
 import Link from "next/link";
 
+
 export default function Header() {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [showHeader, setShowHeader] = useState<boolean>(true);

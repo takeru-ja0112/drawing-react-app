@@ -11,6 +11,7 @@ import { z } from 'zod';
 import { motion } from 'motion/react';
 import { createRoom } from '@/app/lobby/action';
 import Input from '@/components/atoms/Input';
+import historyLocalRoom from '@/lib/hitoryLocalRoom';
 
 const usernameSchema = z.string().max(20);
 
@@ -21,8 +22,8 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     const [user, setUser] = useState(username || '');
     const [nameError, setNameError] = useState<string>('');
     const [searchName, setSearchName] = useState('');
-    const [searchError , setSearchError] = useState<string>('');
-
+    const [searchError, setSearchError] = useState<string>('');
+    const { setLocalRoom } = historyLocalRoom();
 
     const handleCreateRoom = async () => {
         if (!user) {
@@ -53,6 +54,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
             setNameError('ルームに参加するにはユーザー名が必要です');
             return false;
         }
+        setLocalRoom(roomId);
         router.push(`/room/${roomId}`);
     }
 
@@ -86,6 +88,9 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
 
                     <div className='bg-white p-4 mb-4 rounded-xl shadow-md'>
                         {/* ユーザー名の管理 */}
+                        <div className='mb-2'>
+                            <label htmlFor="username" className='font-semibold'>ユーザー名</label>
+                        </div>
                         <div className='my-2'>
                             <Input
                                 name="username"
@@ -100,7 +105,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                     }
                                 }}
                                 placeholder="ユーザー名を入力してください"
-                                className={`w-full ${nameError ? 'border-red-500 border-2' : ''}` }
+                                className={`w-full ${nameError ? 'border-red-500 border-2' : ''}`}
                             />
                         </div>
                         {nameError && (
@@ -118,6 +123,9 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                     </div>
 
                     <div className='bg-white p-4 rounded-xl shadow-md'>
+                        <div className='mb-2'>
+                            <label htmlFor="username" className='font-semibold'>ルーム</label>
+                        </div>
                         <div className='mb-5'>
                             <Input
                                 name="search"
@@ -136,7 +144,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                     {rooms.map((room) => (
                                         <div
                                             key={room.id}
-                                            className="bg-white border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                                            className="border border-yellow-400 border-3 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
                                             onClick={() => handleIntoRoom({ roomId: room.id })}
                                         >
                                             <div className="flex justify-between items-center">

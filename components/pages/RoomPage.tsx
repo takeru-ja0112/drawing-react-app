@@ -31,7 +31,6 @@ export default function RoomPage() {
         const userInfo = getOrCreateUser();
 
         setUser(userInfo);
-        console.log('ユーザー情報:', userInfo);
     }, []);
 
     return (

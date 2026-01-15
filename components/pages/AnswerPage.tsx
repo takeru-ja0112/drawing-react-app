@@ -50,7 +50,6 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
     };
 
     const handleAnswer = async () => {
-        console.log({ isAnswerRole, theme, answer });
         if (!isAnswerRole || !theme) return;
 
         const result = isAnswerMatched(theme, answer);
