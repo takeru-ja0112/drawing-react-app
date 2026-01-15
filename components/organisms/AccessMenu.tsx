@@ -21,6 +21,7 @@ export default function AccessMenu({
         const localRoom = getLocalRoom();
         setLocalRoom(localRoom);
     }, [])
+    
 
     return (
         <>
