@@ -104,3 +104,49 @@ export async function getTheme(roomId: string) {
         return { success: false, error: 'Failed to fetch theme', data: null };
     }
 }
+
+// お題の正誤判定のため複数パターンを取得
+export async function getThemePatternByRoomId(roomId : string ) {
+    const id = roomId;
+    let themeId :string = "";
+
+    try{
+        const { data, error } = await supabase
+            .from('rooms')
+            .select('current_theme_id')
+            .eq('id', id)
+            .single();
+        if (error) {
+            console.error('Failed to fetch current theme id:', error);
+            return { success: false, error: error.message, data: null };
+        }
+
+        if (!data) {
+            return { success: false, error: 'No current theme id found', data: null };
+        }
+
+        themeId = data.current_theme_id;
+    }catch (error) {
+        console.error('Unexpected error:', error);
+        return { success: false, error: 'Failed to fetch current theme id', data: null };
+    }
+
+    try {
+        const { data, error } = await supabase
+            .from('theme')
+            .select('*')
+            .eq('id', themeId)
+            .single();
+
+        if (error) {
+            console.error('Failed to fetch theme patterns:', error);
+            return { success: false, error: error.message, data: null };
+        }
+
+        return { success: true, error: null, data };
+    }
+    catch (error) {
+        console.error('Unexpected error:', error);
+        return { success: false, error: 'Failed to fetch theme patterns', data: null };
+    }
+}

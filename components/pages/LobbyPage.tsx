@@ -19,7 +19,7 @@ const forbiddenChars = /[<>&\/\\'"]/;
 const usernameSchema = z.string().max(20).refine((val) => !forbiddenChars.test(val), {
     message: 'ユーザー名に使用できない文字が含まれています。',
 });
-const roomNameSchema = z.string().max(30).refine((val) => !forbiddenChars.test(val), {
+const roomNameSchema = z.string().max(10).refine((val) => !forbiddenChars.test(val), {
     message: 'ルーム名に使用できない文字が含まれています。',
 });
 
@@ -57,7 +57,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
             setRoomError('ルーム名は必須です');
             return;
         } else if (!isValid) {
-            setRoomError('ルーム名は30文字以内です。');
+            setRoomError('ルーム名は10文字以内です。');
             return;
         } else {
             setRoomError('');
@@ -153,7 +153,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                         )}
                         <div>
                             <Button
-                                value={loading ? '作成中...' : 'ルームを作成'}
+                                value='ルームを作成'
                                 onClick={handleCreateRoom}
                                 disabled={loading}
                             />
@@ -182,7 +182,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                     {filteredRooms.map((room) => (
                                         <div
                                             key={room.id}
-                                            className="border border-gray-400 border-3 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                                            className=" border border-gray-400 border-3 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
                                             onClick={() => handleIntoRoom({ roomId: room.id })}
                                         >
                                             <div className="flex justify-between items-center">
@@ -210,7 +210,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                     <Input
                         value={roomName}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRoomName(e.target.value)}
-                        className='w-full'
+                        className={`w-full ${roomError ? 'border-red-500 border-2' : ''}`}
                         placeholder='ルーム名を入力してください'
                     />
                     {roomError && (
@@ -225,9 +225,10 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                             disabled={loading}
                         />
                         <Button
-                            value={loading ? '作成中...' : 'ルームを作成'}
+                            value={loading ? '作成中...' : '作成'}
                             onClick={createRoom}
                             disabled={loading}
+                            className='w-30'
                         />
                     </div>
                 </Modal>

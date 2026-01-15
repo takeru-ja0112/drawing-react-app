@@ -1,6 +1,6 @@
 "use client";
 
-import { Stage, Layer, Line, Circle , Rect } from 'react-konva';
+import { Stage, Layer, Line, Circle, Rect } from 'react-konva';
 import { useState, useEffect, useRef } from 'react';
 import Header from '@/components/organisms/Header';
 import { setdbAnswer, checkAnswerRole } from '@/app/room/[id]/answer/action';
@@ -26,45 +26,60 @@ type Drawing = {
 type AnswerPageProps = {
     roomId: string;
     drawings: Drawing[];
-    theme: string | null;
+    theme: ThemePattern | null;
 };
+
+interface ThemePattern {
+    furigana: string;
+    kanji: string;
+    katakana: string;
+}
 
 export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answer, setAnswer] = useState('');
     const [isAnswerRole, setIsAnswerRole] = useState(false);
     const confettiRef = useRef<any>(null);
+    const [isNext, setIsNext] = useState(false);
 
     const currentDrawing = drawings[currentIndex];
+    const { furigana, kanji, katakana }: ThemePattern = theme ? theme : { furigana: '', kanji: '', katakana: '' };
 
     const handleNext = () => {
+        setIsNext(false);
+
         if (currentIndex < drawings.length - 1) {
             setCurrentIndex(currentIndex + 1);
-        }
-    };
-
-    const handlePrev = () => {
-        if (currentIndex > 0) {
-            setCurrentIndex(currentIndex - 1);
         }
     };
 
     const handleAnswer = async () => {
         if (!isAnswerRole || !theme) return;
 
-        const result = isAnswerMatched(theme, answer);
+        const result = isAnswerMatched(answer);
         if (result) {
             alert('正解です！');
             fire();
         } else {
+            // 不正解時の処理
+            setIsNext(true);
+            console.log(isNext);
             alert('ちゃいます！')
         }
     }
 
-    const isAnswerMatched = (theme: string, userAnswer: string) => {
+    const isAnswerMatched = (userAnswer: string) => {
         if (userAnswer === null) return false;
 
-        return userAnswer === theme;
+        const formFurigana = furigana.split('・').join('');
+        const formKanji = kanji.split('・').join('');
+        const formKatakana = katakana.split('・').join('');
+
+        if (userAnswer === formFurigana) return true;
+        if (userAnswer === formKanji) return true;
+        if (userAnswer === formKatakana) return true;
+
+        return false;
     };
 
     const fire = () => {
@@ -130,36 +145,43 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
 
                             {/* キャンバス表示 */}
                             <div className="flex justify-center mb-6">
-                                <div className="border-4 border-gray-300 rounded-lg overflow-hidden shadow-lg">
-                                    <Stage width={300} height={300}>
-                                        <Layer>
-                                            {currentDrawing.canvas_data.lines.map((line, i) => (
-                                                <Line key={`line-${i}`} points={line} stroke="black" strokeWidth={2} />
-                                            ))}
-                                            {currentDrawing.canvas_data.circles.map((circle, i) => (
-                                                <Circle
-                                                    key={`circle-${i}`}
-                                                    x={circle.x}
-                                                    y={circle.y}
-                                                    radius={circle.radius}
-                                                    stroke="black"
-                                                    strokeWidth={2}
-                                                />
-                                            ))}
-                                            {currentDrawing.canvas_data.rects.map((rect, i) => (
-                                                <Rect
-                                                    key={`rect-${i}`}
-                                                    x={rect.x}
-                                                    y={rect.y}
-                                                    width={rect.width}
-                                                    height={rect.height}
-                                                    stroke="black"
-                                                    strokeWidth={2}
-                                                />
-                                            ))}
-                                        </Layer>
-                                    </Stage>
-                                </div>
+                                {!currentDrawing ? (
+                                    <div className="border-4 border-gray-300 rounded-lg overflow-hidden shadow-lg w-[300px] h-[300px] flex items-center justify-center bg-gray-100 animate-pulse">
+                                        <div className="w-2/3 h-2/3 bg-gray-300 rounded-lg" />
+                                        <p>読み込み中...</p>
+                                    </div>
+                                ) : (
+                                    <div className="border-4 border-gray-300 rounded-lg overflow-hidden shadow-lg">
+                                        <Stage width={300} height={300}>
+                                            <Layer>
+                                                {currentDrawing.canvas_data.lines.map((line, i) => (
+                                                    <Line key={`line-${i}`} points={line} stroke="black" strokeWidth={2} />
+                                                ))}
+                                                {currentDrawing.canvas_data.circles.map((circle, i) => (
+                                                    <Circle
+                                                        key={`circle-${i}`}
+                                                        x={circle.x}
+                                                        y={circle.y}
+                                                        radius={circle.radius}
+                                                        stroke="black"
+                                                        strokeWidth={2}
+                                                    />
+                                                ))}
+                                                {currentDrawing.canvas_data.rects.map((rect, i) => (
+                                                    <Rect
+                                                        key={`rect-${i}`}
+                                                        x={rect.x}
+                                                        y={rect.y}
+                                                        width={rect.width}
+                                                        height={rect.height}
+                                                        stroke="black"
+                                                        strokeWidth={2}
+                                                    />
+                                                ))}
+                                            </Layer>
+                                        </Stage>
+                                    </div>
+                                )}
                             </div>
 
                             {/* 回答入力 */}
@@ -185,13 +207,18 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                     />
                                 )}
 
-                                <button
+                                <Button
                                     onClick={handleNext}
-                                    disabled={currentIndex === drawings.length - 1}
-                                    className="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-400 transition"
-                                >
-                                    次へ →
-                                </button>
+                                    disabled={!isNext}
+                                    className={
+                                        isNext
+                                            ?
+                                            ''
+                                            :
+                                            'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    }
+                                    value='次へ'
+                                />
                             </div>
                         </>
                     )}
