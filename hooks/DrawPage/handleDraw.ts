@@ -82,13 +82,12 @@ export default function useDraw(roomId: string) {
             const rect = rects[lastRectIdx];
             const dx = point.x - rect.x;
             const dy = point.y - rect.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            const width = Math.max(1, distance);
-            const height = Math.max(1, distance);
-            const rotation = Math.atan2(dy, dx) * (180 / Math.PI);
+            const width = dx;
+            const height = dy;
+            // const rotation = Math.atan2(dy, dx) * (180 / Math.PI);
             setRects((prev) => [
                 ...prev.slice(0, lastRectIdx),
-                { ...rect, width, height, rotation }
+                { ...rect, width, height, rotation: 0 }
             ]);
         }
     };

@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 import React from "react";
 
 interface BtnProps {
-    value: string;
+    value?: string;
     onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     disabled?: boolean;
     type?: "button" | "submit" | "reset";
@@ -24,7 +24,7 @@ export default function Btn({ value, className ,onClick, disabled, type = "butto
             type={type}
             {...props}
         >
-            {icon && <span className="inline-block mr-2 align-middle">{icon}</span>}
+            {icon && <span className="inline-block align-middle">{icon}</span>}
             {value}
         </motion.button>
     );

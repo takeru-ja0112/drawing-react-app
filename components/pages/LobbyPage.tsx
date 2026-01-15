@@ -7,40 +7,70 @@ import { setUsername, getUsername } from '@/lib/user';
 import type { Room } from '@/type/roomType';
 import { generateUser } from '@/lib/user';
 import Header from '@/components/organisms/Header';
-import Modal from '@/components/organisms/Modal';
+import { z } from 'zod';
+import { motion } from 'motion/react';
+import { createRoom } from '@/app/lobby/action';
+import Input from '@/components/atoms/Input';
+
+const usernameSchema = z.string().max(20);
 
 export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     const [loading, setLoading] = useState(false);
     const username = getUsername();
-    console.log('Retrieved username:', username);
     const router = useRouter();
     const [user, setUser] = useState(username || '');
-    const [isUserModal, setIsUserModal] = useState(false);
+    const [nameError, setNameError] = useState<string>('');
+    const [searchName, setSearchName] = useState('');
+    const [searchError , setSearchError] = useState<string>('');
 
-    const createRoom = async () => {
+
+    const handleCreateRoom = async () => {
+        if (!user) {
+            setNameError('ユーザー名は必須です');
+            return;
+        }
+
         setLoading(true);
         try {
-            const res = await fetch('/api/rooms', {
-                method: 'POST',
-            });
-            const data = await res.json();
-
-            if (data.id) {
-                router.push(`/room/${data.id}`);
+            const result = await createRoom();
+            if (result.success && result.data) {
+                const roomId = result.data.id;
+                router.push(`/room/${roomId}`);
+            } else {
+                console.error('Failed to create room:', result.error);
             }
         } catch (error) {
             console.error('Failed to create room:', error);
         } finally {
             setLoading(false);
         }
-    };
+    }
 
-    const handleIsusername = ({ roomId }: { roomId: string }) => {
+    const handleIntoRoom = ({ roomId }: { roomId: string }) => {
+        const isValid = validateUsername(user);
+
         if (!user) {
-            setIsUserModal(true);
+            setNameError('ルームに参加するにはユーザー名が必要です');
             return false;
         }
         router.push(`/room/${roomId}`);
+    }
+
+    const setUsernameSchema = (name: string) => {
+        setNameError('');
+        const isValid = validateUsername(name);
+
+        if (isValid) {
+            setUser(name);
+            setUsername(name);
+        } else {
+            setNameError('ユーザー名は20文字以内です。');
+        }
+    }
+
+    const validateUsername = (name: string) => {
+        const parseResult = usernameSchema.safeParse(name);
+        return parseResult.success;
     }
 
     useEffect(() => {
@@ -54,92 +84,74 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
             <div className="p-8">
                 <div className="max-w-lg mx-auto">
 
-                    {/* ユーザー名の管理 */}
-                    <div className='my-2'>
-                        <label className="block mb-2 font-semibold" htmlFor="username">ユーザー名</label>
-                        <input
-                            type="text"
-                            id="username"
-                            name="username"
-                            value={user}
-                            onChange={(e) => {
-                                const newName = e.target.value;
-                                setUser(newName);
-                                setUsername(newName);
-                            }}
-                            placeholder='名前を入力してください'
-                            className="border rounded-lg p-2 w-full"
-                        />
-                    </div>
-
-                    <div className="mb-8">
-                        <Button
-                            value={loading ? '作成中...' : 'ルームを作成'}
-                            onClick={createRoom}
-                            disabled={loading}
-                        />
-                    </div>
-
-                    <div className="space-y-4">
-                        <h2 className="text-xl font-semibold">参加可能なルーム</h2>
-
-                        {rooms.length === 0 ? (
-                            <p className="text-gray-500">まだルームがありません</p>
-                        ) : (
-                            <div className="grid gap-4">
-                                {rooms.map((room) => (
-                                    <div
-                                        key={room.id}
-                                        className="bg-white border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                                        onClick={() => handleIsusername({ roomId: room.id })}
-                                    >
-                                        <div className="flex justify-between items-center">
-                                            <div>
-                                                <p className="font-mono text-sm text-gray-600">ID: {room.id.slice(0, 8)}</p>
-                                            </div>
-                                            <Button value="参加" />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* 名前入力モーダル */}
-                {isUserModal && (
-                    <Modal isOpen={isUserModal} onClose={() => setIsUserModal(false)}>
-                        <h2 className="text-xl font-semibold mb-4">ユーザー名を入力してください</h2>
-                        <input
-                            type="text"
-                            value={user}
-                            onChange={(e) => setUser(e.target.value)}
-                            placeholder="名前を入力"
-                            className="border rounded-lg p-2 w-full mb-4"
-                        />
-                        <div className="flex justify-end">
-                            <button
-                                onClick={() => setIsUserModal(false)}
-                                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg mr-2"
-                            >
-                                キャンセル
-                            </button>
-                            <Button
-                                onClick={() => {
-                                    if (user) {
-                                        setUsername(user);
-                                        setIsUserModal(false);
-                                    } else {
-                                        alert('ユーザー名を入力してください');
+                    <div className='bg-white p-4 mb-4 rounded-xl shadow-md'>
+                        {/* ユーザー名の管理 */}
+                        <div className='my-2'>
+                            <Input
+                                name="username"
+                                value={user}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                    setUsernameSchema(e.target.value)
+                                }}
+                                onBlur={() => {
+                                    setNameError('');
+                                    if (!user) {
+                                        setNameError('ユーザー名は必須です');
                                     }
                                 }}
-                                className=" px-4 py-2 rounded-lg"
-                                value='保存'
+                                placeholder="ユーザー名を入力してください"
+                                className={`w-full ${nameError ? 'border-red-500 border-2' : ''}` }
                             />
                         </div>
-                    </Modal>
-                )
-                }
+                        {nameError && (
+                            <div className="mb-2">
+                                <p className="text-red-500 font-semibold text-sm">{nameError}</p>
+                            </div>
+                        )}
+                        <div>
+                            <Button
+                                value={loading ? '作成中...' : 'ルームを作成'}
+                                onClick={handleCreateRoom}
+                                disabled={loading}
+                            />
+                        </div>
+                    </div>
+
+                    <div className='bg-white p-4 rounded-xl shadow-md'>
+                        <div className='mb-5'>
+                            <Input
+                                name="search"
+                                value={searchName}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchName(e.target.value)}
+                                placeholder="検索名を入力してください"
+                                className={`w-full ${searchError ? 'border-red-500 border-2' : ''}`}
+                            />
+                        </div>
+                        <h2 className="text-md font-semibold text-gray-700">参加可能なルーム</h2>
+                        <div className="space-y-4">
+                            {rooms.length === 0 ? (
+                                <p className="text-gray-500">まだルームがありません</p>
+                            ) : (
+                                <div className="grid gap-4">
+                                    {rooms.map((room) => (
+                                        <div
+                                            key={room.id}
+                                            className="bg-white border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                                            onClick={() => handleIntoRoom({ roomId: room.id })}
+                                        >
+                                            <div className="flex justify-between items-center">
+                                                <div>
+                                                    <p className="font-mono text-sm text-gray-600">ID: {room.id.slice(0, 8)}</p>
+                                                </div>
+                                                <Button value="参加" />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
             </div>
         </>
     );

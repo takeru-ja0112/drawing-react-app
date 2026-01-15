@@ -53,7 +53,6 @@ export async function createRoom() {
       .from('rooms')
       .insert({
         short_id: shortId,
-        status: 'WAITING'
       })
       .select()
       .single();

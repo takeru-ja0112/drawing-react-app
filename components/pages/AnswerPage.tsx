@@ -1,10 +1,13 @@
 "use client";
 
-import { Stage, Layer, Line, Circle } from 'react-konva';
-import { useState, useEffect, use } from 'react';
+import { Stage, Layer, Line, Circle , Rect } from 'react-konva';
+import { useState, useEffect, useRef } from 'react';
 import Header from '@/components/organisms/Header';
 import { setdbAnswer, checkAnswerRole } from '@/app/room/[id]/answer/action';
 import Button from '@/components/atoms/Button';
+import Input from '@/components/atoms/Input';
+import ReactCanvasConfetti from 'react-canvas-confetti';
+import confetti from 'canvas-confetti';
 
 type Drawing = {
     id: string;
@@ -22,12 +25,14 @@ type Drawing = {
 type AnswerPageProps = {
     roomId: string;
     drawings: Drawing[];
+    theme: string | null;
 };
 
-export default function AnswerPage({ roomId, drawings }: AnswerPageProps) {
+export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answer, setAnswer] = useState('');
     const [isAnswerRole, setIsAnswerRole] = useState(false);
+    const confettiRef = useRef<any>(null);
 
     const currentDrawing = drawings[currentIndex];
 
@@ -41,6 +46,33 @@ export default function AnswerPage({ roomId, drawings }: AnswerPageProps) {
         if (currentIndex > 0) {
             setCurrentIndex(currentIndex - 1);
         }
+    };
+
+    const handleAnswer = async () => {
+        console.log({ isAnswerRole, theme, answer });
+        if (!isAnswerRole || !theme) return;
+
+        const result = isAnswerMatched(theme, answer);
+        if (result) {
+            alert('正解です！');
+            fire();
+        } else {
+            alert('ちゃいます！')
+        }
+    }
+
+    const isAnswerMatched = (theme: string, userAnswer: string) => {
+        if (userAnswer === null) return false;
+
+        return userAnswer === theme;
+    };
+
+    const fire = () => {
+        confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 },
+        });
     };
 
     useEffect(() => {
@@ -76,7 +108,7 @@ export default function AnswerPage({ roomId, drawings }: AnswerPageProps) {
             <div className="flex flex-col items-center justify-center p-8">
                 <div className="max-w-4xl w-full bg-white rounded-2xl shadow-xl p-8">
                     <h1 className="text-4xl font-bold mb-4 text-center">
-                        回答フェーズ
+                        回答
                     </h1>
 
                     {drawings.length === 0 ? (
@@ -114,6 +146,17 @@ export default function AnswerPage({ roomId, drawings }: AnswerPageProps) {
                                                     strokeWidth={2}
                                                 />
                                             ))}
+                                            {currentDrawing.canvas_data.rects.map((rect, i) => (
+                                                <Rect
+                                                    key={`rect-${i}`}
+                                                    x={rect.x}
+                                                    y={rect.y}
+                                                    width={rect.width}
+                                                    height={rect.height}
+                                                    stroke="black"
+                                                    strokeWidth={2}
+                                                />
+                                            ))}
                                         </Layer>
                                     </Stage>
                                 </div>
@@ -122,12 +165,12 @@ export default function AnswerPage({ roomId, drawings }: AnswerPageProps) {
                             {/* 回答入力 */}
                             {isAnswerRole && (
                                 <div className="mb-6">
-                                    <input
+                                    <Input
                                         type="text"
                                         value={answer}
-                                        onChange={(e) => setAnswer(e.target.value)}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAnswer(e.target.value)}
                                         placeholder="答えを入力してください"
-                                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none text-lg"
+                                        className="w-full "
                                     />
                                 </div>
                             )}
@@ -137,7 +180,8 @@ export default function AnswerPage({ roomId, drawings }: AnswerPageProps) {
                                 {isAnswerRole && (
                                     <Button
                                         value="回答する"
-                                        disabled={isAnswerRole}
+                                        onClick={handleAnswer}
+                                        disabled={!isAnswerRole}
                                     />
                                 )}
 

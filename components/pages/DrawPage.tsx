@@ -13,9 +13,10 @@ import Modal from "@/components/organisms/Modal";
 type DrawPageProps = {
     roomId: string;
     theme?: string;
+    mode?: 'demo';
 };
 
-export default function DrawPage({ roomId , theme }: DrawPageProps) {
+export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
     const {
         count,
         isSaving,
@@ -37,7 +38,7 @@ export default function DrawPage({ roomId , theme }: DrawPageProps) {
         h,
     } = useDraw(roomId);
     const [isSaveOpen, setIsSaveOpen] = useState(false);
-    const [ isThemeOpen, setIsThemeOpen ] = useState(true);
+    const [isThemeOpen, setIsThemeOpen] = useState(true);
 
     return (
         <>
@@ -48,7 +49,7 @@ export default function DrawPage({ roomId , theme }: DrawPageProps) {
                     <label className="block mb-2 font-semibold text-gray-700">
                         お題
                     </label>
-                    <h1 className="text-xl font-bold">{isThemeOpen ?  '' : theme}</h1>
+                    <h1 className="text-xl font-bold">{isThemeOpen ? '' : theme}</h1>
 
                     <motion.h1
                         key={count}
@@ -60,8 +61,8 @@ export default function DrawPage({ roomId , theme }: DrawPageProps) {
                     </motion.h1>
                     <div className="mb-4">
                         <IconContext.Provider value={{ size: '1.5em' }}>
-                            <Button onClick={handleUndo} className="border border-black px-2 py-1 mr-2 rounded" icon={<TbArrowBackUp />} value="" />
-                            <Button onClick={handleRedo} className="border border-black px-2 py-1 mr-2 rounded" icon={<TbArrowForwardUp />} value="" />
+                            <Button onClick={handleUndo} className="border border-black px-2 py-1 mr-2 rounded" icon={<TbArrowBackUp />} />
+                            <Button onClick={handleRedo} className="border border-black px-2 py-1 mr-2 rounded" icon={<TbArrowForwardUp />} />
                             <Button onClick={handleReset} className="border border-black px-2 py-1 rounded" icon={<TbTrash />} value="リセット" />
                         </IconContext.Provider>
                     </div>
@@ -87,14 +88,14 @@ export default function DrawPage({ roomId , theme }: DrawPageProps) {
                             },
                         ].map(({ key, label, icon }) => (
                             <motion.label
-                            key={key}
-                            whileHover={{ scale: 1.08 }}
-                            whileTap={{ scale: 0.97 }}
-                            animate={{
-                                boxShadow: tool === key ? '0 0 0 2px #08071cff' : '0 0 0 1px #d1d5db',
-                                backgroundColor: tool === key ? '#ffcd44ff' : '#fff',
-                            }}
-                            className={`w-full flex flex-col items-center px-4 py-2 rounded-lg cursor-pointer border transition-all duration-150 ${tool === key ? 'border-gray-500' : 'border-gray-300'}`}
+                                key={key}
+                                whileHover={{ scale: 1.08 }}
+                                whileTap={{ scale: 0.97 }}
+                                animate={{
+                                    boxShadow: tool === key ? '0 0 0 2px #08071cff' : '0 0 0 1px #d1d5db',
+                                    backgroundColor: tool === key ? '#ffcd44ff' : '#fff',
+                                }}
+                                className={`w-full flex flex-col items-center px-4 py-2 rounded-lg cursor-pointer border ${tool === key ? 'border-gray-500' : 'border-gray-300'}`}
                             >
                                 <input
                                     type="radio"
@@ -103,7 +104,7 @@ export default function DrawPage({ roomId , theme }: DrawPageProps) {
                                     checked={tool === key}
                                     onChange={() => setTool(key as typeof tool)}
                                     className="hidden"
-                                    />
+                                />
                                 <span className="mb-1 text-xl">{icon}</span>
                                 <span className={`text-sm font-semibold ${tool === key ? 'text-gray-900' : 'text-gray-400'}`}>{label}</span>
                             </motion.label>
@@ -115,7 +116,7 @@ export default function DrawPage({ roomId , theme }: DrawPageProps) {
                                 tension={0.5}
                                 lineCap="round"
                                 lineJoin="round"
-                                >
+                            >
                                 {lines.map((line, i) => (
                                     <Line key={i} points={line} stroke="black" />
                                 ))}
@@ -128,14 +129,14 @@ export default function DrawPage({ roomId , theme }: DrawPageProps) {
                             </Layer>
                         </Stage>
                     </div>
-                    <div className="mt-3">
+                    {mode === 'demo' ? null : <div className="mt-3">
                         <Button
                             onClick={() => setIsSaveOpen(!isSaveOpen)}
                             disabled={isSaving || (lines.length === 0 && circles.length === 0 && rects.length === 0)}
                             className="w-full border px-4 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                             value={isSaving ? '保存中...' : '保存'}
-                            />
-                    </div>
+                        />
+                    </div>}
                 </div>
                 {saveMessage && (
                     <div className="mb-4 p-2 bg-gray-100 rounded">
@@ -144,8 +145,8 @@ export default function DrawPage({ roomId , theme }: DrawPageProps) {
                 )}
                 {isSaveOpen && (
                     <Modal
-                    isOpen={true}
-                    onClose={() => setIsSaveOpen(false)}
+                        isOpen={true}
+                        onClose={() => setIsSaveOpen(false)}
                     >
                         <h2 className="text-xl font-semibold mb-4">保存しますか？</h2>
                         <p>保存が完了次第、自動で回答ページに移動します。</p>
@@ -153,7 +154,7 @@ export default function DrawPage({ roomId , theme }: DrawPageProps) {
                             <button
                                 onClick={() => setIsSaveOpen(false)}
                                 className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg mr-2"
-                                >
+                            >
                                 キャンセル
                             </button>
                             <Button
@@ -163,11 +164,11 @@ export default function DrawPage({ roomId , theme }: DrawPageProps) {
                                 }}
                                 value={isSaving ? '保存中...' : '保存する'}
                                 disabled={isSaving}
-                                />
+                            />
                         </div>
                     </Modal>
                 )}
-                <Modal isOpen={isThemeOpen} onClose={() => setIsThemeOpen(false)}>
+                {mode === 'demo' ? null : <Modal isOpen={isThemeOpen} onClose={() => setIsThemeOpen(false)}>
                     <h2 >お題</h2>
                     <p className="font-bold text-xl my-4">{theme}</p>
                     <Button
@@ -176,6 +177,7 @@ export default function DrawPage({ roomId , theme }: DrawPageProps) {
                         value="確認しました"
                     />
                 </Modal>
+                }
             </div>
         </>
     );

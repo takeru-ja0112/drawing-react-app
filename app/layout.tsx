@@ -27,7 +27,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-200`}
       >
-        {children}
+        {/* ヘッダーの高さ分全体をさげる */}
+        <div className="pt-15">{children}</div>
       </body>
     </html>
   );
