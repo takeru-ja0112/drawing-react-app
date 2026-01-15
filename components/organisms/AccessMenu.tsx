@@ -1,8 +1,11 @@
+"use client";
+
 import { IconContext } from "react-icons";
 import { TbHome, TbUsersGroup, TbArrowBackUp } from "react-icons/tb";
 import Link from "next/link";
 import Image from "next/image";
 import historyLocalRoom from "@/lib/hitoryLocalRoom";
+import { useEffect , useState} from "react";
 
 export default function AccessMenu({
     isOpen,
@@ -11,10 +14,14 @@ export default function AccessMenu({
     isOpen: boolean;
     onClose: () => void;
 }) {
+    const [localRoom, setLocalRoom] = useState<string | null>(null);
     const { getLocalRoom } = historyLocalRoom();
-    const localRoom = getLocalRoom();
-    
-    
+
+    useEffect(() => {
+        const localRoom = getLocalRoom();
+        setLocalRoom(localRoom);
+    }, [])
+
     return (
         <>
             <div className={`fixed inset-0 backdrop-blur-sm z-40 ${isOpen ? "block" : "hidden"}`} onClick={onClose}></div>
