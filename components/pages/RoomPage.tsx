@@ -6,28 +6,43 @@ import { usePresence } from '@/hooks/usePresence';
 import { getOrCreateUser, type UserInfo } from '@/lib/user';
 import Button from '@/components/atoms/Button';
 import Link from 'next/link';
-import Header from '@/components/organisms/Header';
 import { TbPencil, TbBallBowling } from 'react-icons/tb';
 import { IconContext } from 'react-icons';
 import { motion } from 'motion/react';
-
-type Room = {
-    id: string;
-    status: string;
-    current_theme: string | null;
-    answerer_id: string | null;
-};
+import { useRouter } from 'next/navigation';
+import { isCheckAnswer, setdbAnswer } from '@/app/room/[id]/answer/action';
+import Modal from '@/components/organisms/Modal';
 
 export default function RoomPage() {
     const params = useParams();
     const roomId = params.id as string;
-    // const [room, setRoom] = useState<Room | null>(null);
     const [user, setUser] = useState<UserInfo>({ id: '', username: '' });
     const { users } = usePresence(roomId, user.id, user.username);
+    const router = useRouter();
+    const [isAnswerModalOpen, setIsAnswerModalOpen] = useState(false);
+
+    const handleCheckAnswer = async () => {
+        const { success, data: isAnswerer } = await isCheckAnswer(roomId);
+
+        if (success && isAnswerer) {
+            router.push(`/room/${roomId}/answer`);
+        } else {
+            setIsAnswerModalOpen(true);
+        }
+    }
+    const handleSetAnswer = async () => {
+        const userId = localStorage.getItem('drawing_app_user_id');
+        if (!userId) return;
+        // 回答者として登録
+
+        const result = await setdbAnswer(roomId, userId); // 'current-user-id'は実際のユーザーIDに置き換えてください
+        if (!result.success) {
+            // console.error('Failed to set answerer:', result.error);
+        }
+        router.push(`/room/${roomId}/answer`);
+    }
 
     useEffect(() => {
-        // ユーザー情報を取得または生成
-        // const userInfo = getOrCreateUser();
         const userInfo = getOrCreateUser();
 
         setUser(userInfo);
@@ -42,24 +57,26 @@ export default function RoomPage() {
                     >
                         <h2 className="text-lg text-gray-700 font-semibold mb-2">参加者</h2>
                         {users.length > 0 ? (
-                            <ul>
+                            // <ul>
+                            <div className='grid grid-cols-2 gap-2'>
                                 {users.map((user, index) => (
-                                    <motion.li
+                                    <motion.div
                                         initial={{ opacity: 0, x: 10 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: index * 0.2 }}
                                         key={index}
                                     >
-                                        <div className='w-full p-2 bg-amber-400 my-2 rounded-full text-center font-bold'>
+                                        <div className='w-full p-2 bg-amber-400 rounded-sm text-center font-bold whitespace-nowrap overflow-hidden text-ellipsis'>
                                             {user.user_name}
                                         </div>
-                                    </motion.li>
+                                    </motion.div>
                                 ))}
-                            </ul>
+                            </div>
+                            // </ul>
                         ) : (
-                            <p className="text-gray-500">
-                                参加者がいません。
-                            </p>
+                        <p className="text-gray-500">
+                            参加者がいません。
+                        </p>
                         )}
                     </div>
                     <div className="text-center">
@@ -73,7 +90,7 @@ export default function RoomPage() {
                                 </div>
 
                                 <Link href={`/room/${roomId}/drawing`}>
-                                    <Button value="Drawerになる" icon={<TbPencil />} />
+                                    <Button value="Drawページへ" icon={<TbPencil />} />
                                 </Link>
                             </div>
 
@@ -85,14 +102,27 @@ export default function RoomPage() {
                                     </p>
                                 </div>
 
-                                <Link href={`/room/${roomId}/answer`}>
-                                    <Button value="Answerになる" icon={<TbBallBowling />} />
-                                </Link>
+                                <Button value="Answerページへ" icon={<TbBallBowling />} onClick={handleCheckAnswer} />
                             </div>
                         </IconContext.Provider>
                     </div>
                 </div>
             </div>
+            {isAnswerModalOpen && <Modal
+                isOpen={isAnswerModalOpen}
+                onClose={() => setIsAnswerModalOpen(false)}
+            >
+                <div className="p-4 text-center">
+                    <h2 className="text-2xl font-bold text-gray-500 mb-4">確認</h2>
+                    <p className="mb-4 font-bold">
+                        まだAnswerが決まっていません<br />
+                        あなたがAnswerになりますか？
+                    </p>
+                    <Button value="いいえ" onClick={() => setIsAnswerModalOpen(false)} />
+                    <Button value="はい" onClick={() => { handleSetAnswer(); setIsAnswerModalOpen(false); }} className="ml-4" />
+                </div>
+            </Modal>
+            }
         </div>
     );
 }

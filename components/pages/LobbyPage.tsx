@@ -18,7 +18,7 @@ import { TbLoaderQuarter } from 'react-icons/tb';
 import Loading from '@/components/atoms/Loading';
 
 const forbiddenChars = /[<>&\/\\'"]/;
-const usernameSchema = z.string().max(20).refine((val) => !forbiddenChars.test(val), {
+const usernameSchema = z.string().max(10).refine((val) => !forbiddenChars.test(val), {
     message: 'ユーザー名に使用できない文字が含まれています。',
 });
 const roomNameSchema = z.string().max(10).refine((val) => !forbiddenChars.test(val), {
@@ -103,7 +103,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
             setUser(name);
             setUsername(name);
         } else {
-            setNameError('ユーザー名は20文字以内です。');
+            setNameError('ユーザー名は10文字以内です。');
         }
     }
 

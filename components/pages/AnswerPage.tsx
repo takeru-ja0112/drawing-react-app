@@ -93,19 +93,6 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
     useEffect(() => {
         const userId = localStorage.getItem('drawing_app_user_id');
         if (!userId) return;
-        // 回答者として登録
-        const registerAnswerer = async () => {
-            const result = await setdbAnswer(roomId, userId); // 'current-user-id'は実際のユーザーIDに置き換えてください
-            if (!result.success) {
-                // console.error('Failed to set answerer:', result.error);
-            }
-        };
-        registerAnswerer();
-    }, []);
-
-    useEffect(() => {
-        const userId = localStorage.getItem('drawing_app_user_id');
-        if (!userId) return;
         const fetchAnswerRole = async () => {
             const result = await checkAnswerRole(roomId, userId);
             if (result.success) {

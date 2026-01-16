@@ -14,7 +14,7 @@ export default function Header() {
 
     useEffect(() => {
         const handleScroll = () => {
-            if (window.scrollY > lastScrollY.current && window.scrollY > 100) {
+            if (window.scrollY > lastScrollY.current && window.scrollY > 20) {
                 // スクロールダウン
                 setShowHeader(false);
             } else {

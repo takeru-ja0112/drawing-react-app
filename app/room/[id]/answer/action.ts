@@ -1,9 +1,30 @@
 import { supabase } from '@/lib/supabase';
 
+// 回答者が決定しているか確認
+export async function isCheckAnswer(roomId: string) {
+    try {
+        const { data, error } = await supabase
+            .from('rooms')
+            .select('answer_id')
+            .eq('id', roomId)
+            .single();
+
+        if (error) {
+            console.error('Failed to fetch answerer:', error);
+            return { success: false, error: error.message, data: null };
+        }
+
+        const isAnswered = data?.answer_id ? true : false;
+        return { success: true, error: null, data: isAnswered };
+    } catch (error) {
+        console.error('Unexpected error:', error);
+        return { success: false, error: 'Failed to fetch answerer', data: null };
+    }
+}
+
 // 回答者の登録
 export async function setdbAnswer(roomId: string, userId: string) {
     try {
-
         // 既に回答者が設定されているか確認
         const { data: roomData, error: roomError } = await supabase
             .from('rooms')

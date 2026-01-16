@@ -15,7 +15,7 @@ export default function HomePage() {
             <div
                 className=" bg-gray-200 flex items-center justify-center px-8 overflow-hidden"
             >
-                <div className="max-w-2xl w-90 mx-5 mt-50 mb-30 z-10">
+                <div className="max-w-2xl w-90 mx-5 mt-20 mb-30 z-10">
                     {/* メインコンテンツ */}
                     <motion.div
                         initial={{ opacity: 0, y: -10 }}
