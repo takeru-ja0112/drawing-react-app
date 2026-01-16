@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useMotionValue, useTransform, useSpring } from "motion/react";
-import { useState, useEffect } from "react";
 import Button from "@/components/atoms/Button";
 import Image from "next/image";
-import Header from "../organisms/Header";
+import Card from "@/components/atoms/Card";
+import { motion } from "motion/react";
+import WhatsMinimal from "@/components/molecules/illust/top/WhatsMinimal";
+import NoLimitPeople from "@/components/molecules/illust/top/NoLimitPeople ";
 
 export default function HomePage() {
     const title = "Minimal Drawer";
@@ -13,14 +14,11 @@ export default function HomePage() {
     return (
         <>
             <div
-                className=" bg-gray-200 flex items-center justify-center px-8 overflow-hidden"
+                className="min-w-[320px] flex items-center justify-center px-8 overflow-hidden"
             >
                 <div className="max-w-2xl w-90 mx-5 mt-20 mb-30 z-10">
                     {/* メインコンテンツ */}
                     <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
                         className="text-center mb-12 flex flex-col items-center justify-center"
                     // style={{ perspective: "1000px" }}
                     >
@@ -42,9 +40,6 @@ export default function HomePage() {
 
                     {/* ボタンエリア */}
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.6, duration: 0.5 }}
                         className="space-y-4"
                     >
                         <div className="mb-2">
@@ -61,6 +56,29 @@ export default function HomePage() {
                             </Link>
                         </div>
                     </motion.div>
+
+                    <div className="mt-30 text-center text-2xl mb-6">
+                        <h2 className="font-bold">{title}ってなに？</h2>
+                    </div>
+                    <Card className="text-center">
+                        {/* イメージ */}
+                        <WhatsMinimal />
+                        <h2 className="text-xl text-gray-700 font-semibold mb-2">お題をシンプルに表現！</h2>
+                        <p className="text-gray-600">
+                            {title}は出題されたお題を、直線、正円、長方形を使って表現するシンプルなゲーム！
+                            <br />
+                        </p>
+                    </Card>
+                    <Card className="mt-10 text-center">
+                        {/* イメージ */}
+                        <NoLimitPeople />
+                        <h2 className="text-xl text-gray-700 font-semibold mb-2">人数制限なし！</h2>
+                        <p className="text-gray-600">
+                            このゲームでは描く人と答える人で分かれます。描く人は何人でも参加可能！
+                            <br />
+                            みんなでわいわい楽しもう！
+                        </p>
+                    </Card>
                 </div>
             </div>
         </>

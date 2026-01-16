@@ -8,6 +8,7 @@ import Button from '@/components/atoms/Button';
 import Input from '@/components/atoms/Input';
 import ReactCanvasConfetti from 'react-canvas-confetti';
 import confetti from 'canvas-confetti';
+import Card from '@/components/atoms/Card';
 
 type Drawing = {
     id: string;
@@ -107,7 +108,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
     return (
         <>
             <div className="flex flex-col items-center justify-center p-8">
-                <div className="max-w-4xl w-full bg-white rounded-2xl shadow-xl p-8">
+                <Card className="max-w-lg w-full">
                     <h1 className="text-4xl font-bold mb-4 text-center">
                         回答
                     </h1>
@@ -124,7 +125,9 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                     {currentIndex + 1} / {drawings.length} 人目
                                 </p>
                                 <p className="text-sm text-gray-500">
-                                    要素数: {currentDrawing.element_count} |
+                                    要素数: {currentDrawing.element_count}
+                                </p>
+                                <p className="text-sm text-gray-500 whitespace-nowrap overflow-hidden text-ellipsis">
                                     描いた人: {currentDrawing.user_name}
                                 </p>
                             </div>
@@ -208,7 +211,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                             </div>
                         </>
                     )}
-                </div>
+                </Card>
             </div>
         </>
     );

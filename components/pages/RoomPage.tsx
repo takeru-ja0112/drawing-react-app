@@ -12,6 +12,7 @@ import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
 import { isCheckAnswer, setdbAnswer } from '@/app/room/[id]/answer/action';
 import Modal from '@/components/organisms/Modal';
+import Card from '@/components/atoms/Card';
 
 export default function RoomPage() {
     const params = useParams();
@@ -52,9 +53,7 @@ export default function RoomPage() {
         <div>
             <div className="w-full p-8">
                 <div className="max-w-lg mx-auto">
-                    <div
-                        className="mb-4 p-4 bg-gray-100 rounded-lg shadow-md border border-dotted border-gray-300 border-4"
-                    >
+                    <Card className="mb-4">
                         <h2 className="text-lg text-gray-700 font-semibold mb-2">参加者</h2>
                         {users.length > 0 ? (
                             // <ul>
@@ -78,11 +77,11 @@ export default function RoomPage() {
                             参加者がいません。
                         </p>
                         )}
-                    </div>
+                    </Card>
                     <div className="text-center">
                         <IconContext.Provider value={{ size: '1.5em' }}>
                             {/* 書く人用の説明 */}
-                            <div className="mb-4 bg-white p-4 rounded-lg shadow-md">
+                            <Card className="mb-4">
                                 <div className='my-4'>
                                     <p>
                                         <span className='font-bold'>Drawer</span>はお題を描こう
@@ -92,10 +91,10 @@ export default function RoomPage() {
                                 <Link href={`/room/${roomId}/drawing`}>
                                     <Button value="Drawページへ" icon={<TbPencil />} />
                                 </Link>
-                            </div>
+                            </Card>
 
                             {/* 回答者用の説明 */}
-                            <div className="mb-4 bg-white p-4 rounded-lg shadow-md">
+                            <Card className="mb-4">
                                 <div className='my-4'>
                                     <p>
                                         <span className='font-bold'>Answer</span>はDrawerの描いた絵を見てお題を当てよう
@@ -103,7 +102,7 @@ export default function RoomPage() {
                                 </div>
 
                                 <Button value="Answerページへ" icon={<TbBallBowling />} onClick={handleCheckAnswer} />
-                            </div>
+                            </Card>
                         </IconContext.Provider>
                     </div>
                 </div>

@@ -26,7 +26,7 @@ export default function Modal({
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.8, opacity: 0 }}
-                    className="bg-white border border-dotted border-gray-300 border-4 rounded-lg mx-6 p-6 max-w-lg"
+                    className="bg-white border border-dotted border-gray-300 border-4 rounded-3xl mx-6 p-6 max-w-lg"
                     onClick={(e) => e.stopPropagation()}
                 >
                     {children}

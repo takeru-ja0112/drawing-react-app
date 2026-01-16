@@ -26,7 +26,7 @@ export default function AccessMenu({
     return (
         <>
             <div className={`fixed inset-0 backdrop-blur-sm z-40 ${isOpen ? "block" : "hidden"}`} onClick={onClose}></div>
-            <div className={`w-70 bg-white fixed top-0 h-fit shadow-lg z-50 p-6 block ${isOpen ? "left-0" : "-left-full"} transition-left duration-300 rounded-r-xl`}>
+            <div className={`w-70 bg-white fixed top-3 h-fit shadow-lg z-50 p-6 block ${isOpen ? "left-0 opacity-100" : "-left-full opacity-0"} transition-left duration-300 rounded-r-xl`}>
                 <div className="mb-8">
                     <Image src="/minimalDrawIcon.svg" alt="Logo" width={40} height={40} />
                 </div>

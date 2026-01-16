@@ -8,14 +8,13 @@ import Button from '@/components/atoms/Button';
 import { setUsername, getUsername } from '@/lib/user';
 import type { Room } from '@/type/roomType';
 import { generateUser } from '@/lib/user';
-import Header from '@/components/organisms/Header';
 import { z } from 'zod';
 import { createRoomByUsername } from '@/app/lobby/action';
 import Input from '@/components/atoms/Input';
 import historyLocalRoom from '@/lib/hitoryLocalRoom';
 import Modal from '@/components/organisms/Modal';
-import { TbLoaderQuarter } from 'react-icons/tb';
 import Loading from '@/components/atoms/Loading';
+import Card from '@/components/atoms/Card';
 
 const forbiddenChars = /[<>&\/\\'"]/;
 const usernameSchema = z.string().max(10).refine((val) => !forbiddenChars.test(val), {
@@ -127,7 +126,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
             <div className="p-8">
                 <div className="max-w-lg mx-auto">
 
-                    <div className='bg-white p-4 mb-4 rounded-xl shadow-md'>
+                    <Card className='mb-4'>
                         {/* ユーザー名の管理 */}
                         <div className='mb-2'>
                             <label htmlFor="username" className='font-semibold text-gray-700'>ユーザー名</label>
@@ -161,9 +160,9 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                 disabled={loading}
                             />
                         </div>
-                    </div>
+                    </Card>
 
-                    <div className='bg-white p-4 rounded-xl shadow-md'>
+                    <Card className='mb-4'>
                         <div className='mb-2'>
                             <label htmlFor="username" className='font-semibold text-gray-700'>ルーム検索</label>
                         </div>
@@ -205,7 +204,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                 </div>
                             )}
                         </div>
-                    </div>
+                    </Card>
                 </div>
             </div>
             {isOpen && (
