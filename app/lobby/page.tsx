@@ -8,8 +8,6 @@ export default async function Page() {
     const result = await getRooms();
     const rooms: Room[] = result.success ? result.data as Room[] : [];
 
-    console.log('Fetched rooms:', rooms);
-
     return (
         <>
             <LobbyPage rooms={rooms} />

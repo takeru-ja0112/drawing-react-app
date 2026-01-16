@@ -9,6 +9,9 @@ import Input from '@/components/atoms/Input';
 import ReactCanvasConfetti from 'react-canvas-confetti';
 import confetti from 'canvas-confetti';
 import Card from '@/components/atoms/Card';
+import MistakeModal from '../organisms/answer/MistakeModal';
+import CorrectModal from '../organisms/answer/CorrectModal';
+import { motion } from 'motion/react';
 
 type Drawing = {
     id: string;
@@ -46,12 +49,19 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
     const currentDrawing = drawings[currentIndex];
     const { furigana, kanji, katakana }: ThemePattern = theme ? theme : { furigana: '', kanji: '', katakana: '' };
 
+    const [isOpen, setIsOpen] = useState(false);
+    const [correctModal, setCorrectModal] = useState(false);
+    const [mistakeModal, setMistakeModal] = useState(false);
+
+
     const handleNext = () => {
-        setIsNext(false);
+        console.log("Next clicked");
 
         if (currentIndex < drawings.length - 1) {
             setCurrentIndex(currentIndex + 1);
+        } else {
         }
+        setMistakeModal(false);
     };
 
     const handleAnswer = async () => {
@@ -59,13 +69,12 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
 
         const result = isAnswerMatched(answer);
         if (result) {
-            alert('正解です！');
+            setCorrectModal(true);
             fire();
         } else {
-            // 不正解時の処理
+            setMistakeModal(true);
             setIsNext(true);
-            console.log(isNext);
-            alert('ちゃいます！')
+            setIsOpen(false);
         }
     }
 
@@ -140,7 +149,35 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                         <p>読み込み中...</p>
                                     </div>
                                 ) : (
-                                    <div className="border-4 border-gray-300 rounded-lg overflow-hidden shadow-lg">
+                                    <div className="border-4 border-gray-300 relative rounded-lg overflow-hidden shadow-lg">
+                                        {/* レースカーテンのような表現 */}
+                                        <button
+                                            onClick={() => { setIsOpen(true); console.log("Modal opened") }}
+                                        >
+                                            <div className='w-full h-full flex absolute top-0 z-10'>
+                                                <motion.div
+                                                    initial={{ left: 0 }}
+                                                    animate={isOpen ? { left: '-100%' } : { left: '0' }}
+                                                    transition={{ duration: 3, ease: "easeInOut" }}
+                                                    className="absolute w-1/2 h-full bg-yellow-500 rounded-br-[30%]"
+                                                />
+                                                <motion.div
+                                                    initial={{ right: 0 }}
+                                                    animate={isOpen ? { right: '-100%' } : { right: '0' }}
+                                                    transition={{ duration: 3, ease: "easeInOut" }}
+                                                    className="absolute w-1/2 h-full bg-yellow-500 rounded-bl-[30%]"
+                                                />
+                                            </div>
+                                            <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  z-11'>
+                                                <motion.h1
+                                                    initial={{ opacity: 1 }}
+                                                    animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
+                                                    transition={{ duration: 1, }}
+                                                    className='font-bold text-4xl text-white'
+                                                >ひらく</motion.h1>
+                                            </div>
+                                        </button>
+
                                         <Stage width={300} height={300}>
                                             <Layer>
                                                 {currentDrawing.canvas_data.lines.map((line, i) => (
@@ -196,7 +233,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                     />
                                 )}
 
-                                <Button
+                                {/* <Button
                                     onClick={handleNext}
                                     disabled={!isNext}
                                     className={
@@ -207,11 +244,23 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                             'bg-gray-300 text-gray-500 cursor-not-allowed'
                                     }
                                     value='次へ'
-                                />
+                                /> */}
                             </div>
                         </>
                     )}
                 </Card>
+
+                {correctModal &&
+                    <CorrectModal
+                        onClick={() => setCorrectModal(false)}
+                    />
+                }
+                {mistakeModal &&
+                    <MistakeModal
+                        onClick={() => handleNext()}
+                    />
+                }
+                {/* <MistakeModal /> */}
             </div>
         </>
     );

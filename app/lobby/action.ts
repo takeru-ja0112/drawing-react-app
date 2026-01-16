@@ -62,13 +62,11 @@ export async function createRoomByUsername(username: string, roomName: string) {
       .single();
 
     if (error) {
-      console.error('Failed to create room:', error);
       return { success: false, error: error.message, data: null };
     }
 
     return { success: true, error: null, data };
   } catch (error) {
-    console.error('Unexpected error:', error);
     return { success: false, error: 'Failed to create room', data: null };
   }
 }
@@ -84,13 +82,11 @@ export async function updateRoomStatus(roomId: string, status: 'WAITING' | 'DRAW
       .single();
 
     if (error) {
-      console.error('Failed to update room status:', error);
       return { success: false, error: error.message, data: null };
     }
 
     return { success: true, error: null, data };
   } catch (error) {
-    console.error('Unexpected error:', error);
     return { success: false, error: 'Failed to update room status', data: null };
   }
 }
