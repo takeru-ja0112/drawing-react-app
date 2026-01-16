@@ -42,7 +42,6 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
 
     return (
         <>
-            <Header />
             <div className="p-8">
                 <div className="max-w-lg mx-auto text-center">
                     {/* お題 */}

@@ -12,7 +12,6 @@ export default function HomePage() {
 
     return (
         <>
-            <Header />
             <div
                 className=" bg-gray-200 flex items-center justify-center px-8 overflow-hidden"
             >

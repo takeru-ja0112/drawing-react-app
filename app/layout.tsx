@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Header from "@/components/organisms/Header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,6 +29,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-200`}
       >
         {/* ヘッダーの高さ分全体をさげる */}
+        <Header />
         <div className="pt-20">{children}</div>
         <footer className="text-center p-4 text-gray-500 text-sm">
           &copy; 2026, Takeru

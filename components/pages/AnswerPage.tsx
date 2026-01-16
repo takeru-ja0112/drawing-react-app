@@ -119,7 +119,6 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
 
     return (
         <>
-            <Header />
             <div className="flex flex-col items-center justify-center p-8">
                 <div className="max-w-4xl w-full bg-white rounded-2xl shadow-xl p-8">
                     <h1 className="text-4xl font-bold mb-4 text-center">

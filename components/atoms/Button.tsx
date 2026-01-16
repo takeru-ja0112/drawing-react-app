@@ -24,8 +24,10 @@ export default function Btn({ value, className ,onClick, disabled, type = "butto
             type={type}
             {...props}
         >
-            {icon && <span className="inline-block align-middle">{icon}</span>}
-            {value}
+            <span className="flex flex-row items-center justify-center">
+                {icon && <span className="mr-1">{icon}</span>}
+                {value}
+            </span>
         </motion.button>
     );
 }

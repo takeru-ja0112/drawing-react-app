@@ -35,7 +35,6 @@ export default function RoomPage() {
 
     return (
         <div>
-            <Header />
             <div className="w-full p-8">
                 <div className="max-w-lg mx-auto">
                     <div

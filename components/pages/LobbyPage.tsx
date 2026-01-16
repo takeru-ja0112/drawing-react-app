@@ -14,6 +14,8 @@ import { createRoomByUsername } from '@/app/lobby/action';
 import Input from '@/components/atoms/Input';
 import historyLocalRoom from '@/lib/hitoryLocalRoom';
 import Modal from '@/components/organisms/Modal';
+import { TbLoaderQuarter } from 'react-icons/tb';
+import Loading from '@/components/atoms/Loading';
 
 const forbiddenChars = /[<>&\/\\'"]/;
 const usernameSchema = z.string().max(20).refine((val) => !forbiddenChars.test(val), {
@@ -35,6 +37,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     const [roomName, setRoomName] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [roomError, setRoomError] = useState<string>('');
+    const [joinLoadingId, setJoinLoadingId] = useState<string | null>(null);
 
     const handleCreateRoom = () => {
         if (!user) {
@@ -87,6 +90,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
             setNameError('ルームに参加するにはユーザー名が必要です');
             return false;
         }
+        setJoinLoadingId(roomId);
         setLocalRoom(roomId);
         router.push(`/room/${roomId}`);
     }
@@ -120,7 +124,6 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
 
     return (
         <>
-            <Header />
             <div className="p-8">
                 <div className="max-w-lg mx-auto">
 
@@ -191,7 +194,11 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                                     <h3 className='font-semibold text-lg'>{room.room_name}</h3>
                                                     <p className="font-mono text-sm text-gray-600">作成者：{room.created_by_name}</p>
                                                 </div>
-                                                <Button value="参加" />
+                                                <Button
+                                                    key={room.id}
+                                                    value="参加"
+                                                    icon={joinLoadingId === room.id ? <Loading /> : null}
+                                                />
                                             </div>
                                         </div>
                                     ))}
@@ -225,7 +232,8 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                             disabled={loading}
                         />
                         <Button
-                            value={loading ? '作成中...' : '作成'}
+                            value='作成'
+                            icon={loading ? <Loading /> : null}
                             onClick={createRoom}
                             disabled={loading}
                             className='w-30'
