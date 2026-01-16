@@ -14,7 +14,7 @@ import { isCheckAnswer, setdbAnswer } from '@/app/room/[id]/answer/action';
 import Modal from '@/components/organisms/Modal';
 import Card from '@/components/atoms/Card';
 
-export default function RoomPage() {
+export default function RoomPage({ title }: { title: string }) {
     const params = useParams();
     const roomId = params.id as string;
     const [user, setUser] = useState<UserInfo>({ id: '', username: '' });
@@ -53,6 +53,10 @@ export default function RoomPage() {
         <div>
             <div className="w-full p-8">
                 <div className="max-w-lg mx-auto">
+                    <div className="mb-6 text-center">
+                        <h2 className="text-lg text-gray-500 font-semibold mb-2">ルーム名</h2>
+                        <p className="text-gray-900 font-bold break-all">{title}</p>
+                    </div>
                     <Card className="mb-4">
                         <h2 className="text-lg text-gray-700 font-semibold mb-2">参加者</h2>
                         {users.length > 0 ? (
@@ -73,9 +77,9 @@ export default function RoomPage() {
                             </div>
                             // </ul>
                         ) : (
-                        <p className="text-gray-500">
-                            参加者がいません。
-                        </p>
+                            <p className="text-gray-500">
+                                参加者がいません。
+                            </p>
                         )}
                     </Card>
                     <div className="text-center">

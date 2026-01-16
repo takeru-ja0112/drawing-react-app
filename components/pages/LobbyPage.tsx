@@ -15,6 +15,8 @@ import historyLocalRoom from '@/lib/hitoryLocalRoom';
 import Modal from '@/components/organisms/Modal';
 import Loading from '@/components/atoms/Loading';
 import Card from '@/components/atoms/Card';
+import { supabase } from '@/lib/supabase';
+import { getRooms } from '@/app/lobby/action';
 
 const forbiddenChars = /[<>&\/\\'"]/;
 const usernameSchema = z.string().max(10).refine((val) => !forbiddenChars.test(val), {
@@ -27,6 +29,7 @@ const roomNameSchema = z.string().max(10).refine((val) => !forbiddenChars.test(v
 export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     const [loading, setLoading] = useState(false);
     const username = getUsername();
+    const [roomsList , setRoomsList ] = useState<Room[]>(rooms);
     const router = useRouter();
     const [user, setUser] = useState(username || '');
     const [nameError, setNameError] = useState<string>('');
@@ -47,7 +50,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
         setIsOpen(true);
     }
 
-    const filteredRooms = rooms.filter((room) =>
+    const filteredRooms = roomsList.filter((room) =>
         room.room_name?.toLowerCase().includes(searchName.toLowerCase())
     );
 
@@ -119,6 +122,33 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     useEffect(() => {
         // 初回ユーザー生成
         generateUser();
+    }, []);
+
+    useEffect(()=>{
+        // ルームリストの再取得
+        const fetchRooms = async () => {
+            const res = await getRooms();
+            if (res.success && res.data) {
+                setRoomsList(res.data);
+            }
+        }
+        fetchRooms();
+
+        const subscription = supabase
+            .channel('public:rooms')
+            .on(
+                'postgres_changes',
+                { event: 'INSERT', schema: 'public', table: 'rooms' },
+                (payload) => {
+                    console.log('New room inserted:', payload.new);
+                    fetchRooms();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(subscription);
+        }
     }, []);
 
     return (

@@ -12,6 +12,7 @@ import Card from '@/components/atoms/Card';
 import MistakeModal from '../organisms/answer/MistakeModal';
 import CorrectModal from '../organisms/answer/CorrectModal';
 import { motion } from 'motion/react';
+import { supabase } from '@/lib/supabase';
 
 type Drawing = {
     id: string;
@@ -45,8 +46,9 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
     const [isAnswerRole, setIsAnswerRole] = useState(false);
     const confettiRef = useRef<any>(null);
     const [isNext, setIsNext] = useState(false);
+    const [data, setData] = useState<Drawing[]>(drawings);
 
-    const currentDrawing = drawings[currentIndex];
+    const currentDrawing = data[currentIndex];
     const { furigana, kanji, katakana }: ThemePattern = theme ? theme : { furigana: '', kanji: '', katakana: '' };
 
     const [isOpen, setIsOpen] = useState(false);
@@ -56,10 +58,8 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
 
     const handleNext = () => {
         console.log("Next clicked");
-
-        if (currentIndex < drawings.length - 1) {
+        if (currentIndex < data.length - 1) {
             setCurrentIndex(currentIndex + 1);
-        } else {
         }
         setMistakeModal(false);
     };
@@ -114,6 +114,35 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
         fetchAnswerRole();
     }, []);
 
+    useEffect(() => {
+        // 初回データ取得
+        const fetchData = async () => {
+            const { data } = await supabase.from('drawings').select('*').eq('room_id', roomId).order('created_at', { ascending: false });
+            setData(data || []);
+        };
+        fetchData();
+        console.log("Drawings data:", data);
+
+        const subscription = supabase
+            .channel('public:drawings')
+            .on(
+                'postgres_changes',
+                { event: 'INSERT', schema: 'public', table: 'drawings', filter: `room_id=eq.${roomId}` },
+                () => {
+                    setCurrentIndex(0);
+                    setAnswer('');
+                    setIsNext(false);
+                    fetchData();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(subscription
+            )
+        };
+    }, []);
+
     return (
         <>
             <div className="flex flex-col items-center justify-center p-8">
@@ -122,7 +151,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                         回答
                     </h1>
 
-                    {drawings.length === 0 ? (
+                    {data.length === 0 ? (
                         <div className="text-center py-12">
                             <p className="text-xl text-gray-500">まだ描画データがありません</p>
                         </div>
@@ -131,13 +160,13 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                             {/* 進捗表示 */}
                             <div className="mb-6 text-center">
                                 <p className="text-lg font-semibold">
-                                    {currentIndex + 1} / {drawings.length} 人目
+                                    {currentIndex + 1} / {data.length} 人目
                                 </p>
                                 <p className="text-sm text-gray-500">
-                                    要素数: {currentDrawing.element_count}
+                                    要素数: {currentDrawing?.element_count}
                                 </p>
                                 <p className="text-sm text-gray-500 whitespace-nowrap overflow-hidden text-ellipsis">
-                                    描いた人: {currentDrawing.user_name}
+                                    描いた人: {currentDrawing?.user_name}
                                 </p>
                             </div>
 
@@ -211,7 +240,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                             </div>
 
                             {/* 回答入力 */}
-                            {isAnswerRole && (
+                            {isAnswerRole ? (
                                 <div className="mb-6">
                                     <Input
                                         type="text"
@@ -221,6 +250,14 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                         className="w-full "
                                     />
                                 </div>
+                            ) : (
+                                <Button
+                                    onClick={handleNext}
+                                    className={
+                                        isNext ? '' : 'w-full'
+                                    }
+                                    value='次へ'
+                                />
                             )}
 
                             {/* ナビゲーションボタン */}
@@ -233,18 +270,6 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                     />
                                 )}
 
-                                {/* <Button
-                                    onClick={handleNext}
-                                    disabled={!isNext}
-                                    className={
-                                        isNext
-                                            ?
-                                            ''
-                                            :
-                                            'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                    }
-                                    value='次へ'
-                                /> */}
                             </div>
                         </>
                     )}

@@ -1,11 +1,11 @@
 import RoomPage from '@/components/pages/RoomPage';
-import { isCheckAnswer } from './answer/action';
+import { getInfoRoom } from './action';
 
 export default async function Page({params } : { params: Promise<{ id: string }> }) {
     const { id:roomId } = await params;
-    const { success, data } = await isCheckAnswer(roomId);
-    console.log('Is answerer set:', success, data);
+    const res = await getInfoRoom(roomId);
+    console.log('Room Status:', res);
+    const title = res.success && res.data ? res.data.room_name : '';
 
-
-    return <RoomPage />
+    return <RoomPage title={title}/>
 }
