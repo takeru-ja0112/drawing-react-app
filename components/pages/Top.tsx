@@ -108,7 +108,7 @@ export default function Top() {
                         <Card className="mt-10 text-center">
                             {/* イメージ */}
                             <div className="my-4">
-                                <h2 className="text-4xl font-bold text-yellow-600">Lets Play!</h2>
+                                <h2 className="text-4xl font-bold text-yellow-500">Lets Play!</h2>
                             </div>
                             <h2 className="text-xl text-gray-700 font-semibold mb-2">登録なしですぐに遊べる！</h2>
                             <p className="text-gray-600">
