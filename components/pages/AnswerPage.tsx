@@ -46,6 +46,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
     const [isAnswerRole, setIsAnswerRole] = useState(false);
     const confettiRef = useRef<any>(null);
     const [isNext, setIsNext] = useState(false);
+    const [isBack, setIsBack] = useState(false);
     const [data, setData] = useState<Drawing[]>(drawings);
 
     const currentDrawing = data[currentIndex];
@@ -63,6 +64,14 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
         }
         setMistakeModal(false);
     };
+
+    const handleBack = () => {
+        console.log("Back clicked");
+        if (currentIndex > 0) {
+            setCurrentIndex(currentIndex - 1);
+        }
+        setIsBack(false);
+    }
 
     const handleAnswer = async () => {
         if (!isAnswerRole || !theme) return;
@@ -251,13 +260,22 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                     />
                                 </div>
                             ) : (
-                                <Button
-                                    onClick={handleNext}
-                                    className={
-                                        isNext ? '' : 'w-full'
-                                    }
-                                    value='次へ'
-                                />
+                                <div className="grid grid-cols-2 gap-2">
+                                    <Button
+                                        onClick={handleBack}
+                                        className={
+                                            isBack ? '' : 'w-full'
+                                        }
+                                        value='戻る'
+                                    />
+                                    <Button
+                                        onClick={handleNext}
+                                        className={
+                                            isNext ? '' : 'w-full'
+                                        }
+                                        value='次へ'
+                                    />
+                                </div>
                             )}
 
                             {/* ナビゲーションボタン */}
