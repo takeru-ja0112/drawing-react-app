@@ -5,11 +5,17 @@ import Button from "@/components/atoms/Button";
 import Image from "next/image";
 import Card from "@/components/atoms/Card";
 import { motion } from "motion/react";
+import { useInView } from "react-intersection-observer";
 import WhatsMinimal from "@/components/molecules/illust/top/WhatsMinimal";
 import NoLimitPeople from "@/components/molecules/illust/top/NoLimitPeople ";
 
-export default function HomePage() {
+export default function Top() {
     const title = "Minimal Drawer";
+
+    // スクロール出現用ref
+    const [ref1, inView1] = useInView({ triggerOnce: true, threshold: 0.2 });
+    const [ref2, inView2] = useInView({ triggerOnce: true, threshold: 0.2 });
+    const [ref3, inView3] = useInView({ triggerOnce: true, threshold: 0.2 });
 
     return (
         <>
@@ -52,7 +58,7 @@ export default function HomePage() {
                         {/* サブボタン */}
                         <div className="">
                             <Link href="/drawing">
-                                <Button value="描画テスト" className="text-xl w-full" />
+                                <Button value="描いてみる" className="text-xl w-full" />
                             </Link>
                         </div>
                     </motion.div>
@@ -60,33 +66,62 @@ export default function HomePage() {
                     <div className="mt-30 text-center text-2xl mb-6">
                         <h2 className="font-bold">{title}ってなに？</h2>
                     </div>
-                    <Card className="text-center">
-                        {/* イメージ */}
-                        <WhatsMinimal />
-                        <h2 className="text-xl text-gray-700 font-semibold mb-2">お題をシンプルに表現！</h2>
-                        <p className="text-gray-600">
-                            {title}は出題されたお題を、直線、正円、長方形を使って表現するシンプルなゲーム！
-                            <br />
-                        </p>
-                    </Card>
-                    <Card className="mt-10 text-center">
-                        {/* イメージ */}
-                        <NoLimitPeople />
-                        <h2 className="text-xl text-gray-700 font-semibold mb-2">人数制限なし！</h2>
-                        <p className="text-gray-600">
-                            このゲームでは描く人と答える人で分かれます。描く人は何人でも参加可能！
-                            <br />
-                            みんなでわいわい楽しもう！
-                        </p>
-                    </Card>
-                    <Card className="mt-10 text-center">
-                        {/* イメージ */}
-                        <NoLimitPeople />
-                        <h2 className="text-xl text-gray-700 font-semibold mb-2">アカウント登録不要！</h2>
-                        <p className="text-gray-600">
-                            このゲームはアカウントログイン不要の完全無料で遊ぶ事ができます！
-                        </p>
-                    </Card>
+                    <motion.div
+                        ref={ref1}
+                        initial={{ opacity: 0, y: 40 }}
+                        animate={inView1 ? { opacity: 1, y: 0 } : {}}
+                        transition={{ duration: 0.7, ease: "easeOut" }}
+                    >
+                        <Card className="text-center">
+                            {/* イメージ */}
+                            <WhatsMinimal />
+                            <h2 className="text-xl text-gray-700 font-semibold mb-2">お題をシンプルに表現！</h2>
+                            <p className="text-gray-600">
+                                {title}は出題されたお題を、直線、正円、長方形を使って表現するシンプルなゲーム！
+                                <br />
+                            </p>
+                        </Card>
+                    </motion.div>
+                    <motion.div
+                        ref={ref2}
+                        initial={{ opacity: 0, y: 40 }}
+                        animate={inView2 ? { opacity: 1, y: 0 } : {}}
+                        transition={{ duration: 0.7, ease: "easeOut", delay: 0.1 }}
+                    >
+                        <Card className="mt-10 text-center">
+                            {/* イメージ */}
+                            <NoLimitPeople />
+                            <h2 className="text-xl text-gray-700 font-semibold mb-2">人数制限なし！</h2>
+                            <p className="text-gray-600">
+                                このゲームでは描く人と答える人で分かれます。描く人は何人でも参加可能！
+                                <br />
+                                みんなでわいわい楽しもう！
+                            </p>
+                        </Card>
+                    </motion.div>
+                    <motion.div
+                        ref={ref3}
+                        initial={{ opacity: 0, y: 40 }}
+                        animate={inView3 ? { opacity: 1, y: 0 } : {}}
+                        transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
+                    >
+                        <Card className="mt-10 text-center">
+                            {/* イメージ */}
+                            <div className="my-4">
+                                <h2 className="text-4xl font-bold text-yellow-600">Lets Play!</h2>
+                            </div>
+                            <h2 className="text-xl text-gray-700 font-semibold mb-2">登録なしですぐに遊べる！</h2>
+                            <p className="text-gray-600">
+                                このゲームはアカウントログイン不要の完全無料で遊ぶ事ができます！
+                            </p>
+                        </Card>
+                    </motion.div>
+                    <div className="mt-10">
+                        {/* メインボタン */}
+                        <Link href="/lobby">
+                            <Button value="ロビーに移動" className="text-xl w-full" />
+                        </Link>
+                    </div>
                 </div>
             </div>
         </>
