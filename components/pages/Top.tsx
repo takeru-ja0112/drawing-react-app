@@ -16,7 +16,7 @@ export default function HomePage() {
             <div
                 className="min-w-[320px] flex items-center justify-center px-8 overflow-hidden"
             >
-                <div className="max-w-2xl w-90 mx-5 mt-20 mb-30 z-10">
+                <div className="max-w-2xl w-90 mt-20 mb-30 z-10">
                     {/* メインコンテンツ */}
                     <motion.div
                         className="text-center mb-12 flex flex-col items-center justify-center"
@@ -77,6 +77,14 @@ export default function HomePage() {
                             このゲームでは描く人と答える人で分かれます。描く人は何人でも参加可能！
                             <br />
                             みんなでわいわい楽しもう！
+                        </p>
+                    </Card>
+                    <Card className="mt-10 text-center">
+                        {/* イメージ */}
+                        <NoLimitPeople />
+                        <h2 className="text-xl text-gray-700 font-semibold mb-2">アカウント登録不要！</h2>
+                        <p className="text-gray-600">
+                            このゲームはアカウントログイン不要の完全無料で遊ぶ事ができます！
                         </p>
                     </Card>
                 </div>
