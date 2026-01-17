@@ -1,7 +1,12 @@
 import { supabase } from "@/lib/supabase";
 
-// ルームのステータスを変更
-export async function setStatusRoom(roomId : string , status: 'WATING' | 'DRAWING' | 'ANSWERING' | 'FINISHED') {
+
+/**  ルームのステータスを変更 
+ * 
+ *  @param roomId ルームID
+ *  @param status 'WATING' | 'DRAWING' | 'ANSWERING' | 'FINISHED' | 'RESETTING'
+*/
+export async function setStatusRoom(roomId: string, status: 'WATING' | 'DRAWING' | 'ANSWERING' | 'FINISHED' | 'RESETTING') {
     try {
         const { data, error } = await supabase
             .from('rooms')
@@ -23,14 +28,14 @@ export async function setStatusRoom(roomId : string , status: 'WATING' | 'DRAWIN
 }
 
 // ルームのステータスを取得
-export async function getInfoRoom(roomId : string) {
+export async function getInfoRoom(roomId: string) {
     try {
         const { data, error } = await supabase
             .from('rooms')
             .select('*')
             .eq('id', roomId)
             .single();
-        
+
         console.log('Fetched room data:', data);
 
         if (error) {
@@ -42,5 +47,61 @@ export async function getInfoRoom(roomId : string) {
     } catch (error) {
         console.error('Unexpected error:', error);
         return { success: false, error: 'Failed to fetch room status', data: null };
+    }
+}
+
+async function getRandomTheme() {
+    try {
+        const { data, error } = await supabase
+            .from('theme')
+            .select('id, theme')
+
+        if (error) {
+            console.error('Failed to fetch random theme:', error);
+            return { success: false, error: error.message, data: null };
+        }
+
+        if (!data) {
+            return { success: false, error: "null", data: null };
+        }
+        const randomTheme = data[Math.floor(Math.random() * data.length)];
+        return { success: true, error: null, data: randomTheme };
+    } catch (error) {
+        console.error('Unexpected error:', error);
+        return { success: false, error: 'Failed to fetch random theme', data: null };
+    }
+}
+
+/**
+ * ルーム設定をリセットして初期状態に戻す
+ * その際にお題を再取得する
+ */
+export async function resetRoomSettings(roomId: string) {
+    const themeResult = await getRandomTheme();
+    console.log("Random theme fetched:", themeResult);
+    const newTheme = themeResult.success && themeResult.data ? themeResult.data : null;
+
+    try {
+        const { data, error } = await supabase
+            .from('rooms')
+            .update({
+                answer_id: null,
+                status: 'WATING',
+                current_theme: newTheme?.theme || null,
+                current_theme_id: newTheme?.id || null,
+            })
+            .eq('id', roomId)
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Failed to reset room settings:', error);
+            return { success: false, error: error.message, data: null };
+        }
+
+        return { success: true, error: null, data };
+    } catch (error) {
+        console.error('Unexpected error:', error);
+        return { success: false, error: 'Failed to reset room settings', data: null };
     }
 }

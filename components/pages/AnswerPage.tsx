@@ -2,17 +2,18 @@
 
 import { Stage, Layer, Line, Circle, Rect } from 'react-konva';
 import { useState, useEffect, useRef } from 'react';
-import Header from '@/components/organisms/Header';
-import { setdbAnswer, checkAnswerRole } from '@/app/room/[id]/answer/action';
+import { checkAnswerRole } from '@/app/room/[id]/answer/action';
 import Button from '@/components/atoms/Button';
 import Input from '@/components/atoms/Input';
-import ReactCanvasConfetti from 'react-canvas-confetti';
 import confetti from 'canvas-confetti';
 import Card from '@/components/atoms/Card';
 import MistakeModal from '../organisms/answer/MistakeModal';
 import CorrectModal from '../organisms/answer/CorrectModal';
 import { motion } from 'motion/react';
 import { supabase } from '@/lib/supabase';
+import { setStatusRoom, resetRoomSettings } from '@/app/room/[id]/action';
+import FinishModal from '../organisms/answer/FinishModal';
+import { useRouter } from 'next/navigation';
 
 type Drawing = {
     id: string;
@@ -40,6 +41,10 @@ interface ThemePattern {
     katakana: string;
 }
 
+interface RoomStatus {
+    status: 'WATING' | 'DRAWING' | 'ANSWERING' | 'FINISHED' | 'RESETTING';
+}
+
 export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answer, setAnswer] = useState('');
@@ -56,6 +61,9 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
     const [correctModal, setCorrectModal] = useState(false);
     const [mistakeModal, setMistakeModal] = useState(false);
 
+    const [roomStatus, setRoomStatus] = useState<RoomStatus>({ status: 'ANSWERING' });
+
+    const router = useRouter();
 
     const handleNext = () => {
         console.log("Next clicked");
@@ -78,9 +86,12 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
 
         const result = isAnswerMatched(answer);
         if (result) {
+            // 正解時の処理
             setCorrectModal(true);
             fire();
+
         } else {
+            // 不正解時の処理
             setMistakeModal(true);
             setIsNext(true);
             setIsOpen(false);
@@ -108,6 +119,16 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
             origin: { y: 0.6 },
         });
     };
+
+    const handleReset = async () => {
+        const result = await resetRoomSettings(roomId);
+        if (result.success) {
+            console.log("Room reset successfully");
+            router.push(`/room/${roomId}`);
+        } else {
+            console.error("Failed to reset room:", result.error);
+        }
+    }
 
     useEffect(() => {
         const userId = localStorage.getItem('drawing_app_user_id');
@@ -152,11 +173,48 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
         };
     }, []);
 
-    console.log("gitTest")
+    useEffect(() => {
+        const fetchRoomStatus = async () => {
+            const { data, error } = await supabase
+                .from('rooms')
+                .select('status')
+                .eq('id', roomId)
+                .single();
+
+            if (error) {
+                console.error('Failed to fetch room status:', error);
+                return;
+            }
+
+            if (data) {
+                setRoomStatus({ status: data.status });
+            }
+        };
+
+        fetchRoomStatus();
+
+        const subscription = supabase
+            .channel('public:rooms')
+            .on(
+                'postgres_changes',
+                { event: 'UPDATE', schema: 'public', table: 'rooms', filter: `id=eq.${roomId}` },
+                (payload) => {
+                    console.log('Room status updated:', payload.new.status);
+                    const newStatus = payload.new.status;
+                    setRoomStatus({ status: newStatus });
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(subscription);
+        };
+    }, [roomStatus])
 
     return (
         <>
             <div className="flex flex-col items-center justify-center p-8">
+                <h1 className='text-3xl'>{roomStatus.status}</h1>
                 <Card className="max-w-lg w-full">
                     <h1 className="text-4xl font-bold mb-4 text-center">
                         回答
@@ -260,6 +318,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                         placeholder="答えを入力してください"
                                         className="w-full "
                                     />
+                                    <p className='text-gray-400 text-sm'>ひらがな、カタカナ、漢字のいずれでも構いません。</p>
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-2 gap-2">
@@ -301,7 +360,10 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
 
                 {correctModal &&
                     <CorrectModal
-                        onClick={() => setCorrectModal(false)}
+                        onClick={() => {
+                            setCorrectModal(false)
+                            setStatusRoom(roomId, 'FINISHED');
+                        }}
                     />
                 }
                 {mistakeModal &&
@@ -309,7 +371,10 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                         onClick={() => handleNext()}
                     />
                 }
-                {/* <MistakeModal /> */}
+
+                {roomStatus.status === "FINISHED" && isAnswerRole &&
+                    <FinishModal onFinish={() => { }} onReset={handleReset}></FinishModal>
+                }
             </div>
         </>
     );

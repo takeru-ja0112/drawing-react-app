@@ -8,6 +8,31 @@ export type CanvasData = {
   circles: Array<{x: number; y: number; radius: number}>;
 };
 
+/**
+ * 描画データの取得
+ * ルームIDとユーザーIDでフィルタリングし、該当する描画データを返す
+ */
+export async function getDrawingByRoomAndUser(roomId: string , userId : string){
+  try {
+    const { data, error } = await supabase
+      .from('drawings')
+      .select('*')
+      .eq('room_id', roomId)
+      .eq('user_id', userId)
+      .single();
+      
+    if (error) {
+      console.error('Failed to fetch drawing:', error);
+      return { success: false, error: error.message, data: null };
+    }
+
+    return { success: true, error: null, data };
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return { success: false, error: 'Failed to fetch drawing', data: null };
+  }
+}
+
 // 描画データを保存（room_idとuser_nameが一致する場合は更新）
 export async function saveDrawing(
   roomId: string,

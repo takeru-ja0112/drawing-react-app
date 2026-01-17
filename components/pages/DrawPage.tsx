@@ -9,6 +9,9 @@ import { TbArrowForwardUp, TbArrowBackUp, TbTrash } from 'react-icons/tb';
 import { IconContext } from "react-icons";
 import { useState } from "react";
 import Modal from "@/components/organisms/Modal";
+import { getDrawingByRoomAndUser } from "@/app/room/[id]/drawing/action";
+import { useEffect } from "react";
+
 
 type DrawPageProps = {
     roomId: string;
@@ -39,6 +42,28 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
     } = useDraw(roomId);
     const [isSaveOpen, setIsSaveOpen] = useState(false);
     const [isThemeOpen, setIsThemeOpen] = useState(true);
+
+    useEffect(() => {
+        console.log("roomId:", roomId);
+        const fetchDrawing = async () => {
+            const user = localStorage.getItem('drawing_app_user_id');
+            if (user) {
+                const parsedUser = (user);
+                const result = await getDrawingByRoomAndUser(roomId, parsedUser);
+                console.log("Fetch drawing result:", result);
+                if (result.success && result.data) {
+                    const drawing = result.data;
+                    if (drawing.canvas_data) {
+                        const canvasData = (drawing.canvas_data);
+                        lines.splice(0, lines.length, ...canvasData.lines);
+                        circles.splice(0, circles.length, ...canvasData.circles);
+                        rects.splice(0, rects.length, ...canvasData.rects);
+                    }
+                }
+            }
+        };
+        fetchDrawing();
+    },[])
 
     return (
         <>

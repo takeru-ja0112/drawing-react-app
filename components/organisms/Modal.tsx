@@ -8,7 +8,7 @@ export default function Modal({
     children,
 }: {
     isOpen: boolean;
-    onClose: () => void;
+    onClose?: () => void;
     children: React.ReactNode;
 }) {
     if (!isOpen) return null;

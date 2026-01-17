@@ -43,7 +43,7 @@ export default function Header() {
                 </nav>
                 <div className="w-full bg-white flex justify-center">
                     <Link href="/">
-                        <Image src="/minimalDrawIcon.svg" alt="Logo" width={50} height={50} />
+                        <Image src="/minimalDrawIcon.svg" alt="Logo" width={50} height={50} loading="eager"/>
                     </Link>
                 </div>
             </header>
