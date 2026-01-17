@@ -38,7 +38,8 @@ export async function saveDrawing(
   roomId: string,
   userId: string,
   canvasData: CanvasData,
-  userName : string
+  userName : string,
+  theme?: string
 ) {
   try {
     // 要素数を計算
@@ -67,6 +68,7 @@ export async function saveDrawing(
           user_id: userId,
           canvas_data: canvasData,
           element_count: elementCount,
+          theme: theme,
         })
         .eq('id', existing.id)
         .select()
@@ -84,6 +86,7 @@ export async function saveDrawing(
           user_name: userName,
           canvas_data: canvasData,
           element_count: elementCount,
+          theme: theme,
         })
         .select()
         .single();
@@ -126,5 +129,3 @@ export async function getTheme(roomId: string) {
     return { success: false, error: 'Failed to fetch theme', data: null };
   }
 }
-
-// 回答者の

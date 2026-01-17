@@ -83,6 +83,22 @@ export async function resetRoomSettings(roomId: string) {
 
     try {
         const { data, error } = await supabase
+            .from('drawings')
+            .delete()
+            .eq('room_id', roomId);
+
+        if (error) {
+            console.error('Failed to clear drawings during reset:', error);
+            return { success: false, error: error.message, data: null };
+        }
+    } catch (error) {
+        console.error('Unexpected error during drawing clearance:', error);
+        return { success: false, error: 'Failed to clear drawings during reset', data: null };
+    }
+
+    try {
+        
+        const { data, error } = await supabase
             .from('rooms')
             .update({
                 answer_id: null,

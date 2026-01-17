@@ -14,6 +14,7 @@ import { supabase } from '@/lib/supabase';
 import { setStatusRoom, resetRoomSettings } from '@/app/room/[id]/action';
 import FinishModal from '../organisms/answer/FinishModal';
 import { useRouter } from 'next/navigation';
+import StatusBar from '../organisms/StatusBat';
 
 type Drawing = {
     id: string;
@@ -147,7 +148,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
     useEffect(() => {
         // 初回データ取得
         const fetchData = async () => {
-            const { data } = await supabase.from('drawings').select('*').eq('room_id', roomId).order('created_at', { ascending: false });
+            const { data } = await supabase.from('drawings').select('*').eq('room_id', roomId).order('created_at', { ascending: true });
             setData(data || []);
         };
         fetchData();
@@ -214,7 +215,8 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
     return (
         <>
             <div className="flex flex-col items-center justify-center p-8">
-                <h1 className='text-3xl'>{roomStatus.status}</h1>
+                {/* ステータスエリア */}
+                <StatusBar status={roomStatus.status}></StatusBar>
                 <Card className="max-w-lg w-full">
                     <h1 className="text-4xl font-bold mb-4 text-center">
                         回答
