@@ -57,6 +57,7 @@ export async function createRoomByUsername(username: string, roomName: string) {
         short_id: shortId,
         created_by_name: sanitizedUsername,
         room_name: sanitizedRoomName,
+        // status: 'WAITING',
       })
       .select()
       .single();

@@ -15,6 +15,7 @@ import { setStatusRoom, resetRoomSettings } from '@/app/room/[id]/action';
 import FinishModal from '../organisms/answer/FinishModal';
 import { useRouter } from 'next/navigation';
 import StatusBar from '../organisms/StatusBat';
+import ChallengeModal from '../organisms/answer/ChallengeModal';
 
 type Drawing = {
     id: string;
@@ -34,6 +35,7 @@ type AnswerPageProps = {
     roomId: string;
     drawings: Drawing[];
     theme: ThemePattern | null;
+    status: 'WATING' | 'DRAWING' | 'ANSWERING' | 'FINISHED' | 'RESETTING';
 };
 
 interface ThemePattern {
@@ -46,7 +48,7 @@ interface RoomStatus {
     status: 'WATING' | 'DRAWING' | 'ANSWERING' | 'FINISHED' | 'RESETTING';
 }
 
-export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps) {
+export default function AnswerPage({ roomId, drawings, theme , status }: AnswerPageProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answer, setAnswer] = useState('');
     const [isAnswerRole, setIsAnswerRole] = useState(false);
@@ -61,8 +63,9 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
     const [isOpen, setIsOpen] = useState(false);
     const [correctModal, setCorrectModal] = useState(false);
     const [mistakeModal, setMistakeModal] = useState(false);
+    const [lastModal, setLastModal] = useState(false);
 
-    const [roomStatus, setRoomStatus] = useState<RoomStatus>({ status: 'ANSWERING' });
+    const [roomStatus, setRoomStatus] = useState<RoomStatus>({ status: status });
 
     const router = useRouter();
 
@@ -93,7 +96,11 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
 
         } else {
             // 不正解時の処理
-            setMistakeModal(true);
+            if (currentIndex === data.length - 1) {
+                setLastModal(true);
+            } else {
+                setMistakeModal(true);
+            }
             setIsNext(true);
             setIsOpen(false);
         }
@@ -372,6 +379,12 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                     <MistakeModal
                         onClick={() => handleNext()}
                     />
+                }
+                {lastModal && <ChallengeModal
+                    onChallenge={handleReset}
+                    onModify={() => { }}
+                    onEnd={() => {setStatusRoom(roomId, 'FINISHED') }}
+                />
                 }
 
                 {roomStatus.status === "FINISHED" && isAnswerRole &&
