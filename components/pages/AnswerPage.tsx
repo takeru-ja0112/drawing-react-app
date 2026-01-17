@@ -152,6 +152,8 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
         };
     }, []);
 
+    console.log("gitTest")
+
     return (
         <>
             <div className="flex flex-col items-center justify-center p-8">
@@ -264,15 +266,19 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                     <Button
                                         onClick={handleBack}
                                         className={
-                                            isBack ? '' : 'w-full'
+                                            `${isBack ? '' : 'w-full'}
+                                            ${currentIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}`
                                         }
+                                        disabled={currentIndex === 0}
                                         value='戻る'
                                     />
                                     <Button
                                         onClick={handleNext}
                                         className={
-                                            isNext ? '' : 'w-full'
+                                            `${isNext ? '' : 'w-full'}
+                                            ${currentIndex === data.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}`
                                         }
+                                        disabled={currentIndex === data.length - 1}
                                         value='次へ'
                                     />
                                 </div>
