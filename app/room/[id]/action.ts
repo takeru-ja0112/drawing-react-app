@@ -102,7 +102,7 @@ export async function resetRoomSettings(roomId: string) {
             .from('rooms')
             .update({
                 answer_id: null,
-                status: 'WATING',
+                status: 'WAITING',
                 current_theme: newTheme?.theme || null,
                 current_theme_id: newTheme?.id || null,
             })

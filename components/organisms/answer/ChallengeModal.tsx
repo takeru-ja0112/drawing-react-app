@@ -1,7 +1,7 @@
 import Modal from '@/components/organisms/Modal';
 import Button from '@/components/atoms/Button';
 
-export default function ChallengeModal({ onChallenge , onModify , onEnd }: { onChallenge: () => void; onModify: () => void; onEnd: () => void; }) {
+export default function ChallengeModal({ onChallenge , onModify , onFinish }: { onChallenge: () => void; onModify: () => void; onFinish: () => void; }) {
     return (
         <Modal isOpen={true}>
             <div className="p-6">
@@ -18,7 +18,7 @@ export default function ChallengeModal({ onChallenge , onModify , onEnd }: { onC
                     className="w-full mt-4"
                 />
                 <Button
-                    onClick={onEnd}
+                    onClick={onFinish}
                     value="終了する"
                     className="w-full mt-4"
                 />

@@ -207,6 +207,7 @@ export default function useDraw(roomId: string) {
         rects,
         tool,
         setTool,
+        setCount,
         handleMouseDown,
         handleMouseMove,
         handleMouseUp,

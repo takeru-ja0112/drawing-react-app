@@ -30,6 +30,7 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
         rects,
         tool,
         setTool,
+        setCount,
         handleMouseDown,
         handleMouseMove,
         handleMouseUp,
@@ -55,6 +56,7 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
                     const drawing = result.data;
                     if (drawing.canvas_data) {
                         const canvasData = (drawing.canvas_data);
+                        setCount(canvasData.lines.length + canvasData.circles.length + canvasData.rects.length);
                         lines.splice(0, lines.length, ...canvasData.lines);
                         circles.splice(0, circles.length, ...canvasData.circles);
                         rects.splice(0, rects.length, ...canvasData.rects);

@@ -13,7 +13,7 @@ export default function FinishModal({ onFinish, onReset }: { onFinish: () => voi
                 />
                 <Button
                     onClick={onFinish}
-                    value="終了する"
+                    value="終了してロビーに戻る"
                     className="w-full mt-4"
                 />
             </div>

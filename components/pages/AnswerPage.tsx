@@ -48,7 +48,7 @@ interface RoomStatus {
     status: 'WATING' | 'DRAWING' | 'ANSWERING' | 'FINISHED' | 'RESETTING';
 }
 
-export default function AnswerPage({ roomId, drawings, theme , status }: AnswerPageProps) {
+export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPageProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answer, setAnswer] = useState('');
     const [isAnswerRole, setIsAnswerRole] = useState(false);
@@ -138,6 +138,10 @@ export default function AnswerPage({ roomId, drawings, theme , status }: AnswerP
         }
     }
 
+    const handleFinish = async () => {
+        router.push(`/lobby`);
+    }
+
     useEffect(() => {
         const userId = localStorage.getItem('drawing_app_user_id');
         if (!userId) return;
@@ -150,16 +154,20 @@ export default function AnswerPage({ roomId, drawings, theme , status }: AnswerP
             }
         };
         fetchAnswerRole();
-    }, []);
+    }, [roomId]);
 
     useEffect(() => {
         // 初回データ取得
         const fetchData = async () => {
-            const { data } = await supabase.from('drawings').select('*').eq('room_id', roomId).order('created_at', { ascending: true });
+            const { data } = await supabase
+            .from('drawings')
+            .select('*')
+            .eq('room_id', roomId)
+            .order('element_count', { ascending: true });
             setData(data || []);
+            console.log("データは取得", data)
         };
         fetchData();
-        console.log("Drawings data:", data);
 
         const subscription = supabase
             .channel('public:drawings')
@@ -179,7 +187,8 @@ export default function AnswerPage({ roomId, drawings, theme , status }: AnswerP
             supabase.removeChannel(subscription
             )
         };
-    }, []);
+    }, [roomId]);
+
 
     useEffect(() => {
         const fetchRoomStatus = async () => {
@@ -383,12 +392,12 @@ export default function AnswerPage({ roomId, drawings, theme , status }: AnswerP
                 {lastModal && <ChallengeModal
                     onChallenge={handleReset}
                     onModify={() => { }}
-                    onEnd={() => {setStatusRoom(roomId, 'FINISHED') }}
+                    onFinish={handleFinish}
                 />
                 }
 
                 {roomStatus.status === "FINISHED" && isAnswerRole &&
-                    <FinishModal onFinish={() => { }} onReset={handleReset}></FinishModal>
+                    <FinishModal onFinish={handleFinish} onReset={handleReset}></FinishModal>
                 }
             </div>
         </>
