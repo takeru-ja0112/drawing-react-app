@@ -48,29 +48,15 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
     const [isSaveOpen, setIsSaveOpen] = useState(false);
     const [isThemeOpen, setIsThemeOpen] = useState(true);
     const [isBlocked, setIsBlocked] = useState(true);
-    useBlocker(() => {} , isBlocked);
+    useBlocker(() => { }, isBlocked);
 
     useEffect(() => {
         getToSessionStorage();
-    },[])
-
-    /**
-     * 自動保存機能
-     * 
-     * 描画をし終わってから3秒ごとにセッションストレージに保存する
-     */
-    const DEBOUNCE_SAVE_INTERVAL = 5000; // 5秒ごとに保存
-    useEffect(() => {
-        const interval = setInterval(() => {
-            saveToSessionStorage();
-        }, DEBOUNCE_SAVE_INTERVAL);
-
-        return () => clearInterval(interval);
     }, []);
 
     return (
         <>
-            <div className="px-8 py-2">
+            <div className="px-8 pt-2 pb-16">
                 <div className="max-w-lg mx-auto text-center">
                     {/* お題 */}
                     <label className="block mb-1 font-semibold text-gray-600">
@@ -156,15 +142,19 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
                             </Layer>
                         </Stage>
                     </div>
-                    {mode === 'demo' ? null : <div className="mt-3">
+                </div>
+                {mode === 'demo' ? null :
+                    <motion.div
+                        className="px-8 w-80 bottom-5 absolute left-1/2 transform -translate-x-1/2"
+                    >
                         <Button
                             onClick={() => setIsSaveOpen(!isSaveOpen)}
                             disabled={isSaving || (lines.length === 0 && circles.length === 0 && rects.length === 0)}
-                            className="w-full border px-4 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full disabled:opacity-50 disabled:cursor-not-allowed"
                             value={isSaving ? '保存中...' : '保存'}
                         />
-                    </div>}
-                </div>
+                    </motion.div>
+                }
                 {saveMessage && (
                     <div className="mb-4 p-2 bg-gray-100 rounded">
                         {saveMessage}

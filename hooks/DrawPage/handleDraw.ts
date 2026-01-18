@@ -35,6 +35,8 @@ export default function useDraw(roomId: string) {
     const router = useRouter();
 
 
+        // デバウンス用タイマーref
+        const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [tool, setTool] = useState<'line' | 'circle' | 'rect'>('line');
 
     const w = 300;
@@ -108,6 +110,14 @@ export default function useDraw(roomId: string) {
         rectsHistory.current = newRectsHistory;
         historyStep.current = newLinesHistory.length - 1;
     }
+            // デバウンス保存処理
+            if (saveTimeoutRef.current) {
+                clearTimeout(saveTimeoutRef.current);
+            }
+            saveTimeoutRef.current = setTimeout(() => {
+                console.log("データを保存します");
+                saveToSessionStorage();
+            }, 3000); // 3秒後に保存
 
     const handleUndo = () => {
         if (historyStep.current === 0) return;
