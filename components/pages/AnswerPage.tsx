@@ -279,7 +279,7 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
                                     <div className="border-4 border-gray-300 relative rounded-lg overflow-hidden shadow-lg">
                                         {/* レースカーテンのような表現 */}
                                         <button
-                                            onClick={() => { setIsOpen(true); console.log("Modal opened") }}
+                                            onClick={() => { setIsOpen(true) }}
                                         >
                                             <div className='w-full h-full flex absolute top-0 z-10'>
                                                 <motion.div

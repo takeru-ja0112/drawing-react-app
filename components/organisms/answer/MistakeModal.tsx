@@ -1,6 +1,7 @@
 import Modal from '@/components/organisms/Modal';
+import { useEffect } from 'react';
 
-export default function MistakeModal({ onClick}: { onClick: () => void }) {
+export default function MistakeModal({ onClick }: { onClick: () => void }) {
     return (
         <Modal isOpen={true} onClose={onClick}>
             <div className="p-6">
@@ -8,5 +9,5 @@ export default function MistakeModal({ onClick}: { onClick: () => void }) {
                 <p className="text-center">次のイラストへ移ります</p>
             </div>
         </Modal>
-    )
+    );
 }
