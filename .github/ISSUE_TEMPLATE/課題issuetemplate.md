@@ -7,23 +7,23 @@ assignees: ''
 
 ---
 
-// Template name
-issue template
+## 課題
 
-// About 
-Here is a template for creating an issue
+### sample
 
-// Template content
-## Overview
-Please provide an overview of the issue you are creating.
-ex) I want to adapt the style of the header.
+### 詳細
 
-## Purpose
-Describe the purpose of this issue
-ex) To style it.
+- sample
 
-## Task
-Break down and manage your tasks.
+---
+
+## 備考
+
+- sample
+
+---
+
+## やるべきタスク
 - [ ] XXXX
 - [ ] XXXX
 - [ ] XXXX
