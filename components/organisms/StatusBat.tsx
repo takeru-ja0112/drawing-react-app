@@ -10,7 +10,7 @@ export default function StatusBar({ status }: { status: string }) {
         // ステータス表示部分
     switch (status) {
         case "WAITING":
-            setStatusValue("参加者を待っています");
+            setStatusValue("回答者を待っています");
             break;
         case "DRAWING":
             setStatusValue("お題に沿ってお絵描き中です");

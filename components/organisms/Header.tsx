@@ -33,9 +33,9 @@ export default function Header() {
     return (
         <>
             <header
-                className={`h-20 fixed top-0 left-0 w-full z-40 transition-transform duration-500 ${
-                    showHeader ? "translate-y-0" : "-translate-y-full"
-                } flex items-center justify-between bg-white shadow-md p-4`}
+                className={`h-20 fixed top-2 left-0 rounded-full w-[90%] left-1/2 -translate-x-1/2 z-40 transition-transform duration-500 ${
+                    showHeader ? "translate-y-0" : "-translate-y-[120%]"
+                } flex items-center justify-between bg-white shadow-md px-7`}
             >
                 <nav>
                     {/* ハンバーガーメニューの作成 */}

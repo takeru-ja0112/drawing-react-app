@@ -67,6 +67,8 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
 
     const [roomStatus, setRoomStatus] = useState<RoomStatus>({ status: status });
 
+    const [isCheckStage, setIsCheckStage] = useState(false);
+
     const router = useRouter();
 
     const handleNext = () => {
@@ -98,8 +100,10 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
             // 不正解時の処理
             if (currentIndex === data.length - 1) {
                 setLastModal(true);
+                setIsCheckStage(true);
             } else {
                 setMistakeModal(true);
+                setIsCheckStage(true);
             }
             setIsNext(true);
             setIsOpen(false);
@@ -375,11 +379,32 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
                             {/* ナビゲーションボタン */}
                             <div className="flex justify-between gap-4">
                                 {isAnswerRole && (
-                                    <Button
-                                        value="回答する"
-                                        onClick={handleAnswer}
-                                        disabled={!isAnswerRole}
-                                    />
+                                    <>
+                                        <Button
+                                            onClick={handleBack}
+                                            className={
+                                                `
+                                                ${currentIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}`
+                                            }
+                                            disabled={currentIndex === 0}
+                                            value='戻る'
+                                        />
+                                        <Button
+                                            value="回答する"
+                                            onClick={handleAnswer}
+                                            disabled={!isAnswerRole}
+                                            className='w-80'
+                                        />
+                                        <Button
+                                            onClick={handleNext}
+                                            className={
+                                                `
+                                            ${currentIndex === data.length - 1 || !isCheckStage ? 'opacity-50 cursor-not-allowed' : ''}`
+                                            }
+                                            disabled={currentIndex === data.length - 1 || !isCheckStage}
+                                            value='次へ'
+                                        />
+                                    </>
                                 )}
 
                             </div>
