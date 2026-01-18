@@ -145,7 +145,7 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
                 </div>
                 {mode === 'demo' ? null :
                     <motion.div
-                        className="px-8 w-80 bottom-5 absolute left-1/2 transform -translate-x-1/2"
+                        className="px-8 w-80 bottom-5 fixed left-1/2 transform -translate-x-1/2"
                     >
                         <Button
                             onClick={() => setIsSaveOpen(!isSaveOpen)}
