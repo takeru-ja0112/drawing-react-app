@@ -107,12 +107,6 @@ export default function useDraw(roomId: string) {
         circlesHistory.current = newCirclesHistory;
         rectsHistory.current = newRectsHistory;
         historyStep.current = newLinesHistory.length - 1;
-        console.log("History updated:", {
-            linesHistory: linesHistory.current,
-            circlesHistory: circlesHistory.current,
-            rectsHistory: rectsHistory.current,
-            historyStep: historyStep.current
-        });
     }
 
     const handleUndo = () => {
@@ -136,11 +130,11 @@ export default function useDraw(roomId: string) {
         historyStep.current = 0;
     }
 
-    
+
     const handleRedo = () => {
         if (historyStep.current === linesHistory.current.length - 1) return;
         setCount((prev) => prev + 1);
-        
+
         historyStep.current += 1;
         const nextLines = linesHistory.current[historyStep.current];
         const nextCircles = circlesHistory.current[historyStep.current];
@@ -149,7 +143,7 @@ export default function useDraw(roomId: string) {
         setCircles(nextCircles);
         setRects(nextRects);
     }
-    
+
     const handleReset = () => {
         setCount(0);
         linesHistory.current = [[]];
@@ -212,6 +206,37 @@ export default function useDraw(roomId: string) {
         }
     };
 
+    // セッションストレージに一時データを保存する処理
+    const saveToSessionStorage = () => {
+        const canvasData = {
+            lines: linesHistory.current[historyStep.current],
+            circles: circlesHistory.current[historyStep.current],
+            rects: rectsHistory.current[historyStep.current],
+        };
+        sessionStorage.setItem(`drawing_${roomId}`, JSON.stringify(canvasData));
+    }
+
+    const getToSessionStorage = () => {
+        const data = sessionStorage.getItem(`drawing_${roomId}`);
+        if (data) {
+            const canvasData = JSON.parse(data);
+            setCount(
+                (canvasData.lines ? canvasData.lines.length : 0) +
+                (canvasData.circles ? canvasData.circles.length : 0) +
+                (canvasData.rects ? canvasData.rects.length : 0)
+            );
+            setLines(canvasData.lines || []);
+            setCircles(canvasData.circles || []);
+            setRects(canvasData.rects || []);
+
+            linesHistory.current = [[...canvasData.lines]];
+            circlesHistory.current = [[...canvasData.circles]];
+            rectsHistory.current = [[...canvasData.rects]];
+            historyStep.current = 0;
+
+        }
+    }
+
     return {
         count,
         isSaving,
@@ -231,6 +256,8 @@ export default function useDraw(roomId: string) {
         handleRedo,
         handleReset,
         handleSave,
+        saveToSessionStorage,
+        getToSessionStorage,
         w,
         h,
     };

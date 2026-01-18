@@ -40,6 +40,8 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
         handleRedo,
         handleReset,
         handleSave,
+        saveToSessionStorage,
+        getToSessionStorage,
         w,
         h,
     } = useDraw(roomId);
@@ -49,35 +51,29 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
     useBlocker(() => {} , isBlocked);
 
     useEffect(() => {
-        console.log("roomId:", roomId);
-        const fetchDrawing = async () => {
-            const user = localStorage.getItem('drawing_app_user_id');
-            if (user) {
-                const parsedUser = (user);
-                const result = await getDrawingByRoomAndUser(roomId, parsedUser);
-                console.log("Fetch drawing result:", result);
-                if (result.success && result.data) {
-                    const drawing = result.data;
-                    if (drawing.canvas_data) {
-                        const canvasData = (drawing.canvas_data);
-                        setCount(canvasData.lines.length + canvasData.circles.length + canvasData.rects.length);
-                        lines.splice(0, lines.length, ...canvasData.lines);
-                        circles.splice(0, circles.length, ...canvasData.circles);
-                        rects.splice(0, rects.length, ...canvasData.rects);
-                        handleInitializeHistory();
-                    }
-                }
-            }
-        };
-        fetchDrawing();
+        getToSessionStorage();
     },[])
+
+    /**
+     * 自動保存機能
+     * 
+     * 描画をし終わってから3秒ごとにセッションストレージに保存する
+     */
+    const DEBOUNCE_SAVE_INTERVAL = 5000; // 5秒ごとに保存
+    useEffect(() => {
+        const interval = setInterval(() => {
+            saveToSessionStorage();
+        }, DEBOUNCE_SAVE_INTERVAL);
+
+        return () => clearInterval(interval);
+    }, []);
 
     return (
         <>
-            <div className="p-8">
+            <div className="px-8 py-2">
                 <div className="max-w-lg mx-auto text-center">
                     {/* お題 */}
-                    <label className="block mb-2 font-semibold text-gray-700">
+                    <label className="block mb-1 font-semibold text-gray-600">
                         お題
                     </label>
                     <h1 className="text-xl font-bold">{isThemeOpen ? '' : theme}</h1>
@@ -193,6 +189,7 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
                                     handleSave();
                                     setIsSaveOpen(false);
                                     setIsBlocked(false);
+                                    saveToSessionStorage();
                                 }}
                                 value={isSaving ? '保存中...' : '保存する'}
                                 disabled={isSaving}

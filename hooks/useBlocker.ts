@@ -6,6 +6,7 @@ export const useBlocker = (blocker : () => void , when = true) => {
 
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
             event.preventDefault();
+            event.returnValue = '';
             blocker();
         };
 
@@ -15,5 +16,5 @@ export const useBlocker = (blocker : () => void , when = true) => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
         };
     }, [blocker, when]);
-    
+
 };
