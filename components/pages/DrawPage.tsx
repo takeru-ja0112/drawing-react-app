@@ -35,7 +35,6 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
         handleMouseDown,
         handleMouseMove,
         handleMouseUp,
-        handleInitializeHistory,
         handleUndo,
         handleRedo,
         handleReset,

@@ -6,6 +6,7 @@ import { use } from 'react';
 export type CanvasData = {
   lines: number[][];
   circles: Array<{x: number; y: number; radius: number}>;
+  rects: Array<{x: number; y: number; width: number; height: number; rotation: number}>;
 };
 
 /**
@@ -43,7 +44,8 @@ export async function saveDrawing(
 ) {
   try {
     // 要素数を計算
-    const elementCount = canvasData.lines.length + canvasData.circles.length;
+    const elementCount = canvasData.lines.length + canvasData.circles.length + canvasData.rects.length;
+    console.log('Saving drawing with element count:', elementCount);
 
     // 既存のデータをチェック（room_idとuser_nameで検索）
     const { data: existing, error: fetchError } = await supabase
