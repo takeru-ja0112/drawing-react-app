@@ -107,6 +107,12 @@ export default function useDraw(roomId: string) {
         circlesHistory.current = newCirclesHistory;
         rectsHistory.current = newRectsHistory;
         historyStep.current = newLinesHistory.length - 1;
+        console.log("History updated:", {
+            linesHistory: linesHistory.current,
+            circlesHistory: circlesHistory.current,
+            rectsHistory: rectsHistory.current,
+            historyStep: historyStep.current
+        });
     }
 
     const handleUndo = () => {
@@ -122,6 +128,28 @@ export default function useDraw(roomId: string) {
         setRects(previousRects);
     }
 
+    // 初期読み込みしてから履歴も更新する
+    const handleInitializeHistory = () => {
+        linesHistory.current = [[...lines]];
+        circlesHistory.current = [[...circles]];
+        rectsHistory.current = [[...rects]];
+        historyStep.current = 0;
+    }
+
+    
+    const handleRedo = () => {
+        if (historyStep.current === linesHistory.current.length - 1) return;
+        setCount((prev) => prev + 1);
+        
+        historyStep.current += 1;
+        const nextLines = linesHistory.current[historyStep.current];
+        const nextCircles = circlesHistory.current[historyStep.current];
+        const nextRects = rectsHistory.current[historyStep.current];
+        setLines(nextLines);
+        setCircles(nextCircles);
+        setRects(nextRects);
+    }
+    
     const handleReset = () => {
         setCount(0);
         linesHistory.current = [[]];
@@ -131,19 +159,6 @@ export default function useDraw(roomId: string) {
         setLines([]);
         setCircles([]);
         setRects([]);
-    }
-
-    const handleRedo = () => {
-        if (historyStep.current === linesHistory.current.length - 1) return;
-        setCount((prev) => prev + 1);
-
-        historyStep.current += 1;
-        const nextLines = linesHistory.current[historyStep.current];
-        const nextCircles = circlesHistory.current[historyStep.current];
-        const nextRects = rectsHistory.current[historyStep.current];
-        setLines(nextLines);
-        setCircles(nextCircles);
-        setRects(nextRects);
     }
 
     useEffect(() => {
@@ -211,6 +226,7 @@ export default function useDraw(roomId: string) {
         handleMouseDown,
         handleMouseMove,
         handleMouseUp,
+        handleInitializeHistory,
         handleUndo,
         handleRedo,
         handleReset,

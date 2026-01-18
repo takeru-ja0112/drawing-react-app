@@ -160,10 +160,10 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
         // 初回データ取得
         const fetchData = async () => {
             const { data } = await supabase
-            .from('drawings')
-            .select('*')
-            .eq('room_id', roomId)
-            .order('element_count', { ascending: true });
+                .from('drawings')
+                .select('*')
+                .eq('room_id', roomId)
+                .order('element_count', { ascending: true });
             setData(data || []);
             console.log("データは取得", data)
         };
@@ -181,6 +181,16 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
                     fetchData();
                 }
             )
+            .on(
+                'postgres_changes',
+                { event: 'UPDATE', schema: 'public', table: 'drawings', filter: `room_id=eq.${roomId}` },
+                () => {
+                    setCurrentIndex(0);
+                    setAnswer('');
+                    setIsNext(false);
+                    fetchData();
+                }
+            )
             .subscribe();
 
         return () => {
@@ -190,6 +200,7 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
     }, [roomId]);
 
 
+    // ステータス変更を検知した処理
     useEffect(() => {
         const fetchRoomStatus = async () => {
             const { data, error } = await supabase

@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation';
 import { isCheckAnswer, setdbAnswer } from '@/app/room/[id]/answer/action';
 import Modal from '@/components/organisms/Modal';
 import Card from '@/components/atoms/Card';
+import { setStatusRoom } from '@/app/room/[id]/action';
 
 export default function RoomPage({ title }: { title: string }) {
     const params = useParams();
@@ -57,57 +58,59 @@ export default function RoomPage({ title }: { title: string }) {
                         <h2 className="text-lg text-gray-500 font-semibold mb-2">ルーム名</h2>
                         <p className="text-gray-900 font-bold break-all">{title}</p>
                     </div>
-                    <Card className="mb-4">
-                        <h2 className="text-lg text-gray-700 font-semibold mb-2">参加者</h2>
-                        {users.length > 0 ? (
-                            // <ul>
-                            <div className='grid grid-cols-2 gap-2'>
-                                {users.map((user, index) => (
-                                    <motion.div
-                                        initial={{ opacity: 0, x: 10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: index * 0.2 }}
-                                        key={index}
-                                    >
-                                        <div className='w-full p-2 bg-amber-400 rounded-sm text-center font-bold whitespace-nowrap overflow-hidden text-ellipsis'>
-                                            {user.user_name}
-                                        </div>
-                                    </motion.div>
-                                ))}
-                            </div>
-                            // </ul>
-                        ) : (
-                            <p className="text-gray-500">
-                                参加者がいません。
-                            </p>
-                        )}
-                    </Card>
-                    <div className="text-center">
-                        <IconContext.Provider value={{ size: '1.5em' }}>
-                            {/* 書く人用の説明 */}
-                            <Card className="mb-4">
-                                <div className='my-4'>
-                                    <p>
-                                        <span className='font-bold'>Drawer</span>はお題を描こう
-                                    </p>
+                    <div className="mb-4 p-5 bg-gray-100 rounded-3xl">
+                        <div className="mb-6">
+                            <h2 className="text-lg text-gray-500 font-semibold mb-2">参加者</h2>
+                            {users.length > 0 ? (
+                                // <ul>
+                                <div className='grid grid-cols-2 gap-2'>
+                                    {users.map((user, index) => (
+                                        <motion.div
+                                            initial={{ opacity: 0, x: 10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: index * 0.2 }}
+                                            key={index}
+                                        >
+                                            <div className='w-full p-2 bg-yellow-400 rounded-sm text-center font-bold whitespace-nowrap overflow-hidden text-ellipsis'>
+                                                {user.user_name}
+                                            </div>
+                                        </motion.div>
+                                    ))}
                                 </div>
+                                // </ul>
+                            ) : (
+                                <p className="text-gray-500">
+                                    参加者がいません。
+                                </p>
+                            )}
+                        </div>
+                        <div className="text-center">
+                            <IconContext.Provider value={{ size: '1.5em' }}>
+                                {/* 書く人用の説明 */}
+                                <Card className="mb-4">
+                                    <div className='my-4'>
+                                        <p>
+                                            <span className='font-bold'>Drawer</span>はお題を描こう
+                                        </p>
+                                    </div>
 
-                                <Link href={`/room/${roomId}/drawing`}>
-                                    <Button value="Drawページへ" icon={<TbPencil />} />
-                                </Link>
-                            </Card>
+                                    <Link href={`/room/${roomId}/drawing`}>
+                                        <Button value="Drawページへ" icon={<TbPencil />} />
+                                    </Link>
+                                </Card>
 
-                            {/* 回答者用の説明 */}
-                            <Card className="mb-4">
-                                <div className='my-4'>
-                                    <p>
-                                        <span className='font-bold'>Answer</span>はDrawerの描いた絵を見てお題を当てよう
-                                    </p>
-                                </div>
+                                {/* 回答者用の説明 */}
+                                <Card className="mb-4">
+                                    <div className='my-4'>
+                                        <p>
+                                            <span className='font-bold'>Answer</span>はDrawerの描いた絵を見てお題を当てよう
+                                        </p>
+                                    </div>
 
-                                <Button value="Answerページへ" icon={<TbBallBowling />} onClick={handleCheckAnswer} />
-                            </Card>
-                        </IconContext.Provider>
+                                    <Button value="Answerページへ" icon={<TbBallBowling />} onClick={handleCheckAnswer} />
+                                </Card>
+                            </IconContext.Provider>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -122,7 +125,7 @@ export default function RoomPage({ title }: { title: string }) {
                         あなたがAnswerになりますか？
                     </p>
                     <Button value="いいえ" onClick={() => setIsAnswerModalOpen(false)} />
-                    <Button value="はい" onClick={() => { handleSetAnswer(); setIsAnswerModalOpen(false); }} className="ml-4" />
+                    <Button value="はい" onClick={() => { handleSetAnswer(); setStatusRoom(roomId, 'DRAWING'); setIsAnswerModalOpen(false); }} className="ml-4" />
                 </div>
             </Modal>
             }

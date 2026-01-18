@@ -7,10 +7,11 @@ import Header from '@/components/organisms/Header';
 import { motion } from "motion/react";
 import { TbArrowForwardUp, TbArrowBackUp, TbTrash } from 'react-icons/tb';
 import { IconContext } from "react-icons";
-import { useState } from "react";
+import { use, useState } from "react";
 import Modal from "@/components/organisms/Modal";
 import { getDrawingByRoomAndUser } from "@/app/room/[id]/drawing/action";
 import { useEffect } from "react";
+import { useBlocker } from "@/hooks/useBlocker";
 
 
 type DrawPageProps = {
@@ -34,6 +35,7 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
         handleMouseDown,
         handleMouseMove,
         handleMouseUp,
+        handleInitializeHistory,
         handleUndo,
         handleRedo,
         handleReset,
@@ -43,6 +45,8 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
     } = useDraw(roomId);
     const [isSaveOpen, setIsSaveOpen] = useState(false);
     const [isThemeOpen, setIsThemeOpen] = useState(true);
+    const [isBlocked, setIsBlocked] = useState(true);
+    useBlocker(() => {} , isBlocked);
 
     useEffect(() => {
         console.log("roomId:", roomId);
@@ -60,6 +64,7 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
                         lines.splice(0, lines.length, ...canvasData.lines);
                         circles.splice(0, circles.length, ...canvasData.circles);
                         rects.splice(0, rects.length, ...canvasData.rects);
+                        handleInitializeHistory();
                     }
                 }
             }
@@ -187,6 +192,7 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
                                 onClick={() => {
                                     handleSave();
                                     setIsSaveOpen(false);
+                                    setIsBlocked(false);
                                 }}
                                 value={isSaving ? '保存中...' : '保存する'}
                                 disabled={isSaving}
