@@ -68,7 +68,7 @@ export async function createRoomByUsername(username: string, roomName: string) {
 
     return { success: true, error: null, data };
   } catch (error) {
-    return { success: false, error: 'Failed to create room', data: null };
+    return { success: false, error: error instanceof Error ? error.message : String(error), data: null };
   }
 }
 
@@ -88,7 +88,7 @@ export async function updateRoomStatus(roomId: string, status: 'WAITING' | 'DRAW
 
     return { success: true, error: null, data };
   } catch (error) {
-    return { success: false, error: 'Failed to update room status', data: null };
+    return { success: false, error: error instanceof Error ? error.message : String(error), data: null };
   }
 }
 

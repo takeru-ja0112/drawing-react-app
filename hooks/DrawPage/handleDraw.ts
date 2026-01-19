@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { saveDrawing } from '@/app/room/[id]/drawing/action';
 import { getOrCreateUser, getUsername } from '@/lib/user';
 import { useRouter } from 'next/navigation';
+import { KonvaEventObject } from 'konva/lib/Node';
 
 export default function useDraw(roomId: string) {
     const [count, setCount] = useState(0);
@@ -35,17 +36,18 @@ export default function useDraw(roomId: string) {
     const router = useRouter();
 
 
-        // デバウンス用タイマーref
-        const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    // デバウンス用タイマーref
+    const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [tool, setTool] = useState<'line' | 'circle' | 'rect'>('line');
 
     const w = 300;
     const h = 300;
 
-    const handleMouseDown = (e: any) => {
+    const handleMouseDown = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
         setCount((prev) => prev + 1);
         const point = e.target.getStage()?.getPointerPosition();
         isDrawing.current = true;
+        if (!point) return;
 
         if (tool === 'line') {
             // 直線の開始点と終了点（最初は同じ点）
@@ -57,11 +59,12 @@ export default function useDraw(roomId: string) {
         }
     }
 
-    const handleMouseMove = (e: any) => {
+    const handleMouseMove = (event: KonvaEventObject<MouseEvent | TouchEvent>) => {
 
         if (isDrawing.current === false) return;
 
-        const point = e.target.getStage().getPointerPosition();
+        const point = event.target.getStage()?.getPointerPosition();
+        if (!point) return;
 
         if (tool === 'line') {
             const lastIdx = lines.length - 1;
@@ -110,14 +113,14 @@ export default function useDraw(roomId: string) {
         rectsHistory.current = newRectsHistory;
         historyStep.current = newLinesHistory.length - 1;
     }
-            // デバウンス保存処理
-            if (saveTimeoutRef.current) {
-                clearTimeout(saveTimeoutRef.current);
-            }
-            saveTimeoutRef.current = setTimeout(() => {
-                console.log("データを保存します");
-                saveToSessionStorage();
-            }, 3000); // 3秒後に保存
+    // デバウンス保存処理
+    if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+    }
+    saveTimeoutRef.current = setTimeout(() => {
+        console.log("データを保存します");
+        saveToSessionStorage();
+    }, 3000); // 3秒後に保存
 
     const handleUndo = () => {
         if (historyStep.current === 0) return;
@@ -164,29 +167,6 @@ export default function useDraw(roomId: string) {
         setCircles([]);
         setRects([]);
     }
-
-    useEffect(() => {
-        linesHistory.current = [[...lines]];
-        circlesHistory.current = [[...circles]];
-        rectsHistory.current = [[...rects]];
-        historyStep.current = 0;
-
-        // クライアント側でユーザー名を取得
-        const name = getUsername();
-        if (name) {
-            setUserName(name);
-        }
-
-        const handleGlobalMouseUp = () => {
-            isDrawing.current = false;
-        }
-
-        document.addEventListener('mouseup', handleGlobalMouseUp);
-
-        return () => {
-            document.removeEventListener('mouseup', handleGlobalMouseUp);
-        }
-    }, []);
 
     const handleSave = async () => {
         setIsSaving(true);
@@ -246,6 +226,30 @@ export default function useDraw(roomId: string) {
 
         }
     }
+
+    // 初回セットアップ
+    useEffect(() => {
+        linesHistory.current = [[...lines]];
+        circlesHistory.current = [[...circles]];
+        rectsHistory.current = [[...rects]];
+        historyStep.current = 0;
+
+        // クライアント側でユーザー名を取得
+        const name = getUsername();
+        if (name) {
+            setUserName(name);
+        }
+
+        const handleGlobalMouseUp = () => {
+            isDrawing.current = false;
+        }
+
+        document.addEventListener('mouseup', handleGlobalMouseUp);
+
+        return () => {
+            document.removeEventListener('mouseup', handleGlobalMouseUp);
+        }
+    }, []);
 
     return {
         count,

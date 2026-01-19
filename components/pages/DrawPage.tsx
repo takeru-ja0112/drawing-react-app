@@ -6,11 +6,12 @@ import Button from '@/components/atoms/Button';
 import { motion } from "motion/react";
 import { TbArrowForwardUp, TbArrowBackUp, TbTrash } from 'react-icons/tb';
 import { IconContext } from "react-icons";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Modal from "@/components/organisms/Modal";
 import { useEffect } from "react";
 import { useBlocker } from "@/hooks/useBlocker";
 import useStatus from "@/hooks/useStatus";
+import { KonvaEventObject } from "konva/lib/Node";
 
 type DrawPageProps = {
     roomId: string;
@@ -23,13 +24,11 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
         count,
         isSaving,
         saveMessage,
-        userName,
         lines,
         circles,
         rects,
         tool,
         setTool,
-        setCount,
         handleMouseDown,
         handleMouseMove,
         handleMouseUp,
@@ -48,8 +47,12 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
     useBlocker(() => { }, isBlocked);
     const { roomStatus } = useStatus(roomId);
 
-    useEffect(() => {
+    const memoGetToSessionStorage = useCallback(() => {
         getToSessionStorage();
+    }, [getToSessionStorage]);
+
+    useEffect(() => {
+        memoGetToSessionStorage();
     }, []);
 
     return (
@@ -122,7 +125,16 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
                         ))}
                     </div>
                     <div className={`mx-auto mt-4 border bg-white border-4 border-gray-400 w-[300px] h-[300px] touch-none rounded overflow-hidden`}>
-                        <Stage width={w} height={h} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onTouchStart={handleMouseDown} onTouchMove={handleMouseMove} onTouchEnd={handleMouseUp}>
+                        <Stage
+                            width={w}
+                            height={h}
+                            onMouseDown={handleMouseDown}
+                            onMouseMove={handleMouseMove}
+                            onMouseUp={handleMouseUp}
+                            onTouchStart={(e: KonvaEventObject<TouchEvent>) => handleMouseDown(e)}
+                            onTouchMove={(e: KonvaEventObject<TouchEvent>) => handleMouseMove(e)}
+                            onTouchEnd={(e: KonvaEventObject<TouchEvent>) => handleMouseUp()}
+                            >
                             <Layer
                                 tension={0.5}
                                 lineCap="round"

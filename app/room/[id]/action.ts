@@ -82,7 +82,7 @@ export async function resetRoomSettings(roomId: string) {
     const newTheme = themeResult.success && themeResult.data ? themeResult.data : null;
 
     try {
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('drawings')
             .delete()
             .eq('room_id', roomId);

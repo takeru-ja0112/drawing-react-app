@@ -1,7 +1,6 @@
 "use server";
 
 import { supabase } from '@/lib/supabase';
-import { use } from 'react';
 
 export type CanvasData = {
   lines: number[][];

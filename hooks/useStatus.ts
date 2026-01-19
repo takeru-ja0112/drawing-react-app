@@ -52,7 +52,7 @@ export default function useStatus(roomId: string) {
             return () => {
                 supabase.removeChannel(subscription);
             };
-        }, [])
+        }, [roomId]);
 
     return { roomStatus };
 

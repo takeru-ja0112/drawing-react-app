@@ -1,4 +1,3 @@
-import { motion } from "motion/react";
 import Select from "@/components/atoms/Select";
 
 /**

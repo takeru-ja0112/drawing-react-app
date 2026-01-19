@@ -1,5 +1,4 @@
 import Modal from '@/components/organisms/Modal';
-import { useEffect } from 'react';
 
 export default function MistakeModal({ onClick }: { onClick: () => void }) {
     return (

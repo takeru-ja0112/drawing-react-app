@@ -8,10 +8,12 @@ interface BtnProps {
     disabled?: boolean;
     type?: "text" | "password" | "email" | "number";
     className?: string;
-    [key: string]: any;
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
 }
 
-export default function Input({ value, name,className, onClick, disabled, type = "text", placeholder, ...props }: BtnProps) {
+export default function Input({ 
+    value, name,className, onClick,  onChange, onBlur, disabled, type = "text", placeholder, ...props }: BtnProps) {
     return (
         <>
             <label htmlFor={name} className="sr-only">{value}</label>
@@ -20,6 +22,8 @@ export default function Input({ value, name,className, onClick, disabled, type =
                 whileTap={{ scale: 0.98 }}
                 className={`bg-white border rounded-xl border-gray-300 px-4 py-2 ${className}`}
                 onClick={onClick}
+                onChange={onChange}
+                onBlur={onBlur}
                 disabled={disabled}
                 type={type}
                 value={value}

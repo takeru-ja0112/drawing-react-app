@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 // サニタイズ用
 import DOMPurify from 'dompurify';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/atoms/Button';
-import { getUsername , setUsernameSchema , validateUsername } from '@/lib/user';
+import { getUsername , setUsernameSchema} from '@/lib/user';
 import type { Room } from '@/type/roomType';
 import { generateUser } from '@/lib/user';
 import { z } from 'zod';
@@ -20,9 +20,6 @@ import SetUserModal from '../organisms/lobby/SetUserModal';
 import CreateRoomModal from '../organisms/lobby/CreateRoomModal';
 
 const forbiddenChars = /[<>&\/\\'"]/;
-const usernameSchema = z.string().max(10).refine((val) => !forbiddenChars.test(val), {
-    message: 'ユーザー名に使用できない文字が含まれています。',
-});
 const roomNameSchema = z.string().max(10).refine((val) => !forbiddenChars.test(val), {
     message: 'ルーム名に使用できない文字が含まれています。',
 });
@@ -35,7 +32,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     const [user, setUser] = useState(username || '');
     const [nameError, setNameError] = useState<string>('');
     const [searchName, setSearchName] = useState('');
-    const [searchError, setSearchError] = useState<string>('');
+    const [searchError] = useState<string>('');
     const { setLocalRoom } = historyLocalRoom();
     const [roomName, setRoomName] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -88,8 +85,6 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     }
 
     const handleIntoRoom = ({ roomId }: { roomId: string }) => {
-        const isValid = validateUsername(user);
-
         if (!user) {
             setNameError('ルームに参加するにはユーザー名が必要です');
             return false;
@@ -124,7 +119,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
             .on(
                 'postgres_changes',
                 { event: 'INSERT', schema: 'public', table: 'rooms' },
-                (payload) => {
+                () => {
                     fetchRooms();
                 }
             )

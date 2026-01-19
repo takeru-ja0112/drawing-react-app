@@ -8,6 +8,25 @@ type Room = {
   answerer_id: string | null
 }
 
+interface Drawing {
+  id: string
+  room_id: string
+  element_count: number
+  lines: number[][]
+  circles: Array<{
+    x: number
+    y: number
+    radius: number
+  }>
+  rects: Array<{
+    x: number
+    y: number
+    width: number
+    height: number
+    rotation: number
+  }>
+}
+
 // ルームの変更をリアルタイムで監視するフック
 export function useRoomRealtime(roomId: string) {
   const [room, setRoom] = useState<Room | null>(null)
@@ -60,7 +79,8 @@ export function useRoomRealtime(roomId: string) {
 
 // 描画データの変更を監視するフック
 export function useDrawingsRealtime(roomId: string) {
-  const [drawings, setDrawings] = useState<any[]>([])
+  const [drawings, setDrawings] = useState<Drawing[]>([])
+  console.log(drawings);
 
   useEffect(() => {
     if (!roomId) return
@@ -90,7 +110,11 @@ export function useDrawingsRealtime(roomId: string) {
           filter: `room_id=eq.${roomId}`
         },
         (payload) => {
-          setDrawings(prev => [...prev, payload.new].sort((a, b) => a.element_count - b.element_count))
+          setDrawings(prev => {
+            const exists = prev.some(d => d.id === payload.new.id)
+            if (exists) return prev
+            return [...prev, payload.new as Drawing].sort((a, b) => a.element_count - b.element_count)
+          })
         }
       )
       .on(

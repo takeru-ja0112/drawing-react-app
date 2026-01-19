@@ -5,7 +5,7 @@ import { TbHome, TbUsersGroup, TbArrowBackUp, TbPencil } from "react-icons/tb";
 import Link from "next/link";
 import Image from "next/image";
 import historyLocalRoom from "@/lib/hitoryLocalRoom";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function AccessMenu({
@@ -19,10 +19,13 @@ export default function AccessMenu({
     const { getLocalRoom } = historyLocalRoom();
     const router = useRouter();
 
-    useEffect(() => {
+    const memoLocalRoom = useCallback(() => {
         const localRoom = getLocalRoom();
         setLocalRoom(localRoom);
-    }, [])
+    }, [getLocalRoom]);
+    useEffect(() => {
+        memoLocalRoom();
+    }, []);
 
     const handleLocalRoomClick = () => {
         const localRoom = getLocalRoom();

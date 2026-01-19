@@ -1,7 +1,7 @@
 "use client";
 
 import { Stage, Layer, Line, Circle, Rect } from 'react-konva';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { checkAnswerRole } from '@/app/room/[id]/answer/action';
 import Button from '@/components/atoms/Button';
 import Input from '@/components/atoms/Input';
@@ -49,17 +49,10 @@ interface ThemePattern {
     katakana: string;
 }
 
-interface RoomStatus {
-    status: 'WATING' | 'DRAWING' | 'ANSWERING' | 'FINISHED' | 'RESETTING';
-}
-
-export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPageProps) {
+export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answer, setAnswer] = useState('');
     const [isAnswerRole, setIsAnswerRole] = useState(false);
-    const confettiRef = useRef<any>(null);
-    const [isNext, setIsNext] = useState(false);
-    const [isBack, setIsBack] = useState(false);
     const [data, setData] = useState<Drawing[]>(drawings);
 
     const currentDrawing = data[currentIndex];
@@ -71,13 +64,9 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
     const [lastModal, setLastModal] = useState(false);
     const [isStatusAnswering, setIsStatusAnswering] = useState(false);
     const [isPleaseCloseModal, setIsPleaseCloseModal] = useState(false);
-
-    const [isCheckStage, setIsCheckStage] = useState(false);
-
     const router = useRouter();
 
     const handleNext = () => {
-        console.log("Next clicked");
         if (currentIndex < data.length - 1) {
             setCurrentIndex(currentIndex + 1);
         }
@@ -85,11 +74,9 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
     };
 
     const handleBack = () => {
-        console.log("Back clicked");
         if (currentIndex > 0) {
             setCurrentIndex(currentIndex - 1);
         }
-        setIsBack(false);
     }
 
     const handleAnswer = async () => {
@@ -107,12 +94,9 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
             // 不正解時の処理
             if (currentIndex === data.length - 1) {
                 setLastModal(true);
-                setIsCheckStage(true);
             } else {
                 setMistakeModal(true);
-                setIsCheckStage(true);
             }
-            setIsNext(true);
             setIsOpen(false);
         }
     }
@@ -142,7 +126,6 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
     const handleReset = async () => {
         const result = await resetRoomSettings(roomId);
         if (result.success) {
-            console.log("Room reset successfully");
             router.push(`/room/${roomId}`);
         } else {
             console.error("Failed to reset room:", result.error);
@@ -186,7 +169,6 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
                 .eq('room_id', roomId)
                 .order('element_count', { ascending: true });
             setData(data || []);
-            console.log("データは取得", data)
         };
         fetchData();
 
@@ -198,7 +180,6 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
                 () => {
                     setCurrentIndex(0);
                     setAnswer('');
-                    setIsNext(false);
                     fetchData();
                 }
             )
@@ -208,7 +189,6 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
                 () => {
                     setCurrentIndex(0);
                     setAnswer('');
-                    setIsNext(false);
                     fetchData();
                 }
             )

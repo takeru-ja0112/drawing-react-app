@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "motion/react";
 import { TbLoaderQuarter } from "react-icons/tb";
 
 export default function Loading({ className }: { className?: string }) {

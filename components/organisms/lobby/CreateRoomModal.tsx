@@ -1,7 +1,6 @@
 import Modal from "@/components/organisms/Modal";
 import Input from "@/components/atoms/Input";
 import Button from "@/components/atoms/Button";
-import RoomSetting from "@/components/molecules/RoomSetting";
 import Loading from "@/components/atoms/Loading";
 
 

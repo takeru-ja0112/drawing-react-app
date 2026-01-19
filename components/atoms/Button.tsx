@@ -9,7 +9,6 @@ interface BtnProps {
     disabled?: boolean;
     type?: "button" | "submit" | "reset";
     className?: string;
-    [key: string]: any;
     icon?: React.ReactNode;
 }
 
