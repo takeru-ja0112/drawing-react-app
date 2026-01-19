@@ -33,7 +33,7 @@ export default function Header() {
     return (
         <>
             <header
-                className={`h-14 fixed top-2 left-0 rounded-full w-[75%] min-w-[300px] left-1/2 -translate-x-1/2 z-40 transition-transform duration-500 ${
+                className={`h-14 fixed top-2 left-0 border border-2 border-white rounded-full w-[75%] min-w-[300px] left-1/2 -translate-x-1/2 z-40 transition-transform duration-500 ${
                     showHeader ? "translate-y-0" : "-translate-y-[120%]"
                 } bg-white shadow-md px-7`}
             >

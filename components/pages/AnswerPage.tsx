@@ -69,8 +69,6 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
     const [correctModal, setCorrectModal] = useState(false);
     const [mistakeModal, setMistakeModal] = useState(false);
     const [lastModal, setLastModal] = useState(false);
-
-    // const [roomStatus, setRoomStatus] = useState<RoomStatus>({ status: status });
     const [isStatusAnswering, setIsStatusAnswering] = useState(false);
     const [isPleaseCloseModal, setIsPleaseCloseModal] = useState(false);
 

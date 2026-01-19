@@ -1,22 +1,23 @@
 "use client";
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, useRef } from 'react';
 // サニタイズ用
 import DOMPurify from 'dompurify';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/atoms/Button';
-import { setUsername, getUsername } from '@/lib/user';
+import { getUsername , setUsernameSchema , validateUsername } from '@/lib/user';
 import type { Room } from '@/type/roomType';
 import { generateUser } from '@/lib/user';
 import { z } from 'zod';
 import { createRoomByUsername } from '@/app/lobby/action';
 import Input from '@/components/atoms/Input';
 import historyLocalRoom from '@/lib/hitoryLocalRoom';
-import Modal from '@/components/organisms/Modal';
 import Loading from '@/components/atoms/Loading';
 import Card from '@/components/atoms/Card';
 import { supabase } from '@/lib/supabase';
 import { getRooms } from '@/app/lobby/action';
+import SetUserModal from '../organisms/lobby/SetUserModal';
+import CreateRoomModal from '../organisms/lobby/CreateRoomModal';
 
 const forbiddenChars = /[<>&\/\\'"]/;
 const usernameSchema = z.string().max(10).refine((val) => !forbiddenChars.test(val), {
@@ -29,7 +30,7 @@ const roomNameSchema = z.string().max(10).refine((val) => !forbiddenChars.test(v
 export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     const [loading, setLoading] = useState(false);
     const username = getUsername();
-    const [roomsList , setRoomsList ] = useState<Room[]>(rooms);
+    const [roomsList, setRoomsList] = useState<Room[]>(rooms);
     const router = useRouter();
     const [user, setUser] = useState(username || '');
     const [nameError, setNameError] = useState<string>('');
@@ -40,6 +41,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [roomError, setRoomError] = useState<string>('');
     const [joinLoadingId, setJoinLoadingId] = useState<string | null>(null);
+    const [isSetUserModal, setIsSetUserModal] = useState<boolean>(!username);
 
     const handleCreateRoom = () => {
         if (!user) {
@@ -97,23 +99,6 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
         router.push(`/room/${roomId}`);
     }
 
-    const setUsernameSchema = (name: string) => {
-        setNameError('');
-        const isValid = validateUsername(name);
-
-        if (isValid) {
-            setUser(name);
-            setUsername(name);
-        } else {
-            setNameError('ユーザー名は10文字以内です。');
-        }
-    }
-
-    const validateUsername = (name: string) => {
-        const parseResult = usernameSchema.safeParse(name);
-        return parseResult.success;
-    }
-
     const validateRoomName = (name: string) => {
         const parseResult = roomNameSchema.safeParse(name);
         return parseResult.success;
@@ -124,7 +109,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
         generateUser();
     }, []);
 
-    useEffect(()=>{
+    useEffect(() => {
         // ルームリストの再取得
         const fetchRooms = async () => {
             const res = await getRooms();
@@ -151,6 +136,15 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
         }
     }, []);
 
+    const daialog = useRef<HTMLDialogElement>(null);
+
+    const handleClick = () => {
+        console.log(daialog);
+        daialog.current?.showModal();
+        setIsOpen(true);
+    }
+
+
     return (
         <>
             <div className="p-8">
@@ -166,7 +160,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                 name="username"
                                 value={user}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                    setUsernameSchema(e.target.value)
+                                    setUsernameSchema({ name: e.target.value, setNameError, setUser });
                                 }}
                                 onBlur={() => {
                                     setNameError('');
@@ -238,37 +232,27 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                 </div>
             </div>
             {isOpen && (
-                <Modal
+                <CreateRoomModal
                     isOpen={isOpen}
-                    onClose={() => setIsOpen(false)}
-                >
-                    <p className="font-semibold mb-2 text-gray-700">ルーム名の入力</p>
-                    <Input
-                        value={roomName}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRoomName(e.target.value)}
-                        className={`w-full ${roomError ? 'border-red-500 border-2' : ''}`}
-                        placeholder='ルーム名を入力してください'
-                    />
-                    {roomError && (
-                        <div className="mt-2">
-                            <p className="text-red-500 font-semibold text-sm">{roomError}</p>
-                        </div>
-                    )}
-                    <div className='flex space-x-2 mt-4'>
-                        <Button
-                            value='キャンセル'
-                            onClick={() => setIsOpen(false)}
-                            disabled={loading}
-                        />
-                        <Button
-                            value='作成'
-                            icon={loading ? <Loading /> : null}
-                            onClick={createRoom}
-                            disabled={loading}
-                            className='w-30'
-                        />
-                    </div>
-                </Modal>
+                    roomName={roomName}
+                    roomError={roomError}
+                    loading={loading}
+                    setIsOpen={setIsOpen}
+                    setRoomName={setRoomName}
+                    createRoom={createRoom}
+                />
+            )}
+
+            {isSetUserModal && (
+                <SetUserModal
+                    isSetUserModal={isSetUserModal}
+                    user={user}
+                    nameError={nameError}
+                    loading={loading}
+                    setUser={setUser}
+                    setNameError={setNameError}
+                    setIsSetUserModal={setIsSetUserModal}
+                />
             )}
         </>
     );

@@ -1,7 +1,14 @@
+import { z } from 'zod';
+
 // ユーザーID（UUID）とユーザー名を管理するユーティリティ
 
 const USER_ID_KEY = 'drawing_app_user_id';
 const USERNAME_KEY = 'drawing_app_username';
+
+const forbiddenChars = /[<>&\/\\'"]/;
+const usernameSchema = z.string().max(10).refine((val) => !forbiddenChars.test(val), {
+  message: 'ユーザー名に使用できない文字が含まれています。',
+});
 
 export const generateUser = () => {
   if (typeof window === 'undefined') return { id: '', username: '' }; // SSR対応
@@ -14,7 +21,7 @@ export const generateUser = () => {
     userId = generateUUID();
     localStorage.setItem(USER_ID_KEY, userId);
   }
-  if(!username){
+  if (!username) {
     username = ``
     localStorage.setItem(USERNAME_KEY, username);
   }
@@ -81,4 +88,21 @@ export function getUserId(): string | null {
 export function getUsername(): string | null {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem(USERNAME_KEY);
+}
+
+export function validateUsername(name: string) {
+  const parseResult = usernameSchema.safeParse(name);
+  return parseResult.success;
+}
+
+export function setUsernameSchema({name , setNameError, setUser}: {name: string, setNameError: React.Dispatch<React.SetStateAction<string>>, setUser: React.Dispatch<React.SetStateAction<string>>}) {
+  setNameError('');
+  const isValid = validateUsername(name);
+
+  if (isValid) {
+    setUser(name);
+    setUsername(name);
+  } else {
+    setNameError('ユーザー名は10文字以内です。');
+  }
 }

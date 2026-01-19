@@ -51,7 +51,7 @@ export default function Top() {
                         <div className="mb-2">
                             {/* メインボタン */}
                             <Link href="/lobby">
-                                <Button value="ロビーに移動" className="text-xl w-full" />
+                                <Button value="みんなで遊ぶ" className="text-xl w-full" />
                             </Link>
                         </div>
 

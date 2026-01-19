@@ -3,13 +3,11 @@
 import { Layer, Rect as KonvaRect, Stage, Line, Circle } from "react-konva";
 import useDraw from '@/hooks/DrawPage/handleDraw';
 import Button from '@/components/atoms/Button';
-import Header from '@/components/organisms/Header';
 import { motion } from "motion/react";
 import { TbArrowForwardUp, TbArrowBackUp, TbTrash } from 'react-icons/tb';
 import { IconContext } from "react-icons";
-import { use, useState } from "react";
+import { useState } from "react";
 import Modal from "@/components/organisms/Modal";
-import { getDrawingByRoomAndUser } from "@/app/room/[id]/drawing/action";
 import { useEffect } from "react";
 import { useBlocker } from "@/hooks/useBlocker";
 import useStatus from "@/hooks/useStatus";

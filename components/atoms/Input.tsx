@@ -18,7 +18,7 @@ export default function Input({ value, name,className, onClick, disabled, type =
             <motion.input
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
-                className={`bg-white border rounded-xl border-gray-500 px-4 py-2 ${className}`}
+                className={`bg-white border rounded-xl border-gray-300 px-4 py-2 ${className}`}
                 onClick={onClick}
                 disabled={disabled}
                 type={type}
