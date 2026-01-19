@@ -64,6 +64,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
     const [lastModal, setLastModal] = useState(false);
     const [isStatusAnswering, setIsStatusAnswering] = useState(false);
     const [isPleaseCloseModal, setIsPleaseCloseModal] = useState(false);
+    const [isMistakeNextDisabled, setIsMistakeNextDisabled] = useState(false);
     const router = useRouter();
 
     const handleNext = () => {
@@ -71,6 +72,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
             setCurrentIndex(currentIndex + 1);
         }
         setMistakeModal(false);
+        setIsMistakeNextDisabled(false);
     };
 
     const handleBack = () => {
@@ -200,6 +202,19 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
         };
     }, [roomId]);
 
+    // mistakeModalが開いたら3秒間ボタンを無効化
+    useEffect(() => {
+        if (mistakeModal) {
+            setIsMistakeNextDisabled(true);
+            const timer = setTimeout(() => {
+                setIsMistakeNextDisabled(false);
+            }, 3000);
+            return () => clearTimeout(timer);
+        } else {
+            setIsMistakeNextDisabled(false);
+        }
+    }, [mistakeModal]);
+
 
     const { roomStatus } = useStatus(roomId);
 
@@ -222,9 +237,6 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                 {/* ステータスエリア */}
                 <StatusBar status={roomStatus.status}></StatusBar>
                 <Card className="max-w-lg w-full">
-                    <h1 className="text-4xl font-bold mb-4 text-center">
-                        回答
-                    </h1>
 
                     {data.length === 0 ? (
                         <div className="text-center py-12">
@@ -277,13 +289,13 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                                         <motion.div
                                                             initial={{ left: 0 }}
                                                             animate={isOpen ? { left: '-100%' } : { left: '0' }}
-                                                            transition={{ duration: 3, ease: "easeInOut" }}
+                                                            transition={isOpen ? { duration: 3, ease: "easeInOut" } : undefined}
                                                             className="absolute w-1/2 h-full bg-yellow-500 rounded-br-[30%]"
                                                         />
                                                         <motion.div
                                                             initial={{ right: 0 }}
                                                             animate={isOpen ? { right: '-100%' } : { right: '0' }}
-                                                            transition={{ duration: 3, ease: "easeInOut" }}
+                                                            transition={isOpen ? { duration: 3, ease: "easeInOut" } : undefined}
                                                             className="absolute w-1/2 h-full bg-yellow-500 rounded-bl-[30%]"
                                                         />
                                                     </div>
@@ -291,7 +303,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                                         <motion.h1
                                                             initial={{ opacity: 1 }}
                                                             animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
-                                                            transition={{ duration: 1, }}
+                                                            transition={isOpen ? { duration: 1 } : undefined}
                                                             className='font-bold text-4xl text-white'
                                                         >ひらく</motion.h1>
                                                     </div>
@@ -408,6 +420,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                 {mistakeModal &&
                     <MistakeModal
                         onClick={() => handleNext()}
+                        disabled={isMistakeNextDisabled}
                     />
                 }
                 {lastModal && <ChallengeModal

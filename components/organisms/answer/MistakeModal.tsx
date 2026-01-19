@@ -1,6 +1,6 @@
 import Modal from '@/components/organisms/Modal';
 
-export default function MistakeModal({ onClick }: { onClick: () => void }) {
+export default function MistakeModal({ onClick , disabled }: { onClick: () => void, disabled: boolean }) {
     return (
         <Modal isOpen={true} onClose={onClick}>
             <div className="p-6">
