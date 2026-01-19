@@ -9,6 +9,7 @@ import confetti from 'canvas-confetti';
 import Card from '@/components/atoms/Card';
 import MistakeModal from '../organisms/answer/MistakeModal';
 import CorrectModal from '../organisms/answer/CorrectModal';
+import Modal from '../organisms/Modal';
 import { motion } from 'motion/react';
 import { supabase } from '@/lib/supabase';
 import { setStatusRoom, resetRoomSettings } from '@/app/room/[id]/action';
@@ -16,6 +17,10 @@ import FinishModal from '../organisms/answer/FinishModal';
 import { useRouter } from 'next/navigation';
 import StatusBar from '../organisms/StatusBat';
 import ChallengeModal from '../organisms/answer/ChallengeModal';
+import { TbArrowBadgeLeftFilled, TbArrowBadgeRightFilled, TbLock } from 'react-icons/tb';
+import { IconContext } from 'react-icons';
+import useStatus from '@/hooks/useStatus';
+
 
 type Drawing = {
     id: string;
@@ -65,7 +70,9 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
     const [mistakeModal, setMistakeModal] = useState(false);
     const [lastModal, setLastModal] = useState(false);
 
-    const [roomStatus, setRoomStatus] = useState<RoomStatus>({ status: status });
+    // const [roomStatus, setRoomStatus] = useState<RoomStatus>({ status: status });
+    const [isStatusAnswering, setIsStatusAnswering] = useState(false);
+    const [isPleaseCloseModal, setIsPleaseCloseModal] = useState(false);
 
     const [isCheckStage, setIsCheckStage] = useState(false);
 
@@ -89,6 +96,8 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
 
     const handleAnswer = async () => {
         if (!isAnswerRole || !theme) return;
+
+        if (roomStatus.status !== 'ANSWERING') { setIsPleaseCloseModal(true); return; };
 
         const result = isAnswerMatched(answer);
         if (result) {
@@ -142,8 +151,18 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
         }
     }
 
+    const handleModify = async () => {
+        await setStatusRoom(roomId, 'DRAWING');
+        setLastModal(false);
+    }
+
     const handleFinish = async () => {
+        await setStatusRoom(roomId, 'FINISHED');
         router.push(`/lobby`);
+    }
+
+    const handleStatusAnswering = async () => {
+        await setStatusRoom(roomId, 'ANSWERING');
     }
 
     useEffect(() => {
@@ -204,48 +223,24 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
     }, [roomId]);
 
 
-    // ステータス変更を検知した処理
-    useEffect(() => {
-        const fetchRoomStatus = async () => {
-            const { data, error } = await supabase
-                .from('rooms')
-                .select('status')
-                .eq('id', roomId)
-                .single();
-
-            if (error) {
-                console.error('Failed to fetch room status:', error);
-                return;
-            }
-
-            if (data) {
-                setRoomStatus({ status: data.status });
-            }
-        };
-
-        fetchRoomStatus();
-
-        const subscription = supabase
-            .channel('public:rooms')
-            .on(
-                'postgres_changes',
-                { event: 'UPDATE', schema: 'public', table: 'rooms', filter: `id=eq.${roomId}` },
-                (payload) => {
-                    console.log('Room status updated:', payload.new.status);
-                    const newStatus = payload.new.status;
-                    setRoomStatus({ status: newStatus });
-                }
-            )
-            .subscribe();
-
-        return () => {
-            supabase.removeChannel(subscription);
-        };
-    }, [roomStatus])
+    const { roomStatus } = useStatus(roomId);
 
     return (
         <>
             <div className="flex flex-col items-center justify-center p-8">
+                {
+                    roomStatus.status !== 'ANSWERING' &&
+                    isAnswerRole &&
+                    (
+                        <IconContext.Provider value={{ size: '1.5em' }}>
+                            <Button
+                                value='締め切る'
+                                icon={<TbLock />}
+                                onClick={() => setIsStatusAnswering(true)}
+                                className='mb-4'
+                            />
+                        </IconContext.Provider>
+                    )}
                 {/* ステータスエリア */}
                 <StatusBar status={roomStatus.status}></StatusBar>
                 <Card className="max-w-lg w-full">
@@ -280,69 +275,92 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
                                         <p>読み込み中...</p>
                                     </div>
                                 ) : (
-                                    <div className="border-4 border-gray-300 relative rounded-lg overflow-hidden shadow-lg">
-                                        {/* レースカーテンのような表現 */}
-                                        <button
-                                            onClick={() => { setIsOpen(true) }}
-                                        >
-                                            <div className='w-full h-full flex absolute top-0 z-10'>
-                                                <motion.div
-                                                    initial={{ left: 0 }}
-                                                    animate={isOpen ? { left: '-100%' } : { left: '0' }}
-                                                    transition={{ duration: 3, ease: "easeInOut" }}
-                                                    className="absolute w-1/2 h-full bg-yellow-500 rounded-br-[30%]"
-                                                />
-                                                <motion.div
-                                                    initial={{ right: 0 }}
-                                                    animate={isOpen ? { right: '-100%' } : { right: '0' }}
-                                                    transition={{ duration: 3, ease: "easeInOut" }}
-                                                    className="absolute w-1/2 h-full bg-yellow-500 rounded-bl-[30%]"
-                                                />
-                                            </div>
-                                            <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  z-11'>
-                                                <motion.h1
-                                                    initial={{ opacity: 1 }}
-                                                    animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
-                                                    transition={{ duration: 1, }}
-                                                    className='font-bold text-4xl text-white'
-                                                >ひらく</motion.h1>
-                                            </div>
-                                        </button>
+                                    <div className='flex items-center gap-5'>
+                                        <IconContext.Provider value={{ size: '2em', color: '#808080' }}>
+                                            <motion.button
+                                                initial={{ scale: 1 }}
+                                                whileTap={{ scale: 0.9 }}
+                                                onClick={handleBack}
+                                                disabled={currentIndex === 0}
+                                                className='disabled:opacity-30 disabled:cursor-not-allowed'
+                                            >
+                                                <TbArrowBadgeLeftFilled />
+                                            </motion.button>
+                                            <div className="border-4 border-gray-300 relative rounded-lg overflow-hidden shadow-lg">
+                                                {/* レースカーテンのような表現 */}
+                                                <button
+                                                    onClick={() => {
+                                                        if (roomStatus.status !== 'ANSWERING') { setIsPleaseCloseModal(true); return; };
+                                                        setIsOpen(true)
 
-                                        <Stage width={300} height={300}>
-                                            <Layer>
-                                                {currentDrawing.canvas_data.lines.map((line, i) => (
-                                                    <Line key={`line-${i}`} points={line} stroke="black" strokeWidth={2} />
-                                                ))}
-                                                {currentDrawing.canvas_data.circles.map((circle, i) => (
-                                                    <Circle
-                                                        key={`circle-${i}`}
-                                                        x={circle.x}
-                                                        y={circle.y}
-                                                        radius={circle.radius}
-                                                        stroke="black"
-                                                        strokeWidth={2}
-                                                    />
-                                                ))}
-                                                {currentDrawing.canvas_data.rects.map((rect, i) => (
-                                                    <Rect
-                                                        key={`rect-${i}`}
-                                                        x={rect.x}
-                                                        y={rect.y}
-                                                        width={rect.width}
-                                                        height={rect.height}
-                                                        stroke="black"
-                                                        strokeWidth={2}
-                                                    />
-                                                ))}
-                                            </Layer>
-                                        </Stage>
+                                                    }}
+                                                >
+                                                    <div className='w-full h-full flex absolute top-0 z-10'>
+                                                        <motion.div
+                                                            initial={{ left: 0 }}
+                                                            animate={isOpen ? { left: '-100%' } : { left: '0' }}
+                                                            transition={{ duration: 3, ease: "easeInOut" }}
+                                                            className="absolute w-1/2 h-full bg-yellow-500 rounded-br-[30%]"
+                                                        />
+                                                        <motion.div
+                                                            initial={{ right: 0 }}
+                                                            animate={isOpen ? { right: '-100%' } : { right: '0' }}
+                                                            transition={{ duration: 3, ease: "easeInOut" }}
+                                                            className="absolute w-1/2 h-full bg-yellow-500 rounded-bl-[30%]"
+                                                        />
+                                                    </div>
+                                                    <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  z-11'>
+                                                        <motion.h1
+                                                            initial={{ opacity: 1 }}
+                                                            animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
+                                                            transition={{ duration: 1, }}
+                                                            className='font-bold text-4xl text-white'
+                                                        >ひらく</motion.h1>
+                                                    </div>
+                                                </button>
+                                                <Stage width={300} height={300}>
+                                                    <Layer>
+                                                        {currentDrawing.canvas_data.lines.map((line, i) => (
+                                                            <Line key={`line-${i}`} points={line} stroke="black" strokeWidth={2} />
+                                                        ))}
+                                                        {currentDrawing.canvas_data.circles.map((circle, i) => (
+                                                            <Circle
+                                                                key={`circle-${i}`}
+                                                                x={circle.x}
+                                                                y={circle.y}
+                                                                radius={circle.radius}
+                                                                stroke="black"
+                                                                strokeWidth={2}
+                                                            />
+                                                        ))}
+                                                        {currentDrawing.canvas_data.rects.map((rect, i) => (
+                                                            <Rect
+                                                                key={`rect-${i}`}
+                                                                x={rect.x}
+                                                                y={rect.y}
+                                                                width={rect.width}
+                                                                height={rect.height}
+                                                                stroke="black"
+                                                                strokeWidth={2}
+                                                            />
+                                                        ))}
+                                                    </Layer>
+                                                </Stage>
+                                            </div>
+                                            <button
+                                                onClick={handleNext}
+                                                className='disabled:opacity-50 disabled:cursor-not-allowed'
+                                                disabled={currentIndex === data.length - 1}
+                                            >
+                                                <TbArrowBadgeRightFilled />
+                                            </button>
+                                        </IconContext.Provider>
                                     </div>
                                 )}
                             </div>
 
                             {/* 回答入力 */}
-                            {isAnswerRole ? (
+                            {isAnswerRole && (
                                 <div className="mb-6">
                                     <Input
                                         type="text"
@@ -350,29 +368,9 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAnswer(e.target.value)}
                                         placeholder="答えを入力してください"
                                         className="w-full "
+                                        disabled={!roomStatus || roomStatus.status !== 'ANSWERING'}
                                     />
                                     <p className='text-gray-400 text-sm'>ひらがな、カタカナ、漢字のいずれでも構いません。</p>
-                                </div>
-                            ) : (
-                                <div className="grid grid-cols-2 gap-2">
-                                    <Button
-                                        onClick={handleBack}
-                                        className={
-                                            `${isBack ? '' : 'w-full'}
-                                            ${currentIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}`
-                                        }
-                                        disabled={currentIndex === 0}
-                                        value='戻る'
-                                    />
-                                    <Button
-                                        onClick={handleNext}
-                                        className={
-                                            `${isNext ? '' : 'w-full'}
-                                            ${currentIndex === data.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}`
-                                        }
-                                        disabled={currentIndex === data.length - 1}
-                                        value='次へ'
-                                    />
                                 </div>
                             )}
 
@@ -381,28 +379,10 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
                                 {isAnswerRole && (
                                     <>
                                         <Button
-                                            onClick={handleBack}
-                                            className={
-                                                `
-                                                ${currentIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}`
-                                            }
-                                            disabled={currentIndex === 0}
-                                            value='戻る'
-                                        />
-                                        <Button
                                             value="回答する"
                                             onClick={handleAnswer}
                                             disabled={!isAnswerRole}
-                                            className='w-80'
-                                        />
-                                        <Button
-                                            onClick={handleNext}
-                                            className={
-                                                `
-                                            ${currentIndex === data.length - 1 || !isCheckStage ? 'opacity-50 cursor-not-allowed' : ''}`
-                                            }
-                                            disabled={currentIndex === data.length - 1 || !isCheckStage}
-                                            value='次へ'
+                                            className='w-80 mx-auto'
                                         />
                                     </>
                                 )}
@@ -411,6 +391,33 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
                         </>
                     )}
                 </Card>
+                {isStatusAnswering && isAnswerRole &&
+                    <Modal
+                        isOpen={isStatusAnswering}
+                        onClose={() => setIsStatusAnswering(false)}
+                    >
+                        <div className="p-6">
+                            <h2 className="text-2xl font-bold mb-4 text-center">締め切りますか？</h2>
+                            <p>描画中の方はいないですか？<br />参加人数分のイラストが届いている事を確認してください</p>
+                            <div className="flex justify-end gap-4 mt-6">
+                                <button
+                                    onClick={() => setIsStatusAnswering(false)}
+                                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg"
+                                >
+                                    キャンセル
+                                </button>
+                                <Button
+                                    onClick={async () => {
+                                        await handleStatusAnswering();
+                                        setIsStatusAnswering(false);
+                                    }}
+                                    value="OK"
+                                />
+                            </div>
+                        </div>
+                    </Modal>
+                }
+
 
                 {correctModal &&
                     <CorrectModal
@@ -427,9 +434,25 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
                 }
                 {lastModal && <ChallengeModal
                     onChallenge={handleReset}
-                    onModify={() => { }}
+                    onModify={handleModify}
                     onFinish={handleFinish}
                 />
+                }
+
+                {isPleaseCloseModal &&
+                    <Modal isOpen={isPleaseCloseModal} onClose={() => setIsPleaseCloseModal(false)}>
+                        <div className="p-6">
+                            <h2 className="text-2xl font-bold mb-4 text-center">まだ締め切っていません</h2>
+                            <p className="text-center">締め切ってから回答を始めてください</p>
+                            <div className="flex justify-end mt-6">
+                                <Button
+                                    onClick={() => setIsPleaseCloseModal(false)}
+                                    className=""
+                                    value='閉じる'
+                                />
+                            </div>
+                        </div>
+                    </Modal>
                 }
 
                 {roomStatus.status === "FINISHED" && isAnswerRole &&

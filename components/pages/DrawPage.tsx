@@ -12,7 +12,7 @@ import Modal from "@/components/organisms/Modal";
 import { getDrawingByRoomAndUser } from "@/app/room/[id]/drawing/action";
 import { useEffect } from "react";
 import { useBlocker } from "@/hooks/useBlocker";
-
+import useStatus from "@/hooks/useStatus";
 
 type DrawPageProps = {
     roomId: string;
@@ -48,6 +48,7 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
     const [isThemeOpen, setIsThemeOpen] = useState(true);
     const [isBlocked, setIsBlocked] = useState(true);
     useBlocker(() => { }, isBlocked);
+    const { roomStatus } = useStatus(roomId);
 
     useEffect(() => {
         getToSessionStorage();
@@ -196,6 +197,26 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
                     />
                 </Modal>
                 }
+
+                {roomStatus.status === 'ANSWERING' && (
+                    <Modal
+                        isOpen={true}
+                        onClose={() => {
+                            window.location.href = `/room/${roomId}/answer`;
+
+                        }}
+                    >
+                        <h1 className="text-xl font-semibold mb-4">回答者が締め切りました</h1>
+                        <p>回答ページに移動します</p>
+                        <Button
+                            onClick={() => {
+                                window.location.href = `/room/${roomId}/answer`;
+                            }}
+                            className="mt-4"
+                            value="OK"
+                        />
+                    </Modal>
+                )}
             </div>
         </>
     );
