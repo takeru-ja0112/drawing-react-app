@@ -33,17 +33,17 @@ export default function Header() {
     return (
         <>
             <header
-                className={`h-20 fixed top-2 left-0 rounded-full w-[75%] min-w-[300px] left-1/2 -translate-x-1/2 z-40 transition-transform duration-500 ${
+                className={`h-14 fixed top-2 left-0 rounded-full w-[75%] min-w-[300px] left-1/2 -translate-x-1/2 z-40 transition-transform duration-500 ${
                     showHeader ? "translate-y-0" : "-translate-y-[120%]"
-                } flex items-center justify-between bg-white shadow-md px-7`}
+                } bg-white shadow-md px-7`}
             >
-                <nav>
+                <nav className=" h-full flex items-center justify-between">
                     {/* ハンバーガーメニューの作成 */}
                     <HamburgerMenu setIsOpen={setIsOpen} />
                 </nav>
-                <div className="w-full bg-white flex justify-center">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                     <Link href="/">
-                        <Image src="/minimalDrawIcon.svg" alt="Logo" width={50} height={50} loading="eager"/>
+                        <Image src="/minimalDrawIcon.svg" alt="Logo" width={40} height={40} loading="eager"/>
                     </Link>
                 </div>
             </header>
