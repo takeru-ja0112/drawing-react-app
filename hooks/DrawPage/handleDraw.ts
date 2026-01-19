@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { saveDrawing } from '@/app/room/[id]/drawing/action';
 import { getOrCreateUser, getUsername } from '@/lib/user';
 import { useRouter } from 'next/navigation';

@@ -125,7 +125,6 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                 'postgres_changes',
                 { event: 'INSERT', schema: 'public', table: 'rooms' },
                 (payload) => {
-                    console.log('New room inserted:', payload.new);
                     fetchRooms();
                 }
             )
@@ -135,15 +134,6 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
             supabase.removeChannel(subscription);
         }
     }, []);
-
-    const daialog = useRef<HTMLDialogElement>(null);
-
-    const handleClick = () => {
-        console.log(daialog);
-        daialog.current?.showModal();
-        setIsOpen(true);
-    }
-
 
     return (
         <>

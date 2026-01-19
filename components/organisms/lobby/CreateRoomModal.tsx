@@ -40,9 +40,9 @@ export default function CreateRoomModal({
                         <p className="text-red-500 font-semibold text-sm">{roomError}</p>
                     </div>
                 )}
-                <RoomSetting
+                {/* <RoomSetting
                     className="mt-4"
-                />
+                /> */}
                 <div className='flex space-x-2 mt-4'>
                     <Button
                         value='キャンセル'

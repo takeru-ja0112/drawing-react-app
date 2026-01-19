@@ -34,9 +34,9 @@ export const usePresence = (roomId: string, userId: string, userName: string) =>
         const usersList = Object.values(state).flatMap(presences => presences)
         setUsers(usersList)
       })
-      .on('presence', { event: 'join' }, ({ key, newPresences }) => {
+      .on('presence', { event: 'join' }, ({}) => {
       })
-      .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+      .on('presence', { event: 'leave' }, ({}) => {
       })
       .subscribe(async (status) => {
         if (status === 'SUBSCRIBED') {
