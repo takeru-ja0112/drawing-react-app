@@ -275,7 +275,7 @@ export default function AnswerPage({ roomId, drawings, theme, status }: AnswerPa
                                         <p>読み込み中...</p>
                                     </div>
                                 ) : (
-                                    <div className='flex items-center gap-5'>
+                                    <div className='flex items-center gap-1'>
                                         <IconContext.Provider value={{ size: '2em', color: '#808080' }}>
                                             <motion.button
                                                 initial={{ scale: 1 }}
