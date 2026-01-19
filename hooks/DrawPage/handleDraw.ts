@@ -120,7 +120,7 @@ export default function useDraw(roomId: string) {
     saveTimeoutRef.current = setTimeout(() => {
         console.log("データを保存します");
         saveToSessionStorage();
-    }, 3000); // 3秒後に保存
+    }, 500); // 0.5秒後に保存
 
     const handleUndo = () => {
         if (historyStep.current === 0) return;
