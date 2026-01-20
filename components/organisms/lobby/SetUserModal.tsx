@@ -48,10 +48,9 @@ export default function SetUserModal({
                     <Button
                         value='設定'
                         onClick={() => {
-                            if (user && validateUsername(user)) {
+                            const result = setUsernameSchema({ name: user, setNameError, setUser });
+                            if (result?.success) {
                                 setIsSetUserModal(false);
-                            } else {
-                                setNameError('ユーザー名は10文字以内です。');
                             }
                         }}
                         disabled={loading}

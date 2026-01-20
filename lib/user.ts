@@ -6,9 +6,14 @@ const USER_ID_KEY = 'drawing_app_user_id';
 const USERNAME_KEY = 'drawing_app_username';
 
 const forbiddenChars = /[<>&\/\\'"]/;
-const usernameSchema = z.string().max(10).refine((val) => !forbiddenChars.test(val), {
-  message: 'ユーザー名に使用できない文字が含まれています。',
-});
+const usernameSchema =
+  z
+    .string()
+    .max(10, "ユーザー名は10文字以内で入力してください。")
+    .refine((val) => !forbiddenChars.test(val),
+      {
+        message: 'ユーザー名に使用できない文字が含まれています。',
+      });
 
 export const generateUser = () => {
   if (typeof window === 'undefined') return { id: '', username: '' }; // SSR対応
@@ -92,17 +97,44 @@ export function getUsername(): string | null {
 
 export function validateUsername(name: string) {
   const parseResult = usernameSchema.safeParse(name);
-  return parseResult.success;
+  return parseResult as { success: boolean; error?: z.ZodError };
 }
 
-export function setUsernameSchema({name , setNameError, setUser}: {name: string, setNameError: React.Dispatch<React.SetStateAction<string>>, setUser: React.Dispatch<React.SetStateAction<string>>}) {
+export function setUsernameSchema({
+  name,
+  setNameError,
+  setUser
+}: {
+  name: string,
+  setNameError: React.Dispatch<React.SetStateAction<string>>,
+  setUser: React.Dispatch<React.SetStateAction<string>>
+}
+) {
   setNameError('');
-  const isValid = validateUsername(name);
+  const result = validateUsername(name);
 
-  if (isValid) {
+  console.log(result);
+  // エラーバリデーション
+
+
+
+  if (result.success && name) {
+    console.log('Valid username:', name);
     setUser(name);
     setUsername(name);
+    return { success: true, error: null };
   } else {
-    setNameError('ユーザー名は10文字以内です。');
+    // ユーザー名が空の場合処理
+    if (name.length === 0) {
+      setUser(name);
+      setUsername(name);
+      setNameError('ユーザー名は必須です。');
+      return;
+    }
+    if(name.length > 10) {
+      setNameError('ユーザー名は10文字以内で入力してください。');
+      return;
+    }
+
   }
 }
