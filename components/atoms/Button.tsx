@@ -13,12 +13,15 @@ interface BtnProps {
 }
 
 export default function Btn({ value, className ,onClick, disabled, type = "button", icon, ...props }: BtnProps) {
+
     return (
         <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.95 }}
             className={`text-black bg-white border hover:bg-gray-200 transition duration-500 border-dotted border-3 font-bold py-2 px-4 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300 ${className}`}
-            onClick={onClick}
+            onClick={(e) => {
+                if (onClick) onClick(e);
+            }}
             disabled={disabled}
             type={type}
             {...props}
