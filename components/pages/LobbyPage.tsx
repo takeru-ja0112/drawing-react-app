@@ -212,9 +212,9 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                             <div className="flex justify-between items-center">
                                                 <TbArrowUpRight className="text-gray-400 text-xl absolute right-3 top-3" />
                                                 <div className='overflow-hidden text-ellipsis whitespace-nowrap'>
-                                                    <label className="block text-gray-700 text-sm">ルーム名</label>
-                                                    <h3 className='font-semibold text-lg'>{room.room_name}</h3>
-                                                    <p className="font-mono text-sm text-gray-600">作成者：{room.created_by_name}</p>
+                                                    <label className="block text-gray-700 text-xs">ルーム名</label>
+                                                    <h3 className='font-semibold text-sm truncate'>{room.room_name}</h3>
+                                                    <p className="font-mono text-sm text-gray-600 text-xs">作成者：{room.created_by_name}</p>
                                                 </div>
                                             </div>
                                         </div>
