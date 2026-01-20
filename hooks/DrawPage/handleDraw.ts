@@ -1,38 +1,39 @@
 "use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { saveDrawing } from '@/app/room/[id]/drawing/action';
 import { getOrCreateUser, getUsername } from '@/lib/user';
 import { useRouter } from 'next/navigation';
 import { KonvaEventObject } from 'konva/lib/Node';
 
 export default function useDraw(roomId: string) {
-    const [count, setCount] = useState(0);
+    const canvasData = JSON.parse(sessionStorage.getItem(`drawing_${roomId}`) || 'null');
+    const [count, setCount] = useState<number>(canvasData ? canvasData.element : 0);
     const [isSaving, setIsSaving] = useState(false);
     const [saveMessage, setSaveMessage] = useState<string>('');
-    const [userName, setUserName] = useState<string>('');
-    const linesHistory = useRef<Array<number[][]>>([]);
-    const circlesHistory = useRef<Array<Array<{ x: number; y: number; radius: number }>>>([]);
-    const rectsHistory = useRef<Array<Array<{ x: number; y: number; width: number; height: number; rotation: number }>>>([]);
+    const [ userName ] = useState<string>(getUsername() || getOrCreateUser().username);
     const historyStep = useRef(0);
     const isDrawing = useRef(false);
-    const [lines, setLines] = useState<number[][]>([]);
+    const [lines, setLines] = useState<number[][]>(canvasData?.lines || []);
     const [circles, setCircles] = useState<
-        Array<{
-            x: number;
-            y: number;
-            radius: number;
-        }>
-    >([]);
+    Array<{
+        x: number;
+        y: number;
+        radius: number;
+    }>
+    >(canvasData?.circles || []);
     const [rects, setRects] = useState<
-        Array<{
-            x: number;
-            y: number;
-            width: number;
-            height: number;
-            rotation: number;
-        }>
-    >([]);
+    Array<{
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+        rotation: number;
+    }>
+    >(canvasData?.rects || []);
+    const linesHistory = useRef<Array<number[][]>>([[...lines]]);
+    const circlesHistory = useRef<Array<Array<{ x: number; y: number; radius: number }>>>([[...circles]]);
+    const rectsHistory = useRef<Array<Array<{ x: number; y: number; width: number; height: number; rotation: number }>>>([[...rects]]);
     const router = useRouter();
 
 
@@ -202,54 +203,10 @@ export default function useDraw(roomId: string) {
             lines: linesHistory.current[historyStep.current],
             circles: circlesHistory.current[historyStep.current],
             rects: rectsHistory.current[historyStep.current],
+            element: lines.length + circles.length + rects.length,
         };
         sessionStorage.setItem(`drawing_${roomId}`, JSON.stringify(canvasData));
     }
-
-    const getToSessionStorage = () => {
-        const data = sessionStorage.getItem(`drawing_${roomId}`);
-        if (data) {
-            const canvasData = JSON.parse(data);
-            setCount(
-                (canvasData.lines ? canvasData.lines.length : 0) +
-                (canvasData.circles ? canvasData.circles.length : 0) +
-                (canvasData.rects ? canvasData.rects.length : 0)
-            );
-            setLines(canvasData.lines || []);
-            setCircles(canvasData.circles || []);
-            setRects(canvasData.rects || []);
-
-            linesHistory.current = [[...canvasData.lines]];
-            circlesHistory.current = [[...canvasData.circles]];
-            rectsHistory.current = [[...canvasData.rects]];
-            historyStep.current = 0;
-
-        }
-    }
-
-    // 初回セットアップ
-    useEffect(() => {
-        linesHistory.current = [[...lines]];
-        circlesHistory.current = [[...circles]];
-        rectsHistory.current = [[...rects]];
-        historyStep.current = 0;
-
-        // クライアント側でユーザー名を取得
-        const name = getUsername();
-        if (name) {
-            setUserName(name);
-        }
-
-        const handleGlobalMouseUp = () => {
-            isDrawing.current = false;
-        }
-
-        document.addEventListener('mouseup', handleGlobalMouseUp);
-
-        return () => {
-            document.removeEventListener('mouseup', handleGlobalMouseUp);
-        }
-    }, []);
 
     return {
         count,
@@ -271,7 +228,6 @@ export default function useDraw(roomId: string) {
         handleReset,
         handleSave,
         saveToSessionStorage,
-        getToSessionStorage,
         w,
         h,
     };

@@ -6,9 +6,8 @@ import Button from '@/components/atoms/Button';
 import { motion } from "motion/react";
 import { TbArrowForwardUp, TbArrowBackUp, TbTrash } from 'react-icons/tb';
 import { IconContext } from "react-icons";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import Modal from "@/components/organisms/Modal";
-import { useEffect } from "react";
 import { useBlocker } from "@/hooks/useBlocker";
 import useStatus from "@/hooks/useStatus";
 import { KonvaEventObject } from "konva/lib/Node";
@@ -37,7 +36,6 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
         handleReset,
         handleSave,
         saveToSessionStorage,
-        getToSessionStorage,
         w,
         h,
     } = useDraw(roomId);
@@ -46,14 +44,6 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
     const [isBlocked, setIsBlocked] = useState(true);
     useBlocker(() => { }, isBlocked);
     const { roomStatus } = useStatus(roomId);
-
-    const memoGetToSessionStorage = useCallback(() => {
-        getToSessionStorage();
-    }, [getToSessionStorage]);
-
-    useEffect(() => {
-        memoGetToSessionStorage();
-    }, []);
 
     return (
         <>
@@ -133,7 +123,7 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
                             onMouseUp={handleMouseUp}
                             onTouchStart={(e: KonvaEventObject<TouchEvent>) => handleMouseDown(e)}
                             onTouchMove={(e: KonvaEventObject<TouchEvent>) => handleMouseMove(e)}
-                            onTouchEnd={(e: KonvaEventObject<TouchEvent>) => handleMouseUp()}
+                            onTouchEnd={() => handleMouseUp()}
                             >
                             <Layer
                                 tension={0.5}

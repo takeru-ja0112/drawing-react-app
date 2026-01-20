@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { usePresence } from '@/hooks/usePresence';
 import { getOrCreateUser, type UserInfo } from '@/lib/user';
 import Button from '@/components/atoms/Button';
@@ -18,7 +18,8 @@ import { setStatusRoom } from '@/app/room/[id]/action';
 export default function RoomPage({ title }: { title: string }) {
     const params = useParams();
     const roomId = params.id as string;
-    const [user, setUser] = useState<UserInfo>({ id: '', username: '' });
+    // こうなるんだったら状態管理ツールを導入する方がいい？
+    const user : UserInfo = (getOrCreateUser());
     const { users } = usePresence(roomId, user.id, user.username);
     const router = useRouter();
     const [isAnswerModalOpen, setIsAnswerModalOpen] = useState(false);
@@ -44,11 +45,11 @@ export default function RoomPage({ title }: { title: string }) {
         router.push(`/room/${roomId}/answer`);
     }
 
-    useEffect(() => {
-        const userInfo = getOrCreateUser();
+    // useEffect(() => {
+    //     const userInfo = getOrCreateUser();
 
-        setUser(userInfo);
-    }, []);
+    //     setUser(userInfo);
+    // }, []);
 
     return (
         <div>

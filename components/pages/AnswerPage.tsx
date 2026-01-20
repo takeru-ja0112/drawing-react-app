@@ -202,20 +202,6 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
         };
     }, [roomId]);
 
-    // mistakeModalが開いたら3秒間ボタンを無効化
-    useEffect(() => {
-        if (mistakeModal) {
-            setIsMistakeNextDisabled(true);
-            const timer = setTimeout(() => {
-                setIsMistakeNextDisabled(false);
-            }, 3000);
-            return () => clearTimeout(timer);
-        } else {
-            setIsMistakeNextDisabled(false);
-        }
-    }, [mistakeModal]);
-
-
     const { roomStatus } = useStatus(roomId);
 
     return (
@@ -420,7 +406,6 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                 {mistakeModal &&
                     <MistakeModal
                         onClick={() => handleNext()}
-                        disabled={isMistakeNextDisabled}
                     />
                 }
                 {lastModal && <ChallengeModal

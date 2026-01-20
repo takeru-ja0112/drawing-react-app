@@ -5,7 +5,6 @@ import { TbHome, TbUsersGroup, TbArrowBackUp, TbPencil } from "react-icons/tb";
 import Link from "next/link";
 import Image from "next/image";
 import historyLocalRoom from "@/lib/hitoryLocalRoom";
-import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function AccessMenu({
@@ -15,26 +14,16 @@ export default function AccessMenu({
     isOpen: boolean;
     onClose: () => void;
 }) {
-    const [localRoom, setLocalRoom] = useState<string | null>(null);
     const { getLocalRoom } = historyLocalRoom();
     const router = useRouter();
 
-    const memoLocalRoom = useCallback(() => {
-        const localRoom = getLocalRoom();
-        setLocalRoom(localRoom);
-    }, [getLocalRoom]);
-    useEffect(() => {
-        memoLocalRoom();
-    }, []);
-
-    const handleLocalRoomClick = () => {
-        const localRoom = getLocalRoom();
-        if (localRoom) {
-            setLocalRoom(localRoom);
-            router.push(`/room/${localRoom}`);
+    const handleGoToLastRoom = () => {
+        const latestRoom = getLocalRoom();
+        if (latestRoom) {
+            router.push(`/room/${latestRoom}`);
+            onClose();
         }
-    }
-
+    };
 
     return (
         <>
@@ -49,11 +38,16 @@ export default function AccessMenu({
                         <Link href="/" onClick={onClose}><li className="my-3 flex px-2 py-1 hover:bg-gray-200 transition duration-200 rounded-full"><TbHome />ホーム</li></Link>
                         <Link href="/lobby" onClick={onClose}><li className="my-3 flex px-3 py-1 hover:bg-gray-200 transition duration-200 rounded-full"><TbUsersGroup />ロビー</li></Link>
                         <Link href="/drawing" onClick={onClose}><li className="my-3 flex px-3 py-1 hover:bg-gray-200 transition duration-200 rounded-full"><TbPencil />試し書き</li></Link>
-                        {localRoom && (
+                        {getLocalRoom() && (
                             <>
                                 <hr className="border-gray-300" />
-                                <button onClick={() => { handleLocalRoomClick(); onClose(); }}><li className="my-3 flex px-3 py-1 hover:bg-gray-200 transition duration-200 rounded-full"><TbArrowBackUp />最後に入ったルーム</li></button>
-                            </>)}
+                                <button onClick={handleGoToLastRoom} className="w-full text-left">
+                                    <li className="my-3 flex px-3 py-1 hover:bg-gray-200 transition duration-200 rounded-full">
+                                        <TbArrowBackUp />最後に入ったルーム
+                                    </li>
+                                </button>
+                            </>
+                        )}
                     </IconContext.Provider>
                 </ol>
             </div>
