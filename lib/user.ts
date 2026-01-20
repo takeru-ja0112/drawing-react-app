@@ -112,14 +112,7 @@ export function setUsernameSchema({
 ) {
   setNameError('');
   const result = validateUsername(name);
-
-  console.log(result);
-  // エラーバリデーション
-
-
-
   if (result.success && name) {
-    console.log('Valid username:', name);
     setUser(name);
     setUsername(name);
     return { success: true, error: null };
