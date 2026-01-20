@@ -207,7 +207,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                     {roomsList.map((room) => (
                                         <div
                                             key={room.id}
-                                            className="relative border border-gray-400 border-3 rounded-3xl p-4 hover:shadow-md transition-shadow cursor-pointer"
+                                            className="relative border border-yellow-500 border-3 rounded-3xl p-4 hover:shadow-md transition-shadow cursor-pointer"
                                             onClick={() => handleIntoRoom({ roomId: room.id })}
                                         >
                                             <div className="flex justify-between items-center">
