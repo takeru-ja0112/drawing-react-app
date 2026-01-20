@@ -6,7 +6,6 @@ import { createRoomByUsername, getRoomByPageSearch } from '@/app/lobby/action';
 import Button from '@/components/atoms/Button';
 import Card from '@/components/atoms/Card';
 import Input from '@/components/atoms/Input';
-import Loading from '@/components/atoms/Loading';
 import historyLocalRoom from '@/lib/hitoryLocalRoom';
 import { supabase } from '@/lib/supabase';
 import { generateUser, getUsername, setUsernameSchema } from '@/lib/user';
@@ -14,7 +13,7 @@ import type { Room } from '@/type/roomType';
 import DOMPurify from 'dompurify';
 import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
-import { TbArrowLeft, TbArrowRight } from 'react-icons/tb';
+import { TbArrowLeft, TbArrowRight, TbArrowUpRight } from 'react-icons/tb';
 import { z } from 'zod';
 import BgObject from '../organisms/BgObject';
 import CreateRoomModal from '../organisms/lobby/CreateRoomModal';
@@ -203,29 +202,25 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                             {rooms.length === 0 ? (
                                 <p className="text-gray-500">まだルームがありません</p>
                             ) : (
-                                <div className="grid gap-4">
+                                <div className="grid gap-4 grid-cols-2">
                                     {roomsList.map((room) => (
                                         <div
                                             key={room.id}
-                                            className=" border border-gray-400 border-3 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                                            className="relative border border-gray-400 border-3 rounded-3xl p-4 hover:shadow-md transition-shadow cursor-pointer"
                                             onClick={() => handleIntoRoom({ roomId: room.id })}
                                         >
                                             <div className="flex justify-between items-center">
-                                                <div>
+                                                <TbArrowUpRight className="text-gray-400 text-xl absolute right-3 top-3" />
+                                                <div className='overflow-hidden text-ellipsis whitespace-nowrap'>
                                                     <label className="block text-gray-700 text-sm">ルーム名</label>
                                                     <h3 className='font-semibold text-lg'>{room.room_name}</h3>
                                                     <p className="font-mono text-sm text-gray-600">作成者：{room.created_by_name}</p>
                                                 </div>
-                                                <Button
-                                                    key={room.id}
-                                                    value="参加"
-                                                    icon={joinLoadingId === room.id ? <Loading /> : null}
-                                                />
                                             </div>
                                         </div>
                                     ))}
                                     {/* ページネーション */}
-                                    <div className="flex justify-center space-x-4 mt-4">
+                                    <div className="flex justify-center space-x-4 mt-4 col-span-2">
                                         <Button
                                             icon={<TbArrowLeft size={20} />}
                                             onClick={() => {
