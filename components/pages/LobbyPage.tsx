@@ -203,11 +203,11 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                             {rooms.length === 0 ? (
                                 <p className="text-gray-500">まだルームがありません</p>
                             ) : (
-                                <div className="grid gap-4 grid-cols-2">
+                                <div className="sm:grid sm:grid-cols-2 gap-3">
                                     {roomsList.map((room) => (
                                         <div
                                             key={room.id}
-                                            className="relative border border-yellow-500 bg-white/50 border-3 rounded-3xl p-4 hover:shadow-md transition-shadow cursor-pointer"
+                                            className="relative border border-yellow-500 bg-white/50 mb-4 border-3 rounded-3xl p-4 hover:shadow-md transition-shadow cursor-pointer"
                                             onClick={() => handleIntoRoom({ roomId: room.id })}
                                         >
                                             <div className="flex justify-between items-center">
