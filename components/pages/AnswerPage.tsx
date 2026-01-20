@@ -68,7 +68,6 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
     const router = useRouter();
 
     const handleNext = () => {
-        console.log('handleNext called', currentIndex, mistake);
         if (currentIndex < data.length - 1) {
             setCurrentIndex(currentIndex + 1);
         }
@@ -78,7 +77,6 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
     const handleBack = () => {
         if (currentIndex > 0) {
             setCurrentIndex(currentIndex - 1);
-            console.log('handleBack called', currentIndex);
         }
     }
 
@@ -329,7 +327,6 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                             </div>
                                             <button
                                                 onClick={() => {
-                                                    console.log('currentIndex:', currentIndex, 'mistake:', mistake);
                                                     if (isAnswerRole && currentIndex >= mistake) return;
                                                     handleNext()
                                                 }}

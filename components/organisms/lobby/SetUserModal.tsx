@@ -1,7 +1,7 @@
-import Modal from '@/components/organisms/Modal';
-import Input from '@/components/atoms/Input';
 import Button from '@/components/atoms/Button';
-import { setUsernameSchema, validateUsername } from '@/lib/user';
+import Input from '@/components/atoms/Input';
+import Modal from '@/components/organisms/Modal';
+import { setUsernameSchema } from '@/lib/user';
 
 export default function SetUserModal({
     isSetUserModal,
