@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 // サニタイズ用
-import { createRoomByUsername, getRooms } from '@/app/lobby/action';
+import { createRoomByUsername, getRoomByPageSearch } from '@/app/lobby/action';
 import Button from '@/components/atoms/Button';
 import Card from '@/components/atoms/Card';
 import Input from '@/components/atoms/Input';
@@ -12,6 +12,7 @@ import { supabase } from '@/lib/supabase';
 import { generateUser, getUsername, setUsernameSchema } from '@/lib/user';
 import type { Room } from '@/type/roomType';
 import DOMPurify from 'dompurify';
+import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 import BgObject from '../organisms/BgObject';
@@ -39,6 +40,9 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     const [joinLoadingId, setJoinLoadingId] = useState<string | null>(null);
     const [isSetUserModal, setIsSetUserModal] = useState<boolean>(!username);
 
+    const [ currentPage , setCurrentPage ] = useState<number>(1);
+    const itemsPerPage = 10;
+
     const handleCreateRoom = () => {
         if (!user) {
             setNameError('ユーザー名は必須です');
@@ -47,10 +51,6 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
 
         setIsOpen(true);
     }
-
-    const filteredRooms = roomsList.filter((room) =>
-        room.room_name?.toLowerCase().includes(searchName.toLowerCase())
-    );
 
     const createRoom = async () => {
         const isValid = validateRoomName(roomName);
@@ -97,6 +97,22 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
         const parseResult = roomNameSchema.safeParse(name);
         return parseResult.success;
     }
+    
+    useEffect(() => {
+
+        const delayDebounceFn = setTimeout(() => {
+            console.log('Searching rooms with name:', searchName);
+            const fetchRooms = async () => {
+                const res = await getRoomByPageSearch(1, itemsPerPage, searchName);
+                if (res.success && res.data) {
+                    setRoomsList(res.data);
+                    setCurrentPage(1);
+                }
+            }
+            fetchRooms();
+        }, 1000); // 1秒遅延
+        return () => clearTimeout(delayDebounceFn);
+    },[searchName]);
 
     useEffect(() => {
         // 初回ユーザー生成
@@ -106,7 +122,8 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     useEffect(() => {
         // ルームリストの再取得
         const fetchRooms = async () => {
-            const res = await getRooms();
+            console.log('Fetching rooms for page:', searchName);
+            const res = await getRoomByPageSearch(currentPage, itemsPerPage, searchName);
             if (res.success && res.data) {
                 setRoomsList(res.data);
             }
@@ -179,7 +196,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                             <Input
                                 name="search"
                                 value={searchName}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchName(e.target.value)}
+                                onChange={(e)=>{setSearchName(e.target.value);}}
                                 placeholder="検索したいルーム名を入力してください"
                                 className={`w-full ${searchError ? 'border-red-500 border-2' : ''}`}
                             />
@@ -190,7 +207,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                 <p className="text-gray-500">まだルームがありません</p>
                             ) : (
                                 <div className="grid gap-4">
-                                    {filteredRooms.map((room) => (
+                                    {roomsList.map((room) => (
                                         <div
                                             key={room.id}
                                             className=" border border-gray-400 border-3 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
@@ -210,6 +227,40 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                             </div>
                                         </div>
                                     ))}
+                                    {/* ページネーション */}
+                                    <div className="flex justify-center space-x-4 mt-4">
+                                        <Button
+                                            value="前のページ"
+                                            onClick={async () => {
+                                                if (currentPage > 1) {
+                                                    const newPage = currentPage - 1;
+                                                    setCurrentPage(newPage);
+                                                    const res = await getRoomByPageSearch(newPage, itemsPerPage, searchName);
+                                                    if (res.success && res.data) {
+                                                        setRoomsList(res.data);
+                                                    }
+                                                }
+                                            }}
+                                            disabled={currentPage === 1}
+                                        />
+                                        <motion.div
+                                        className="flex font-bold border-3 border-dotted border-yellow-600 items-center bg-yellow-400 px-4 rounded"
+                                        >{currentPage}</motion.div>
+                                        <Button
+                                            value="次のページ"
+                                            onClick={async () => {
+                                                const newPage = currentPage + 1;
+                                                setCurrentPage(newPage);
+                                                const res = await getRoomByPageSearch(newPage, itemsPerPage, searchName);
+                                                if (res.success && res.data && res.data.length > 0) {
+                                                    setRoomsList(res.data);
+                                                } else {
+                                                    setCurrentPage(currentPage); // 戻す
+                                                }
+                                            }}
+                                            disabled={roomsList.length < itemsPerPage}
+                                        />
+                                    </div>
                                 </div>
                             )}
                         </div>

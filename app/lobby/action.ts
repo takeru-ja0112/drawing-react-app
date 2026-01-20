@@ -21,6 +21,34 @@ export async function getRooms() {
   }
 }
 
+export async function getRoomByPageSearch(page: number, pageSize: number , searchTerm: string) {
+  try {
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+
+    const { data, error, count } = await supabase
+      // roomsテーブル
+      .from('rooms')
+      // 全カラムと、
+      .select('*', { count: 'exact' })
+      // 作成日時の降順
+      .order('created_at', { ascending: false })
+      // ページネーション
+      .range(from, to)
+      .ilike('room_name', `%${searchTerm}%`);
+
+    if (error) {
+      console.error('Failed to fetch rooms by page:', error);
+      return { success: false, error: error.message, data: null, total: 0 };
+    }
+
+    return { success: true, error: null, data, total: count || 0 };
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return { success: false, error: 'Failed to fetch rooms by page', data: null, total: 0 };
+  }
+}
+
 // 特定のルームを取得
 export async function getRoom(roomId: string) {
   try {
