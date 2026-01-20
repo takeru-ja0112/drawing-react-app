@@ -72,7 +72,7 @@ export default function RoomPage({ title }: { title: string }) {
                                             transition={{ delay: index * 0.2 }}
                                             key={index}
                                         >
-                                            <div className='w-full p-2 bg-yellow-400 rounded-sm text-center font-bold whitespace-nowrap overflow-hidden text-ellipsis'>
+                                            <div className='w-full p-2 bg-yellow-400 rounded-sm text-center font-bold text-xs whitespace-nowrap overflow-hidden text-ellipsis'>
                                                 {user.user_name}
                                             </div>
                                         </motion.div>
