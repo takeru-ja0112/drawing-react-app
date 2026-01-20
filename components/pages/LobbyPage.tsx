@@ -207,11 +207,11 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                     {roomsList.map((room) => (
                                         <div
                                             key={room.id}
-                                            className="relative border border-yellow-500 border-3 rounded-3xl p-4 hover:shadow-md transition-shadow cursor-pointer"
+                                            className="relative border border-yellow-500 bg-white/50 border-3 rounded-3xl p-4 hover:shadow-md transition-shadow cursor-pointer"
                                             onClick={() => handleIntoRoom({ roomId: room.id })}
                                         >
                                             <div className="flex justify-between items-center">
-                                                <TbArrowUpRight className="text-gray-400 text-xl absolute right-3 top-3" />
+                                                <TbArrowUpRight className="text-yellow-600  text-xl absolute right-3 top-3" />
                                                 <div className='overflow-hidden text-ellipsis whitespace-nowrap'>
                                                     <label className="block text-gray-700 text-xs">ルーム名</label>
                                                     <h3 className='font-semibold text-sm truncate'>{room.room_name}</h3>
