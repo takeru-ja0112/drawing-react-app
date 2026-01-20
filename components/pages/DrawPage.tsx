@@ -133,13 +133,13 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
                                 lineJoin="round"
                             >
                                 {lines.map((line, i) => (
-                                    <Line key={i} points={line} stroke="black" />
+                                    <Line key={i} points={line} stroke="black" strokeWidth={3} />
                                 ))}
                                 {circles.map((circle, i) => (
-                                    <Circle key={i} x={circle.x} y={circle.y} radius={circle.radius} stroke="black" />
+                                    <Circle key={i} x={circle.x} y={circle.y} radius={circle.radius} stroke="black" strokeWidth={3} />
                                 ))}
                                 {rects.map((rect, i) => (
-                                    <KonvaRect key={i} x={rect.x} y={rect.y} width={rect.width} height={rect.height} stroke="black" rotation={rect.rotation} />
+                                    <KonvaRect key={i} x={rect.x} y={rect.y} width={rect.width} height={rect.height} stroke="black" strokeWidth={3} rotation={rect.rotation} />
                                 ))}
                             </Layer>
                         </Stage>

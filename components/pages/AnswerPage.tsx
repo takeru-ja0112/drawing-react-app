@@ -304,7 +304,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                                 <Stage width={300} height={300}>
                                                     <Layer>
                                                         {currentDrawing.canvas_data.lines.map((line, i) => (
-                                                            <Line key={`line-${i}`} points={line} stroke="black" strokeWidth={2} />
+                                                            <Line key={`line-${i}`} points={line} stroke="black" strokeWidth={3} />
                                                         ))}
                                                         {currentDrawing.canvas_data.circles.map((circle, i) => (
                                                             <Circle
@@ -313,7 +313,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                                                 y={circle.y}
                                                                 radius={circle.radius}
                                                                 stroke="black"
-                                                                strokeWidth={2}
+                                                                strokeWidth={3}
                                                             />
                                                         ))}
                                                         {currentDrawing.canvas_data.rects.map((rect, i) => (
@@ -324,7 +324,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                                                 width={rect.width}
                                                                 height={rect.height}
                                                                 stroke="black"
-                                                                strokeWidth={2}
+                                                                strokeWidth={3}
                                                             />
                                                         ))}
                                                     </Layer>
