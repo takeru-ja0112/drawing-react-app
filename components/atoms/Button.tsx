@@ -25,7 +25,7 @@ export default function Btn({ value, className ,onClick, disabled, type = "butto
         >
             <span className="flex flex-row items-center justify-center">
                 {icon && <span className="mr-1">{icon}</span>}
-                {value}
+                {value && <span>{value}</span>}
             </span>
         </motion.button>
     );
