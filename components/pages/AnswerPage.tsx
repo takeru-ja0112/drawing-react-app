@@ -64,20 +64,22 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
     const [lastModal, setLastModal] = useState(false);
     const [isStatusAnswering, setIsStatusAnswering] = useState(false);
     const [isPleaseCloseModal, setIsPleaseCloseModal] = useState(false);
-    const [isMistakeNextDisabled, setIsMistakeNextDisabled] = useState(false);
+    const [mistake, setMistake] = useState<number>(0);
     const router = useRouter();
 
     const handleNext = () => {
+        console.log('handleNext called', currentIndex, mistake);
         if (currentIndex < data.length - 1) {
             setCurrentIndex(currentIndex + 1);
+            setMistake(mistake + 1);
         }
         setMistakeModal(false);
-        setIsMistakeNextDisabled(false);
     };
 
     const handleBack = () => {
         if (currentIndex > 0) {
             setCurrentIndex(currentIndex - 1);
+            setMistake(mistake - 1);
         }
     }
 
@@ -324,7 +326,10 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                                 </Stage>
                                             </div>
                                             <button
-                                                onClick={handleNext}
+                                                onClick={() => {
+                                                    if (currentIndex > mistake) return;
+                                                    handleNext()
+                                                }}
                                                 className='disabled:opacity-50 disabled:cursor-not-allowed'
                                                 disabled={currentIndex === data.length - 1}
                                             >
@@ -417,16 +422,14 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
 
                 {isPleaseCloseModal &&
                     <Modal isOpen={isPleaseCloseModal} onClose={() => setIsPleaseCloseModal(false)}>
-                        <div className="p-6">
-                            <h2 className="text-2xl font-bold mb-4 text-center">まだ締め切っていません</h2>
-                            <p className="text-center">締め切ってから回答を始めてください</p>
-                            <div className="flex justify-end mt-6">
-                                <Button
-                                    onClick={() => setIsPleaseCloseModal(false)}
-                                    className=""
-                                    value='閉じる'
-                                />
-                            </div>
+                        <h2 className="text-2xl font-bold mb-4 text-center">まだ締め切っていません</h2>
+                        <p className="text-center">締め切ってから回答を始めてください</p>
+                        <div className="flex justify-end mt-6">
+                            <Button
+                                onClick={() => setIsPleaseCloseModal(false)}
+                                className=""
+                                value='閉じる'
+                            />
                         </div>
                     </Modal>
                 }
