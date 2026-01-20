@@ -3,7 +3,7 @@ import { TbLoaderQuarter } from "react-icons/tb";
 export default function Loading() {
     return (
         <div
-            className="flex items-center justify-center h-full"
+            className="h-full flex items-center justify-center"
         >
             <TbLoaderQuarter className="animate-spin" />
         </div>
