@@ -1,25 +1,25 @@
 "use client";
 
-import { Stage, Layer, Line, Circle, Rect } from 'react-konva';
-import { useState, useEffect } from 'react';
+import { resetRoomSettings, setStatusRoom } from '@/app/room/[id]/action';
 import { checkAnswerRole } from '@/app/room/[id]/answer/action';
 import Button from '@/components/atoms/Button';
-import Input from '@/components/atoms/Input';
-import confetti from 'canvas-confetti';
 import Card from '@/components/atoms/Card';
-import MistakeModal from '../organisms/answer/MistakeModal';
-import CorrectModal from '../organisms/answer/CorrectModal';
-import Modal from '../organisms/Modal';
-import { motion } from 'motion/react';
-import { supabase } from '@/lib/supabase';
-import { setStatusRoom, resetRoomSettings } from '@/app/room/[id]/action';
-import FinishModal from '../organisms/answer/FinishModal';
-import { useRouter } from 'next/navigation';
-import StatusBar from '../organisms/StatusBat';
-import ChallengeModal from '../organisms/answer/ChallengeModal';
-import { TbArrowBadgeLeftFilled, TbArrowBadgeRightFilled, TbLock } from 'react-icons/tb';
-import { IconContext } from 'react-icons';
+import Input from '@/components/atoms/Input';
 import useStatus from '@/hooks/useStatus';
+import { supabase } from '@/lib/supabase';
+import confetti from 'canvas-confetti';
+import { motion } from 'motion/react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { IconContext } from 'react-icons';
+import { TbArrowBadgeLeftFilled, TbArrowBadgeRightFilled, TbLock } from 'react-icons/tb';
+import { Circle, Layer, Line, Rect, Stage } from 'react-konva';
+import ChallengeModal from '../organisms/answer/ChallengeModal';
+import CorrectModal from '../organisms/answer/CorrectModal';
+import FinishModal from '../organisms/answer/FinishModal';
+import MistakeModal from '../organisms/answer/MistakeModal';
+import Modal from '../organisms/Modal';
+import StatusBar from '../organisms/StatusBat';
 
 
 type Drawing = {
@@ -71,7 +71,6 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
         console.log('handleNext called', currentIndex, mistake);
         if (currentIndex < data.length - 1) {
             setCurrentIndex(currentIndex + 1);
-            setMistake(mistake + 1);
         }
         setMistakeModal(false);
     };
@@ -79,7 +78,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
     const handleBack = () => {
         if (currentIndex > 0) {
             setCurrentIndex(currentIndex - 1);
-            setMistake(mistake - 1);
+            console.log('handleBack called', currentIndex);
         }
     }
 
@@ -96,9 +95,10 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
 
         } else {
             // 不正解時の処理
-            if (currentIndex === data.length - 1) {
+            if (mistake + 1 >= data.length) {
                 setLastModal(true);
             } else {
+                setMistake(currentIndex + 1);
                 setMistakeModal(true);
             }
             setIsOpen(false);
@@ -138,6 +138,8 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
 
     const handleModify = async () => {
         await setStatusRoom(roomId, 'DRAWING');
+        setMistake(0);
+        setCurrentIndex(0);
         setLastModal(false);
     }
 
@@ -327,11 +329,12 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                             </div>
                                             <button
                                                 onClick={() => {
-                                                    if (currentIndex > mistake) return;
+                                                    console.log('currentIndex:', currentIndex, 'mistake:', mistake);
+                                                    if (isAnswerRole && currentIndex >= mistake) return;
                                                     handleNext()
                                                 }}
                                                 className='disabled:opacity-50 disabled:cursor-not-allowed'
-                                                disabled={currentIndex === data.length - 1}
+                                                disabled={isAnswerRole ? currentIndex >= mistake : currentIndex === data.length - 1 }
                                             >
                                                 <TbArrowBadgeRightFilled />
                                             </button>
