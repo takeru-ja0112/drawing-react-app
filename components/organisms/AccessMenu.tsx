@@ -19,7 +19,7 @@ export default function AccessMenu({
 
     const handleGoToLastRoom = () => {
         if( typeof window === 'undefined') return;
-        
+
         const latestRoom = getLocalRoom();
         if (latestRoom) {
             router.push(`/room/${latestRoom}`);

@@ -1,32 +1,29 @@
 "use client";
 
-import { useState } from 'react';
 import Loading from '@/components/atoms/Loading';
 
 export default function StatusBar({ status }: { status: string }) {
-    const [ statusValue, setStatusValue ] = useState<string>(status);
-    
+    let statusValue = "";
     switch (status) {
         case "WAITING":
-            setStatusValue("回答者を待っています");
+            statusValue = "回答者を待っています";
             break;
         case "DRAWING":
-            setStatusValue("お題に沿ってお絵描き中です");
+            statusValue = "お題に沿ってお絵描き中です";
             break;
         case "ANSWERING":
-            setStatusValue("回答中です");
+            statusValue = "回答中です";
             break;
         case "FINISHED":
-            setStatusValue("終了しました");
+            statusValue = "終了しました";
             break;
         case "RESETTING":
-            setStatusValue("リセット中です");
+            statusValue = "リセット中です";
             break;
-        
         default:
             break;
     }
-    
+
     return (
         <div className="mb-3 text-center bg-yellow-400 py-2 rounded-3xl w-full max-w-lg">
             <h1 className='font-bold flex items-center justify-center'>
@@ -34,7 +31,7 @@ export default function StatusBar({ status }: { status: string }) {
                     <Loading className="mr-2" />
                 )}
                 {statusValue}
-            
+
             </h1>
         </div>
     );
