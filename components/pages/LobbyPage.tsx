@@ -38,7 +38,6 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     const [roomName, setRoomName] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [roomError, setRoomError] = useState<string>('');
-    const [joinLoadingId, setJoinLoadingId] = useState<string | null>(null);
     const [isSetUserModal, setIsSetUserModal] = useState<boolean>(!username);
 
     const [ currentPage , setCurrentPage ] = useState<number>(1);
@@ -73,6 +72,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
             const result = await createRoomByUsername(user, sanitizedRoomName);
             if (result.success && result.data) {
                 const roomId = result.data.id;
+                setLocalRoom(roomId);
                 router.push(`/room/${roomId}`);
             } else {
                 console.error('Failed to create room:', result.error);
@@ -90,7 +90,6 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
             setNameError('ルームに参加するにはユーザー名が必要です');
             return false;
         }
-        setJoinLoadingId(roomId);
         setLocalRoom(roomId);
         router.push(`/room/${roomId}`);
     }
@@ -197,7 +196,9 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                 className={`w-full ${searchError ? 'border-red-500 border-2' : ''}`}
                             />
                         </div>
-                        <h2 className="text-md font-semibold text-gray-700">参加可能なルーム</h2>
+                        <div className='mb-2'>
+                            <label htmlFor="username" className='font-semibold text-gray-700'>参加可能なルーム</label>
+                        </div>
                         <div className="space-y-4">
                             {rooms.length === 0 ? (
                                 <p className="text-gray-500">まだルームがありません</p>
