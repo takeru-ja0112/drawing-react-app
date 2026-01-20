@@ -64,7 +64,7 @@ export default function RoomPage({ title }: { title: string }) {
                             <h2 className="text-lg text-gray-500 font-semibold mb-2">参加者</h2>
                             {users.length > 0 ? (
                                 // <ul>
-                                <div className='grid grid-cols-2 gap-2'>
+                                <div className='grid grid-cols-3 gap-2'>
                                     {users.map((user, index) => (
                                         <motion.div
                                             initial={{ opacity: 0, x: 10 }}
