@@ -1,19 +1,19 @@
 "use client";
 
-import { useParams } from 'next/navigation';
-import { useState } from 'react';
+import { setStatusRoom } from '@/app/room/[id]/action';
+import { isCheckAnswer, setdbAnswer } from '@/app/room/[id]/answer/action';
+import Button from '@/components/atoms/Button';
+import Card from '@/components/atoms/Card';
+import Modal from '@/components/organisms/Modal';
 import { usePresence } from '@/hooks/usePresence';
 import { getOrCreateUser, type UserInfo } from '@/lib/user';
-import Button from '@/components/atoms/Button';
-import Link from 'next/link';
-import { TbPencil, TbBallBowling } from 'react-icons/tb';
-import { IconContext } from 'react-icons';
 import { motion } from 'motion/react';
-import { useRouter } from 'next/navigation';
-import { isCheckAnswer, setdbAnswer } from '@/app/room/[id]/answer/action';
-import Modal from '@/components/organisms/Modal';
-import Card from '@/components/atoms/Card';
-import { setStatusRoom } from '@/app/room/[id]/action';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { IconContext } from 'react-icons';
+import { TbBallBowling, TbPencil } from 'react-icons/tb';
+import BgObject from '../organisms/BgObject';
 
 export default function RoomPage({ title }: { title: string }) {
     const params = useParams();
@@ -52,13 +52,14 @@ export default function RoomPage({ title }: { title: string }) {
 
     return (
         <div>
+            <BgObject />
             <div className="w-full p-8">
                 <div className="max-w-lg mx-auto">
                     <div className="mb-6 text-center">
                         <h2 className="text-lg text-gray-500 font-semibold mb-2">ルーム名</h2>
                         <p className="text-gray-900 font-bold break-all">{title}</p>
                     </div>
-                    <div className="mb-4 p-5 bg-gray-100 rounded-3xl">
+                    <Card className="mb-4 p-5 bg-gray-100 rounded-3xl">
                         <div className="mb-6">
                             <h2 className="text-lg text-gray-500 font-semibold mb-2">参加者</h2>
                             {users.length > 0 ? (
@@ -111,7 +112,7 @@ export default function RoomPage({ title }: { title: string }) {
                                 </Card>
                             </IconContext.Provider>
                         </div>
-                    </div>
+                    </Card>
                 </div>
             </div>
             {isAnswerModalOpen && <Modal

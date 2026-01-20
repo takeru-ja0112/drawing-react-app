@@ -9,10 +9,11 @@ import useStatus from '@/hooks/useStatus';
 import { supabase } from '@/lib/supabase';
 import confetti from 'canvas-confetti';
 import { motion } from 'motion/react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { IconContext } from 'react-icons';
-import { TbArrowBadgeLeftFilled, TbArrowBadgeRightFilled, TbLock } from 'react-icons/tb';
+import { TbArrowBadgeLeftFilled, TbArrowBadgeRightFilled, TbArrowLeft, TbLock } from 'react-icons/tb';
 import { Circle, Layer, Line, Rect, Stage } from 'react-konva';
 import ChallengeModal from '../organisms/answer/ChallengeModal';
 import CorrectModal from '../organisms/answer/CorrectModal';
@@ -209,6 +210,9 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
     return (
         <>
             <div className="flex flex-col items-center justify-center p-8">
+                <Link href={`/room/${roomId}`} className='absolute top-13 left-2 hover:text-yellow-600 transition duration-300 p-2 rounded-full'>
+                    <TbArrowLeft size='2em' />
+                </Link>
                 {
                     roomStatus.status !== 'ANSWERING' &&
                     isAnswerRole &&

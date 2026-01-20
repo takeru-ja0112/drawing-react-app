@@ -1,16 +1,17 @@
 "use client";
 
-import { Layer, Rect as KonvaRect, Stage, Line, Circle } from "react-konva";
-import useDraw from '@/hooks/DrawPage/handleDraw';
 import Button from '@/components/atoms/Button';
-import { motion } from "motion/react";
-import { TbArrowForwardUp, TbArrowBackUp, TbTrash } from 'react-icons/tb';
-import { IconContext } from "react-icons";
-import { useState } from "react";
 import Modal from "@/components/organisms/Modal";
+import useDraw from '@/hooks/DrawPage/handleDraw';
 import { useBlocker } from "@/hooks/useBlocker";
 import useStatus from "@/hooks/useStatus";
 import { KonvaEventObject } from "konva/lib/Node";
+import { motion } from "motion/react";
+import { useState } from "react";
+import { IconContext } from "react-icons";
+import { TbArrowBackUp, TbArrowForwardUp, TbTrash } from 'react-icons/tb';
+import { Circle, Rect as KonvaRect, Layer, Line, Stage } from "react-konva";
+import BgObject from "../organisms/BgObject";
 
 type DrawPageProps = {
     roomId: string;
@@ -47,6 +48,7 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
 
     return (
         <>
+        <BgObject />
             <div className="px-8 pt-2 pb-16">
                 <div className="max-w-lg mx-auto text-center">
                     {/* お題 */}

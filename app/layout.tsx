@@ -1,7 +1,7 @@
+import Header from "@/components/organisms/Header";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/organisms/Header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,7 +29,7 @@ export default function RootLayout({
         <link rel="icon" href="/minimalDrawIcon.svg" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-200`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-b from-gray-100 to-gray-200 min-h-screen`}
       >
         {/* ヘッダーの高さ分全体をさげる */}
         <Header />

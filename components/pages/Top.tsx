@@ -1,13 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import Button from "@/components/atoms/Button";
-import Image from "next/image";
 import Card from "@/components/atoms/Card";
-import { motion } from "motion/react";
-import { useInView } from "react-intersection-observer";
-import WhatsMinimal from "@/components/molecules/illust/top/WhatsMinimal";
 import NoLimitPeople from "@/components/molecules/illust/top/NoLimitPeople ";
+import WhatsMinimal from "@/components/molecules/illust/top/WhatsMinimal";
+import { motion } from "motion/react";
+import Image from "next/image";
+import Link from "next/link";
+import { useInView } from "react-intersection-observer";
+import BgObject from "../organisms/BgObject";
 
 export default function Top() {
     const title = "Minimal Drawer";
@@ -22,6 +23,7 @@ export default function Top() {
             <div
                 className="min-w-[320px] flex items-center justify-center px-8 overflow-hidden"
             >
+                <BgObject />
                 <div className="max-w-2xl w-90 mt-20 mb-30 z-10">
                     {/* メインコンテンツ */}
                     <motion.div

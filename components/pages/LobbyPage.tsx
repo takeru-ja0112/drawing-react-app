@@ -1,23 +1,22 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 // サニタイズ用
+import { createRoomByUsername, getRooms } from '@/app/lobby/action';
+import Button from '@/components/atoms/Button';
+import Card from '@/components/atoms/Card';
+import Input from '@/components/atoms/Input';
+import Loading from '@/components/atoms/Loading';
+import historyLocalRoom from '@/lib/hitoryLocalRoom';
+import { supabase } from '@/lib/supabase';
+import { generateUser, getUsername, setUsernameSchema } from '@/lib/user';
+import type { Room } from '@/type/roomType';
 import DOMPurify from 'dompurify';
 import { useRouter } from 'next/navigation';
-import Button from '@/components/atoms/Button';
-import { getUsername , setUsernameSchema} from '@/lib/user';
-import type { Room } from '@/type/roomType';
-import { generateUser } from '@/lib/user';
 import { z } from 'zod';
-import { createRoomByUsername } from '@/app/lobby/action';
-import Input from '@/components/atoms/Input';
-import historyLocalRoom from '@/lib/hitoryLocalRoom';
-import Loading from '@/components/atoms/Loading';
-import Card from '@/components/atoms/Card';
-import { supabase } from '@/lib/supabase';
-import { getRooms } from '@/app/lobby/action';
-import SetUserModal from '../organisms/lobby/SetUserModal';
+import BgObject from '../organisms/BgObject';
 import CreateRoomModal from '../organisms/lobby/CreateRoomModal';
+import SetUserModal from '../organisms/lobby/SetUserModal';
 
 const forbiddenChars = /[<>&\/\\'"]/;
 const roomNameSchema = z.string().max(10).refine((val) => !forbiddenChars.test(val), {
@@ -132,6 +131,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
 
     return (
         <>
+            <BgObject />
             <div className="p-8">
                 <div className="max-w-lg mx-auto">
 

@@ -3,7 +3,7 @@ import Hukidashi from "@/components/atoms/Hukidashi"
 export default function WhatsMinimal() {
     return (
         <div className="mb-4 w-full flex justify-center">
-            <div className="relative w-[150px] h-[150px] mx-auto border-4 border-gray-300 rounded-lg shadow-lg">
+            <div className="relative w-[150px] h-[150px] mx-auto border-4 border-gray-300 rounded-lg shadow-lg bg-white">
                 <Hukidashi className="w-fit absolute rotate-[-30deg] -left-10">
                     <p className="font-bold">みかん</p>
                 </Hukidashi>
