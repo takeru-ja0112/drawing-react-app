@@ -1,6 +1,13 @@
 const HISTORY_KEY = 'drawing_app_history_rooms';
 
 export default function historyLocalRoom() {
+    if( typeof window === 'undefined') {
+        return {
+            setLocalRoom: () => {},
+            getLocalRoom: () => null,
+        }
+    }
+
     // 直近でアクセスしてたルームのIDをローカルに保存する
     const setLocalRoom = (roomId: string) => {
         localStorage.removeItem(HISTORY_KEY);

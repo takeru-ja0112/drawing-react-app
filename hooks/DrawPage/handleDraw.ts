@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { KonvaEventObject } from 'konva/lib/Node';
 
 export default function useDraw(roomId: string) {
-    const canvasData = JSON.parse(sessionStorage.getItem(`drawing_${roomId}`) || 'null');
+    const canvasData = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem(`drawing_${roomId}`) || 'null') : null;
     const [count, setCount] = useState<number>(canvasData ? canvasData.element : 0);
     const [isSaving, setIsSaving] = useState(false);
     const [saveMessage, setSaveMessage] = useState<string>('');

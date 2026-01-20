@@ -91,7 +91,6 @@ export function useDrawingsRealtime(roomId: string) {
         .select('*')
         .eq('room_id', roomId)
         .order('element_count', { ascending: true })
-      
       if (data) setDrawings(data)
     }
 
