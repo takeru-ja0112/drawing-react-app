@@ -237,6 +237,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                     setUser={setUser}
                     setNameError={setNameError}
                     setIsSetUserModal={setIsSetUserModal}
+                    className='w-full'
                 />
             )}
         </>

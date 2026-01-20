@@ -8,15 +8,18 @@ export default function SetUserModal({
     user,
     nameError,
     loading,
+    className,
     setUser,
     setNameError,
-    setIsSetUserModal }
+    setIsSetUserModal,
+}
     :
     {
         isSetUserModal: boolean,
         user: string,
         nameError: string,
         loading: boolean,
+        className?: string,
         setUser: React.Dispatch<React.SetStateAction<string>>,
         setNameError: React.Dispatch<React.SetStateAction<string>>,
         setIsSetUserModal: React.Dispatch<React.SetStateAction<boolean>>
@@ -25,6 +28,7 @@ export default function SetUserModal({
         <>
             <Modal
                 isOpen={isSetUserModal}
+                className={className}
             >
                 <p className="font-semibold mb-2 text-gray-700">ユーザー名の入力</p>
                 <Input

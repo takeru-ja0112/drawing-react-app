@@ -372,7 +372,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                         isOpen={isStatusAnswering}
                         onClose={() => setIsStatusAnswering(false)}
                     >
-                        <div className="p-6">
+                        <div>
                             <h2 className="text-2xl font-bold mb-4 text-center">締め切りますか？</h2>
                             <p>描画中の方はいないですか？<br />参加人数分のイラストが届いている事を確認してください</p>
                             <div className="flex justify-end gap-4 mt-6">
