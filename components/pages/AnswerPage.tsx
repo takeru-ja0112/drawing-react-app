@@ -19,6 +19,7 @@ import ChallengeModal from '../organisms/answer/ChallengeModal';
 import CorrectModal from '../organisms/answer/CorrectModal';
 import FinishModal from '../organisms/answer/FinishModal';
 import MistakeModal from '../organisms/answer/MistakeModal';
+import BgObject from '../organisms/BgObject';
 import Modal from '../organisms/Modal';
 import StatusBar from '../organisms/StatusBat';
 
@@ -209,6 +210,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
 
     return (
         <>
+            <BgObject />
             <div className="flex flex-col items-center justify-center p-8">
                 <Link href={`/room/${roomId}`} className='absolute top-13 left-2 hover:text-yellow-600 transition duration-300 p-2 rounded-full'>
                     <TbArrowLeft size='2em' />
