@@ -32,6 +32,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     const [user, setUser] = useState(username || '');
     const [nameError, setNameError] = useState<string>('');
     const [searchName, setSearchName] = useState('');
+    const [searchQuery , setSearchQuery] = useState(searchName);
     const [searchError] = useState<string>('');
     const { setLocalRoom } = historyLocalRoom();
     const [roomName, setRoomName] = useState<string>('');
@@ -41,6 +42,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     const [isSetUserModal, setIsSetUserModal] = useState<boolean>(!username);
 
     const [ currentPage , setCurrentPage ] = useState<number>(1);
+    const [ isPaging, setIsPaging ] = useState<boolean>(false);
     const itemsPerPage = 10;
 
     const handleCreateRoom = () => {
@@ -99,35 +101,29 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     }
     
     useEffect(() => {
-
         const delayDebounceFn = setTimeout(() => {
-            console.log('Searching rooms with name:', searchName);
-            const fetchRooms = async () => {
-                const res = await getRoomByPageSearch(1, itemsPerPage, searchName);
-                if (res.success && res.data) {
-                    setRoomsList(res.data);
-                    setCurrentPage(1);
-                }
-            }
-            fetchRooms();
-        }, 1000); // 1秒遅延
+            setSearchQuery(searchName);
+            // デバウンス後はページ番号を1にリセット
+            setCurrentPage(1);
+        }, 500);
         return () => clearTimeout(delayDebounceFn);
-    },[searchName]);
+    }, [searchName]);
 
     useEffect(() => {
         // 初回ユーザー生成
         generateUser();
     }, []);
 
+
     useEffect(() => {
-        // ルームリストの再取得
         const fetchRooms = async () => {
-            console.log('Fetching rooms for page:', searchName);
-            const res = await getRoomByPageSearch(currentPage, itemsPerPage, searchName);
+            setIsPaging(true);
+            const res = await getRoomByPageSearch(currentPage, itemsPerPage, searchQuery);
             if (res.success && res.data) {
                 setRoomsList(res.data);
             }
-        }
+            setIsPaging(false);
+        };
         fetchRooms();
 
         const subscription = supabase
@@ -144,7 +140,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
         return () => {
             supabase.removeChannel(subscription);
         }
-    }, []);
+    }, [currentPage, searchQuery]);
 
     return (
         <>
@@ -231,34 +227,26 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                     <div className="flex justify-center space-x-4 mt-4">
                                         <Button
                                             value="前のページ"
-                                            onClick={async () => {
-                                                if (currentPage > 1) {
-                                                    const newPage = currentPage - 1;
-                                                    setCurrentPage(newPage);
-                                                    const res = await getRoomByPageSearch(newPage, itemsPerPage, searchName);
-                                                    if (res.success && res.data) {
-                                                        setRoomsList(res.data);
-                                                    }
+                                            onClick={() => {
+                                                if (currentPage > 1 && !isPaging) {
+                                                    setIsPaging(true);
+                                                    setCurrentPage(prev => prev - 1);
                                                 }
                                             }}
-                                            disabled={currentPage === 1}
+                                            disabled={currentPage === 1 || isPaging}
                                         />
                                         <motion.div
                                         className="flex font-bold border-3 border-dotted border-yellow-600 items-center bg-yellow-400 px-4 rounded"
                                         >{currentPage}</motion.div>
                                         <Button
                                             value="次のページ"
-                                            onClick={async () => {
-                                                const newPage = currentPage + 1;
-                                                setCurrentPage(newPage);
-                                                const res = await getRoomByPageSearch(newPage, itemsPerPage, searchName);
-                                                if (res.success && res.data && res.data.length > 0) {
-                                                    setRoomsList(res.data);
-                                                } else {
-                                                    setCurrentPage(currentPage); // 戻す
+                                            onClick={() => {
+                                                if (!isPaging) {
+                                                    setIsPaging(true);
+                                                    setCurrentPage(prev => prev + 1);
                                                 }
                                             }}
-                                            disabled={roomsList.length < itemsPerPage}
+                                            disabled={roomsList.length < itemsPerPage || isPaging}
                                         />
                                     </div>
                                 </div>
