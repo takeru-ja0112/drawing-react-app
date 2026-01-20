@@ -67,8 +67,8 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
                     </motion.h1>
                     <div className="mb-4">
                         <IconContext.Provider value={{ size: '1.5em' }}>
-                            <Button onClick={handleUndo} className="border border-black px-2 py-1 mr-2 rounded" icon={<TbArrowBackUp />} />
-                            <Button onClick={handleRedo} className="border border-black px-2 py-1 mr-2 rounded" icon={<TbArrowForwardUp />} />
+                            <Button onClick={handleUndo} className="border border-black px-2 py-1 mr-2 rounded" icon={<TbArrowBackUp />} value='b'/>
+                            <Button onClick={handleRedo} className="border border-black px-2 py-1 mr-2 rounded" icon={<TbArrowForwardUp />} value='b'/>
                             <Button onClick={handleReset} className="border border-black px-2 py-1 rounded" icon={<TbTrash />} value="リセット" />
                         </IconContext.Provider>
                     </div>
