@@ -18,7 +18,6 @@ import { setStatusRoom } from '@/app/room/[id]/action';
 export default function RoomPage({ title }: { title: string }) {
     const params = useParams();
     const roomId = params.id as string;
-    // こうなるんだったら状態管理ツールを導入する方がいい？
     const user : UserInfo = (getOrCreateUser());
     const { users } = usePresence(roomId, user.id, user.username);
     const router = useRouter();
