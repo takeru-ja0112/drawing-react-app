@@ -264,7 +264,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                             >
                                                 <TbArrowBadgeLeftFilled />
                                             </motion.button>
-                                            <div className="border-4 border-gray-300 relative rounded-lg overflow-hidden shadow-lg">
+                                            <div className="border-4 border-gray-300 w-[300px] h-[300px] relative rounded-lg overflow-hidden shadow-lg">
                                                 {/* レースカーテンのような表現 */}
                                                 <button
                                                     onClick={() => {
@@ -272,6 +272,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                                         setIsOpen(true)
 
                                                     }}
+                                                    className="absolute top-0 left-0 w-full h-full z-20 cursor-pointer"
                                                 >
                                                     <div className='w-full h-full flex absolute top-0 z-10'>
                                                         <motion.div
