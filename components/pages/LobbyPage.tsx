@@ -214,7 +214,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                                 <div className='overflow-hidden text-ellipsis whitespace-nowrap'>
                                                     <label className="block text-gray-700 text-xs">ルーム名</label>
                                                     <h3 className='font-semibold text-sm truncate'>{room.room_name}</h3>
-                                                    <p className="font-mono text-sm text-gray-600 text-xs">作成者：{room.created_by_name}</p>
+                                                    <p className="font-mono text-sm text-gray-600 text-xs truncate">作成者：{room.created_by_name}</p>
                                                 </div>
                                             </div>
                                         </div>
