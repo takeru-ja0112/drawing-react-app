@@ -36,8 +36,6 @@ export async function getInfoRoom(roomId: string) {
             .eq('id', roomId)
             .single();
 
-        console.log('Fetched room data:', data);
-
         if (error) {
             console.error('Failed to fetch room status:', error);
             return { success: false, error: error.message, data: null };
@@ -78,7 +76,6 @@ async function getRandomTheme() {
  */
 export async function resetRoomSettings(roomId: string) {
     const themeResult = await getRandomTheme();
-    console.log("Random theme fetched:", themeResult);
     const newTheme = themeResult.success && themeResult.data ? themeResult.data : null;
 
     try {

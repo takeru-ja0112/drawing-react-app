@@ -119,7 +119,6 @@ export default function useDraw(roomId: string) {
         clearTimeout(saveTimeoutRef.current);
     }
     saveTimeoutRef.current = setTimeout(() => {
-        console.log("データを保存します");
         saveToSessionStorage();
     }, 500); // 0.5秒後に保存
 

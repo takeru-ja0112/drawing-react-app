@@ -44,7 +44,6 @@ export async function saveDrawing(
   try {
     // 要素数を計算
     const elementCount = canvasData.lines.length + canvasData.circles.length + canvasData.rects.length;
-    console.log('Saving drawing with element count:', elementCount);
 
     // 既存のデータをチェック（room_idとuser_nameで検索）
     const { data: existing, error: fetchError } = await supabase

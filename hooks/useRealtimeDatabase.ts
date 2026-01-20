@@ -80,7 +80,6 @@ export function useRoomRealtime(roomId: string) {
 // 描画データの変更を監視するフック
 export function useDrawingsRealtime(roomId: string) {
   const [drawings, setDrawings] = useState<Drawing[]>([])
-  console.log(drawings);
 
   useEffect(() => {
     if (!roomId) return

@@ -13,6 +13,11 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    rules: {
+      'no-console': ['warn', { allow: ['error', 'warn', 'info', 'debug'] }],
+    }
+  }
 ]);
 
 export default eslintConfig;
