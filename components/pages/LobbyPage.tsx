@@ -14,6 +14,7 @@ import type { Room } from '@/type/roomType';
 import DOMPurify from 'dompurify';
 import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
+import { TbArrowLeft, TbArrowRight } from 'react-icons/tb';
 import { z } from 'zod';
 import BgObject from '../organisms/BgObject';
 import CreateRoomModal from '../organisms/lobby/CreateRoomModal';
@@ -226,7 +227,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                     {/* ページネーション */}
                                     <div className="flex justify-center space-x-4 mt-4">
                                         <Button
-                                            value="前のページ"
+                                            icon={<TbArrowLeft size={20} />}
                                             onClick={() => {
                                                 if (currentPage > 1 && !isPaging) {
                                                     setIsPaging(true);
@@ -239,7 +240,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                         className="flex font-bold border-3 border-dotted border-yellow-600 items-center bg-yellow-400 px-4 rounded"
                                         >{currentPage}</motion.div>
                                         <Button
-                                            value="次のページ"
+                                            icon={<TbArrowRight size={20} />}
                                             onClick={() => {
                                                 if (!isPaging) {
                                                     setIsPaging(true);
