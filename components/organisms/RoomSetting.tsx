@@ -25,7 +25,7 @@ export default function RoomSetting({
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                     >
-                        <div className={`px-4 py-2 font-black text-xs rounded-full hover:bg-amber-500 transition-colors duration-200 text-center ${selectedLevel === level ? 'ring-4 ring-amber-300 bg-amber-500' : 'bg-yellow-400'}`}>
+                        <div className={`px-1 py-2 font-black text-sm rounded-full hover:bg-amber-500 transition-colors duration-200 text-center whitespace-nowrap text-ellipsis overflow-hidden ${selectedLevel === level ? 'ring-4 ring-amber-300 bg-amber-500' : 'bg-yellow-400'}`}>
                             {level === 'easy' && 'かんたん'}
                             {level === 'normal' && 'ふつう'}
                             {level === 'hard' && 'むずかしい'}
@@ -45,7 +45,7 @@ export default function RoomSetting({
 
                 ))}
             </div>
-            <p className='text-sm text-yellow-700 font-bold mb-2'>
+            <p className='text-sm text-yellow-700 font-bold h-10'>
                 {selectedLevel === 'easy' && 'いちご、風船、太陽などのかんたんなお題が出るよ！'}
                 {selectedLevel === 'normal' && 'ケーキ、フラミンゴ、トロフィーなどのお題が出るよ！'}
                 {selectedLevel === 'hard' && 'とにかくむずかしいお題が出るよ！'}
