@@ -49,10 +49,10 @@ export default function CreateRoomModal({
                     </div>
                 )}
                 <RoomSetting
-                    className="mt-4"
+                    className="mt-6"
                     setCreateRoomData={setCreateRoomData}
                 />
-                <div className='flex space-x-2 mt-4 justify-end'>
+                <div className='flex space-x-2 mt-6 justify-end'>
                     <Button
                         value='キャンセル'
                         onClick={() => setIsOpen(false)}

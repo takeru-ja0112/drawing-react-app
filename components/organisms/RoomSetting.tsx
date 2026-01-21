@@ -17,7 +17,7 @@ export default function RoomSetting({
         <div className={className}>
             {/* 難易度タブ */}
             <p className="font-semibold mb-2 text-gray-700">難易度</p>
-            <div className="grid grid-cols-3 gap-3 mb-2">
+            <div className="grid grid-cols-3 gap-2 mb-2">
                 {levels.map((level) => (
                     <motion.label
                         key={level}
@@ -25,7 +25,7 @@ export default function RoomSetting({
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                     >
-                        <div className={`px-4 py-2 font-bold rounded-full hover:bg-amber-500 transition-colors duration-200 text-center ${selectedLevel === level ? 'ring-4 ring-amber-300 bg-amber-500' : 'bg-yellow-400'}`}>
+                        <div className={`px-4 py-2 font-black text-xs rounded-full hover:bg-amber-500 transition-colors duration-200 text-center ${selectedLevel === level ? 'ring-4 ring-amber-300 bg-amber-500' : 'bg-yellow-400'}`}>
                             {level === 'easy' && 'かんたん'}
                             {level === 'normal' && 'ふつう'}
                             {level === 'hard' && 'むずかしい'}
@@ -52,7 +52,7 @@ export default function RoomSetting({
             </p>
 
             {/* ジャンルセレクタ */}
-            <p className="font-semibold mb-2 text-gray-700">ジャンル</p>
+            <p className="font-semibold mt-6 mb-2 text-gray-700">ジャンル</p>
             <div className="">
                 <motion.select
                     name="genre"
