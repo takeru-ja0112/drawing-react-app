@@ -44,6 +44,11 @@ export default function SetUserModal({
                         <p className="text-red-500 font-semibold text-sm">{nameError}</p>
                     </div>
                 )}
+                <p className='text-xs text-gray-500 mt-2'>
+                    ・ユーザー名は1文字以上10文字以下で入力してください。<br />
+                    ・ルームの作成、入室する際に必要となります。<br />
+                    ・個人情報などの機密情報は含めないでください。
+                </p>
                 <div className='flex justify-end mt-4'>
                     <Button
                         value='設定'

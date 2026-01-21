@@ -1,6 +1,6 @@
 "use client";
 
-import { resetRoomSettings, setStatusRoom } from '@/app/room/[id]/action';
+import { setStatusRoom } from '@/app/room/[id]/action';
 import { checkAnswerRole } from '@/app/room/[id]/answer/action';
 import Button from '@/components/atoms/Button';
 import Card from '@/components/atoms/Card';
@@ -20,9 +20,11 @@ import CorrectModal from '../organisms/answer/CorrectModal';
 import FinishModal from '../organisms/answer/FinishModal';
 import MistakeModal from '../organisms/answer/MistakeModal';
 import BgObject from '../organisms/BgObject';
-import Modal from '../organisms/Modal';
 import StatusBar from '../organisms/StatusBat';
-
+import { useModalContext } from '@/hooks/useModalContext';
+import AnswerCloseModal from '@/components/organisms/answer/AnswerCloseModal';
+import PleaseCloseModal from '@/components/organisms/answer/PleaseCloseModal';
+import FinalAnswerModal from '@/components/organisms/answer/FinalAnswerModal';
 
 type Drawing = {
     id: string;
@@ -61,19 +63,15 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
     const { furigana, kanji, katakana }: ThemePattern = theme ? theme : { furigana: '', kanji: '', katakana: '' };
 
     const [isOpen, setIsOpen] = useState(false);
-    const [correctModal, setCorrectModal] = useState(false);
-    const [mistakeModal, setMistakeModal] = useState(false);
-    const [lastModal, setLastModal] = useState(false);
-    const [isStatusAnswering, setIsStatusAnswering] = useState(false);
-    const [isPleaseCloseModal, setIsPleaseCloseModal] = useState(false);
     const [mistake, setMistake] = useState<number>(0);
+    const { open, close, modalType } = useModalContext();
+
     const router = useRouter();
 
     const handleNext = () => {
         if (currentIndex < data.length - 1) {
             setCurrentIndex(currentIndex + 1);
         }
-        setMistakeModal(false);
     };
 
     const handleBack = () => {
@@ -82,24 +80,26 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
         }
     }
 
-    const handleAnswer = async () => {
+    const handleAnswer = () => {
         if (!isAnswerRole || !theme) return;
 
-        if (roomStatus.status !== 'ANSWERING') { setIsPleaseCloseModal(true); return; };
+        if (roomStatus.status !== 'ANSWERING') { open('pleaseClose'); return; };
 
+        
         const result = isAnswerMatched(answer);
         if (result) {
             // 正解時の処理
-            setCorrectModal(true);
+            open('correct');
+            setIsOpen(false);
             fire();
-
+            
         } else {
             // 不正解時の処理
             if (mistake + 1 >= data.length) {
-                setLastModal(true);
+                open('challenge');
             } else {
                 setMistake(currentIndex + 1);
-                setMistakeModal(true);
+                open('mistake');
             }
             setIsOpen(false);
         }
@@ -127,29 +127,16 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
         });
     };
 
-    const handleReset = async () => {
-        const result = await resetRoomSettings(roomId);
-        if (result.success) {
-            router.push(`/room/${roomId}`);
-        } else {
-            console.error("Failed to reset room:", result.error);
-        }
-    }
-
     const handleModify = async () => {
         await setStatusRoom(roomId, 'DRAWING');
         setMistake(0);
         setCurrentIndex(0);
-        setLastModal(false);
+        close();
     }
 
     const handleFinish = async () => {
         await setStatusRoom(roomId, 'FINISHED');
         router.push(`/lobby`);
-    }
-
-    const handleStatusAnswering = async () => {
-        await setStatusRoom(roomId, 'ANSWERING');
     }
 
     useEffect(() => {
@@ -223,7 +210,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                             <Button
                                 value='締め切る'
                                 icon={<TbLock />}
-                                onClick={() => setIsStatusAnswering(true)}
+                                onClick={() => open('answerClose')}
                                 className='mb-4'
                             />
                         </IconContext.Provider>
@@ -273,10 +260,9 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                             <div className="border-4 border-gray-300 w-[300px] h-[300px] relative rounded-lg overflow-hidden shadow-lg">
                                                 {/* レースカーテンのような表現 */}
                                                 <button
-                                                    onClick={() => {
-                                                        if (roomStatus.status !== 'ANSWERING') { setIsPleaseCloseModal(true); return; };
-                                                        setIsOpen(true)
-
+                                                    onClick={() => { 
+                                                        if(roomStatus.status !== 'ANSWERING')open('pleaseClose');
+                                                        else setIsOpen(!isOpen); 
                                                     }}
                                                     className="absolute top-0 left-0 w-full h-full z-20 cursor-pointer"
                                                 >
@@ -338,7 +324,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                                     handleNext()
                                                 }}
                                                 className='disabled:opacity-50 disabled:cursor-not-allowed'
-                                                disabled={isAnswerRole ? currentIndex >= mistake : currentIndex === data.length - 1 }
+                                                disabled={isAnswerRole ? currentIndex >= mistake : currentIndex === data.length - 1}
                                             >
                                                 <TbArrowBadgeRightFilled />
                                             </button>
@@ -368,7 +354,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                     <>
                                         <Button
                                             value="回答する"
-                                            onClick={handleAnswer}
+                                            onClick={() => open('finalAnswer')}
                                             disabled={!isAnswerRole}
                                             className='w-80 mx-auto'
                                         />
@@ -379,70 +365,18 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                         </>
                     )}
                 </Card>
-                {isStatusAnswering && isAnswerRole &&
-                    <Modal
-                        isOpen={isStatusAnswering}
-                        onClose={() => setIsStatusAnswering(false)}
-                    >
-                        <div>
-                            <h2 className="text-2xl font-bold mb-4 text-center">締め切りますか？</h2>
-                            <p>描画中の方はいないですか？<br />参加人数分のイラストが届いている事を確認してください</p>
-                            <div className="flex justify-end gap-4 mt-6">
-                                <button
-                                    onClick={() => setIsStatusAnswering(false)}
-                                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg"
-                                >
-                                    キャンセル
-                                </button>
-                                <Button
-                                    onClick={async () => {
-                                        await handleStatusAnswering();
-                                        setIsStatusAnswering(false);
-                                    }}
-                                    value="OK"
-                                />
-                            </div>
-                        </div>
-                    </Modal>
-                }
-
-
-                {correctModal &&
-                    <CorrectModal
-                        onClick={() => {
-                            setCorrectModal(false)
-                            setStatusRoom(roomId, 'FINISHED');
-                        }}
-                    />
-                }
-                {mistakeModal &&
-                    <MistakeModal
-                        onClick={() => handleNext()}
-                    />
-                }
-                {lastModal && <ChallengeModal
-                    onChallenge={handleReset}
+                {modalType === 'finalAnswer' && <FinalAnswerModal handleAnswer={handleAnswer} />}
+                {modalType === 'answerClose' && isAnswerRole && <AnswerCloseModal roomId={roomId} dataLength={data.length} />}
+                {modalType === 'correct' && <CorrectModal roomId={roomId} />}
+                {modalType === 'mistake' && <MistakeModal onClick={() => handleNext()}/>}
+                {modalType === 'challenge' && <ChallengeModal
+                    roomId={roomId}
                     onModify={handleModify}
                     onFinish={handleFinish}
-                />
-                }
-
-                {isPleaseCloseModal &&
-                    <Modal isOpen={isPleaseCloseModal} onClose={() => setIsPleaseCloseModal(false)}>
-                        <h2 className="text-2xl font-bold mb-4 text-center">まだ締め切っていません</h2>
-                        <p className="text-center">締め切ってから回答を始めてください</p>
-                        <div className="flex justify-end mt-6">
-                            <Button
-                                onClick={() => setIsPleaseCloseModal(false)}
-                                className=""
-                                value='閉じる'
-                            />
-                        </div>
-                    </Modal>
-                }
-
+                />}
+                {modalType === 'pleaseClose' && <PleaseCloseModal />}
                 {roomStatus.status === "FINISHED" && isAnswerRole &&
-                    <FinishModal onFinish={handleFinish} onReset={handleReset}></FinishModal>
+                    <FinishModal roomId={roomId}></FinishModal>
                 }
             </div>
         </>

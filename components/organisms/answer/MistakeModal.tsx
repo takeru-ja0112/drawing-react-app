@@ -1,11 +1,23 @@
 import Modal from '@/components/organisms/Modal';
+import { useModalContext } from '@/hooks/useModalContext';
+import Button from '@/components/atoms/Button';
 
 export default function MistakeModal({ onClick }: { onClick: () => void }) {
+    const { close } = useModalContext();
+    
     return (
-        <Modal isOpen={true} onClose={onClick}>
+        <Modal isOpen={true} onClose={()=> { onClick(); close(); }}>
             <div className="p-6">
                 <h2 className="text-2xl font-bold mb-4 text-center">ちゃいます！</h2>
                 <p className="text-center">次のイラストへ移ります</p>
+                <Button
+                    onClick={() => {
+                        onClick();
+                        close();
+                    }}
+                    value="OK"
+                    className="w-full mt-4"
+                />
             </div>
         </Modal>
     );

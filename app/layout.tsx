@@ -35,7 +35,7 @@ export default function RootLayout({
         <SoundProvider>
           {/* ヘッダーの高さ分全体をさげる */}
           <Header />
-          <div className="pt-14">{children}</div>
+            <div className="pt-14">{children}</div>
           <footer className="text-center p-4 text-gray-500 text-sm">
             &copy; 2026, Takeru
           </footer>
