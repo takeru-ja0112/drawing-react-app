@@ -11,7 +11,7 @@ import { supabase } from '@/lib/supabase';
 import { generateUser, getUsername, setUsernameSchema } from '@/lib/user';
 import type { Room } from '@/type/roomType';
 import DOMPurify from 'dompurify';
-import { motion } from 'motion/react';
+import { motion, scale } from 'motion/react';
 import { useRouter } from 'next/navigation';
 import { TbArrowLeft, TbArrowRight, TbArrowUpRight } from 'react-icons/tb';
 import { z } from 'zod';
@@ -32,16 +32,15 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     const [user, setUser] = useState(username || '');
     const [nameError, setNameError] = useState<string>('');
     const [searchName, setSearchName] = useState('');
-    const [searchQuery , setSearchQuery] = useState(searchName);
+    const [searchQuery, setSearchQuery] = useState(searchName);
     const [searchError] = useState<string>('');
     const { setLocalRoom } = historyLocalRoom();
     const [roomName, setRoomName] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [roomError, setRoomError] = useState<string>('');
     const [isSetUserModal, setIsSetUserModal] = useState<boolean>(!username);
-
-    const [ currentPage , setCurrentPage ] = useState<number>(1);
-    const [ isPaging, setIsPaging ] = useState<boolean>(false);
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [isPaging, setIsPaging] = useState<boolean>(false);
     const itemsPerPage = 10;
 
     const handleCreateRoom = () => {
@@ -98,7 +97,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
         const parseResult = roomNameSchema.safeParse(name);
         return parseResult.success;
     }
-    
+
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
             setSearchQuery(searchName);
@@ -191,7 +190,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                             <Input
                                 name="search"
                                 value={searchName}
-                                onChange={(e)=>{setSearchName(e.target.value);}}
+                                onChange={(e) => { setSearchName(e.target.value); }}
                                 placeholder="検索したいルーム名を入力してください"
                                 className={`w-full ${searchError ? 'border-red-500 border-2' : ''}`}
                             />
@@ -204,9 +203,12 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                 <p className="text-gray-500">まだルームがありません</p>
                             ) : (
                                 <div className="sm:grid sm:grid-cols-2 gap-3">
-                                    {roomsList.map((room) => (
-                                        <div
+                                    {roomsList.map((room, index) => (
+                                        <motion.div
                                             key={room.id}
+                                            initial={{ opacity: 0, y: 40 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ duration: 0.4, ease: "easeOut", delay: index * 0.1 }}
                                             className="relative border border-yellow-500 bg-white/50 mb-4 border-3 rounded-3xl p-4 hover:shadow-md transition-shadow cursor-pointer"
                                             onClick={() => handleIntoRoom({ roomId: room.id })}
                                         >
@@ -218,7 +220,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                                     <p className="font-mono text-sm text-gray-600 text-xs truncate">作成者：{room.created_by_name}</p>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </motion.div>
                                     ))}
                                     {/* ページネーション */}
                                     <div className="flex justify-center space-x-4 mt-4 col-span-2">
@@ -233,7 +235,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                             disabled={currentPage === 1 || isPaging}
                                         />
                                         <motion.div
-                                        className="flex font-bold border-3 border-dotted border-yellow-600 items-center bg-yellow-400 px-4 rounded"
+                                            className="flex font-bold border-3 border-dotted border-yellow-600 items-center bg-yellow-400 px-4 rounded"
                                         >{currentPage}</motion.div>
                                         <Button
                                             icon={<TbArrowRight size={20} />}
