@@ -233,6 +233,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                                 }
                                             }}
                                             disabled={currentPage === 1 || isPaging}
+                                            className='disabled:opacity-50 disabled:cursor-not-allowed'
                                         />
                                         <motion.div
                                             className="flex font-bold border-3 border-dotted border-yellow-600 items-center bg-yellow-400 px-4 rounded"
@@ -246,6 +247,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                                 }
                                             }}
                                             disabled={roomsList.length < itemsPerPage || isPaging}
+                                            className='disabled:opacity-50 disabled:cursor-not-allowed'
                                         />
                                     </div>
                                 </div>
