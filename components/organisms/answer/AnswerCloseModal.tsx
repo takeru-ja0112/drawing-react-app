@@ -37,7 +37,7 @@ export default function AnswerCloseModal({ roomId, dataLength }: { roomId: strin
                         </div>
                     </>
                 ) : (
-                    <div className="p-6">
+                    <div>
                         <h2 className="text-2xl font-bold mb-4 text-center">イラストが届いていません</h2>
                         <p className="text-center">参加者全員からイラストが届いている事を確認してください</p>
                         <div className="flex justify-end mt-6">
