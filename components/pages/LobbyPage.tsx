@@ -11,15 +11,14 @@ import { supabase } from '@/lib/supabase';
 import { generateUser, getUsername, setUsernameSchema } from '@/lib/user';
 import type { Room } from '@/type/roomType';
 import DOMPurify from 'dompurify';
-import { motion, scale } from 'motion/react';
+import { motion} from 'motion/react';
 import { useRouter } from 'next/navigation';
-import { TbArrowLeft, TbArrowRight, TbArrowUpRight } from 'react-icons/tb';
+import { TbArrowLeft, TbArrowRight, TbArrowUpRight , TbGhost2 } from 'react-icons/tb';
 import { z } from 'zod';
 import BgObject from '../organisms/BgObject';
 import CreateRoomModal from '../organisms/lobby/CreateRoomModal';
 import SetUserModal from '../organisms/lobby/SetUserModal';
 import type { CreateRoom } from '@/type/roomType';
-import { create } from 'domain';
 
 const forbiddenChars = /[<>&\/\\'"]/;
 const roomNameSchema = z.string().max(10).refine((val) => !forbiddenChars.test(val), {
@@ -50,8 +49,6 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
         username: user, 
         roomName: roomName
     });
-
-    console.log("ルーム設定", createRoomData);
 
     const handleCreateRoom = () => {
         if (!user) {
@@ -113,7 +110,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
             setSearchQuery(searchName);
             // デバウンス後はページ番号を1にリセット
             setCurrentPage(1);
-        }, 500);
+        }, 300);
         return () => clearTimeout(delayDebounceFn);
     }, [searchName]);
 
@@ -213,7 +210,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                 <p className="text-gray-500">まだルームがありません</p>
                             ) : (
                                 <div className="sm:grid sm:grid-cols-2 gap-3">
-                                    {roomsList.map((room, index) => (
+                                    {roomsList.length > 0 ? roomsList.map((room, index) => (
                                         <motion.div
                                             key={room.id}
                                             initial={{ opacity: 0, y: 40 }}
@@ -231,7 +228,12 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                                 </div>
                                             </div>
                                         </motion.div>
-                                    ))}
+                                    )) : (
+                                        <div className='py-5 text-center col-span-2'>
+                                            <TbGhost2 className="text-gray-400 mx-auto mb-2" size={50} />
+                                            <p className="text-gray-500">該当するルームが見つかりません。</p>
+                                        </div>
+                                    )}
                                     {/* ページネーション */}
                                     <div className="flex justify-center space-x-4 mt-4 col-span-2">
                                         <Button

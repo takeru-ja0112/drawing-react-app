@@ -8,12 +8,10 @@ import type { CreateRoom } from '@/type/roomType';
 
 export default function CreateRoomModal({
     isOpen,
-    roomName,
     roomError,
     loading,
     createRoomData,
     setIsOpen,
-    setRoomName,
     setCreateRoomData,
     createRoom,
     className,
