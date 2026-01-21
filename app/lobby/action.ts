@@ -1,5 +1,6 @@
 "use server";
 import { supabase } from '@/lib/supabase';
+import type { CreateRoom } from '@/type/roomType';
 
 // ルーム一覧を取得
 export async function getRooms() {
@@ -21,7 +22,7 @@ export async function getRooms() {
   }
 }
 
-export async function getRoomByPageSearch(page: number, pageSize: number , searchTerm: string) {
+export async function getRoomByPageSearch(page: number, pageSize: number, searchTerm: string) {
   try {
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
@@ -71,9 +72,35 @@ export async function getRoom(roomId: string) {
 }
 
 // ルームを作成
-export async function createRoomByUsername(username: string, roomName: string) {
-  const sanitizedRoomName = roomName;
-  const sanitizedUsername = username;
+export async function createRoomByUsername(createRoomData: CreateRoom) {
+  const sanitizedRoomName = createRoomData.roomName;
+  const sanitizedUsername = createRoomData.username;
+  const sanitizedLevel = createRoomData.level;
+  const sanitizedGenre = createRoomData.genre;
+  let randomTheme;
+
+  try {
+    const { data, error } = await supabase
+      .from('theme')
+      .select('id, theme')
+      .eq('level', sanitizedLevel)
+      .eq('genre', sanitizedGenre);
+
+    if (error) {
+      console.error('Failed to fetch random theme:', error);
+      return { success: false, error: error.message, data: null };
+    }
+
+    if (!data) {
+      return { success: false, error: "null", data: null };
+    }
+    randomTheme = data[Math.floor(Math.random() * data.length)];
+
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return { success: false, error: 'Failed to fetch random theme', data: null };
+  }
+
 
   try {
     // 短いルームIDを生成
@@ -85,7 +112,8 @@ export async function createRoomByUsername(username: string, roomName: string) {
         short_id: shortId,
         created_by_name: sanitizedUsername,
         room_name: sanitizedRoomName,
-        // status: 'WAITING',
+        current_theme: randomTheme.theme,
+        current_theme_id: randomTheme.id,
       })
       .select()
       .single();

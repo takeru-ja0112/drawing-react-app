@@ -6,3 +6,10 @@ export interface Room {
     created_by_name: string | null;
     room_name: string | null;
 };
+
+export interface CreateRoom {
+    username:string;
+    roomName:string;
+    level:string;
+    genre:string;
+}

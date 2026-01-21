@@ -18,6 +18,8 @@ import { z } from 'zod';
 import BgObject from '../organisms/BgObject';
 import CreateRoomModal from '../organisms/lobby/CreateRoomModal';
 import SetUserModal from '../organisms/lobby/SetUserModal';
+import type { CreateRoom } from '@/type/roomType';
+import { create } from 'domain';
 
 const forbiddenChars = /[<>&\/\\'"]/;
 const roomNameSchema = z.string().max(10).refine((val) => !forbiddenChars.test(val), {
@@ -42,6 +44,14 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [isPaging, setIsPaging] = useState<boolean>(false);
     const itemsPerPage = 10;
+    const [createRoomData, setCreateRoomData] = useState<CreateRoom>({
+        level: 'normal', 
+        genre: 'ランダム',
+        username: user, 
+        roomName: roomName
+    });
+
+    console.log("ルーム設定", createRoomData);
 
     const handleCreateRoom = () => {
         if (!user) {
@@ -53,8 +63,8 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     }
 
     const createRoom = async () => {
-        const isValid = validateRoomName(roomName);
-        const sanitizedRoomName = DOMPurify.sanitize(roomName);
+        const isValid = validateRoomName(createRoomData.roomName);
+        const sanitizedRoomName = DOMPurify.sanitize(createRoomData.roomName);
 
         if (!sanitizedRoomName) {
             setRoomError('ルーム名は必須です');
@@ -68,7 +78,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
 
         setLoading(true);
         try {
-            const result = await createRoomByUsername(user, sanitizedRoomName);
+            const result = await createRoomByUsername(createRoomData);
             if (result.success && result.data) {
                 const roomId = result.data.id;
                 setLocalRoom(roomId);
@@ -262,9 +272,12 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                     roomName={roomName}
                     roomError={roomError}
                     loading={loading}
+                    createRoomData={createRoomData}
+                    setCreateRoomData={setCreateRoomData}
                     setIsOpen={setIsOpen}
                     setRoomName={setRoomName}
                     createRoom={createRoom}
+                    className='w-full'
                 />
             )}
 
