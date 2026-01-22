@@ -8,7 +8,7 @@ export default function BgObject() {
                     <motion.div
                         initial={{ rotate: 0 , top:-20}}
                         animate={{ rotate: 360 , top:20}}
-                        transition={{ repeat: Infinity, duration: 60, ease: "linear", repeatType: "loop" }}
+                        transition={{ repeat: Infinity, duration: 60, ease: "linear", repeatType: "reverse" }}
                         className="fixed -left-10 blur-[2px] -z-50"
                     >
                         <div className="border border-yellow-500 w-60 h-60 border-7 rounded-lg" />

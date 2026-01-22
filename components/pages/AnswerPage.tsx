@@ -46,23 +46,24 @@ type Drawing = {
 type AnswerPageProps = {
     roomId: string;
     drawings: Drawing[];
-    theme: ThemePattern | null;
+    initialTheme: ThemePattern | null;
     initialStatus: 'WATING' | 'DRAWING' | 'ANSWERING' | 'FINISHED' | 'RESETTING';
 };
 
 interface ThemePattern {
+    theme: string;
     furigana: string;
     kanji: string;
     katakana: string;
 }
 
-export default function AnswerPage({ roomId, drawings, theme , initialStatus }: AnswerPageProps) {
+export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPageProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answer, setAnswer] = useState('');
     const [isAnswerRole, setIsAnswerRole] = useState(false);
     const [data, setData] = useState<Drawing[]>(drawings);
     const currentDrawing = data[currentIndex];
-    const { furigana, kanji, katakana }: ThemePattern = theme ? theme : { furigana: '', kanji: '', katakana: '' };
+    const { theme, furigana, kanji, katakana }: ThemePattern = initialTheme ? initialTheme : { theme: '', furigana: '', kanji: '', katakana: '' };
 
     const [isOpen, setIsOpen] = useState(false);
     const [mistake, setMistake] = useState<number>(0);
@@ -111,10 +112,12 @@ export default function AnswerPage({ roomId, drawings, theme , initialStatus }: 
     const isAnswerMatched = (userAnswer: string) => {
         if (userAnswer === null) return false;
 
+        const formTheme = theme.split('・').join('');
         const formFurigana = furigana.split('・').join('');
         const formKanji = kanji.split('・').join('');
         const formKatakana = katakana.split('・').join('');
 
+        if (userAnswer === formTheme) return true;
         if (userAnswer === formFurigana) return true;
         if (userAnswer === formKanji) return true;
         if (userAnswer === formKatakana) return true;

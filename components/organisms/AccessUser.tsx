@@ -53,6 +53,7 @@ export default function AccessUser({ roomId }: { roomId: string }) {
                                     initial={{ opacity: 0, x: 10 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: index * 0.2 }}
+                                    onClick={() => setIsFullName(!isfullName)}
                                     className='p-2 bg-yellow-400 rounded-full text-center font-bold text-xs whitespace-nowrap overflow-hidden text-ellipsis'
                                 >
                                     {

@@ -40,6 +40,7 @@ export default function ChallengeModal({ roomId, onModify , setIsAnswerRole }: {
                     value="終了する"
                     className="w-full mt-4"
                 />
+                <p className='text-gray-500 text-xs mt-2'>終了した後は他の人の作品を見る事ができます。</p>
             </div>
         </Modal>
     )

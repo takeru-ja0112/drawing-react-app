@@ -12,5 +12,5 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     const drawings = (result.success && result.data) ? result.data : [];
     const theme = (themeResult.success && themeResult.data) ? themeResult.data : null;
     
-    return <AnswerPage roomId={roomId} drawings={drawings} theme={theme} initialStatus={status} />;
+    return <AnswerPage roomId={roomId} drawings={drawings} initialTheme={theme} initialStatus={status} />;
 }
