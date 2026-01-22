@@ -12,7 +12,7 @@ export default function AccessUser({ roomId }: { roomId: string }) {
 
     return (
         <>
-            <div className="absolute right-2 top-17 bg-blur-sm bg-white/60 border border-white rounded-3xl p-2 pb-2 z-10 shadow-lg">
+            <div className="fixed right-2 top-17 bg-blur-sm bg-white/60 border border-white rounded-3xl p-2 pb-2 z-10 shadow-lg">
                 <motion.label>
                     <motion.button
                         initial={{ rotate: 0 }}
