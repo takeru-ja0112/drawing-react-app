@@ -42,6 +42,7 @@ export default function useStatus(roomId: string) {
                     'postgres_changes',
                     { event: 'UPDATE', schema: 'public', table: 'rooms', filter: `id=eq.${roomId}` },
                     (payload) => {
+                        console.log('ステータス変更:', payload);
                         const newStatus = payload.new.status;
                         setRoomStatus({ status: newStatus });
                     }
@@ -54,5 +55,4 @@ export default function useStatus(roomId: string) {
         }, [roomId]);
 
     return { roomStatus };
-
 }

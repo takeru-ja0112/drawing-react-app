@@ -5,7 +5,6 @@ import { isCheckAnswer, setdbAnswer } from '@/app/room/[id]/answer/action';
 import Button from '@/components/atoms/Button';
 import Card from '@/components/atoms/Card';
 import Modal from '@/components/organisms/Modal';
-import { usePresence } from '@/hooks/usePresence';
 import { getOrCreateUser, type UserInfo } from '@/lib/user';
 import { motion } from 'motion/react';
 import Link from 'next/link';
@@ -16,14 +15,16 @@ import { TbBallBowling, TbPencil } from 'react-icons/tb';
 import BgObject from '../organisms/BgObject';
 import StatusBar from '@/components/organisms/StatusBat';
 import AccessUser from '../organisms/AccessUser';
+import { useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 
 export default function RoomPage({ title }: { title: string }) {
     const params = useParams();
     const roomId = params.id as string;
-    const user : UserInfo = (getOrCreateUser());
-    const { users } = usePresence(roomId, user.id, user.username);
+    const user: UserInfo = (getOrCreateUser());
     const router = useRouter();
     const [isAnswerModalOpen, setIsAnswerModalOpen] = useState(false);
+    const [status, setStatus] = useState<string>('WAITING');
 
     const handleCheckAnswer = async () => {
         const { success, data: isAnswerer } = await isCheckAnswer(roomId);
@@ -46,6 +47,45 @@ export default function RoomPage({ title }: { title: string }) {
         router.push(`/room/${roomId}/answer`);
     }
 
+    useEffect(() => {
+        const fetchRoomStatus = async () => {
+            const { data, error } = await supabase
+                .from('rooms')
+                .select('status')
+                .eq('id', roomId)
+                .single();
+
+            if (error) {
+                console.error('Failed to fetch room status:', error);
+                return;
+            }
+
+            if (data) {
+                setStatus(data.status);
+            }
+        };
+
+        fetchRoomStatus();
+
+        const subscription = supabase
+            .channel('public:rooms')
+            .on(
+                'postgres_changes',
+                { event: 'UPDATE', schema: 'public', table: 'rooms', filter: `id=eq.${roomId}` },
+                (payload) => {
+                    const newStatus = payload.new.status;
+                    // setRoomStatus({ status: newStatus });
+                    console.log('ルームステータスが変更されました:', newStatus);
+                    setStatus(newStatus);
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(subscription);
+        };
+    })
+
     return (
         <div>
             <BgObject />
@@ -55,7 +95,7 @@ export default function RoomPage({ title }: { title: string }) {
                         <h2 className="text-lg text-gray-500 font-semibold mb-2">ルーム名</h2>
                         <p className="text-gray-900 font-bold break-all">{title}</p>
                     </div>
-                    <StatusBar roomId={roomId}></StatusBar>
+                    <StatusBar status={status}></StatusBar>
                     <AccessUser roomId={roomId} />
                     <Card className="mb-4 pb-1 bg-gray-100 rounded-3xl">
                         {/* <div className="mb-6">

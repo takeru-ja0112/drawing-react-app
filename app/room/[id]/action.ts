@@ -118,3 +118,32 @@ export async function resetRoomSettings(roomId: string) {
         return { success: false, error: 'Failed to reset room settings', data: null };
     }
 }
+
+/**
+ * ルームの回答者をリセットする関数
+ * 
+ * ゲームが終了した際に他の回答を確認するために回答者権限をリセットする
+ * 
+ * @param roomId 
+ * @returns 
+ */
+export async function resetRoomAnswer(roomId: string) {
+    try {
+        const { data, error } = await supabase
+            .from('rooms')
+            .update({ answer_id: null , status: 'FINISHED' })
+            .eq('id', roomId)
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Failed to reset room answerer:', error);
+            return { success: false, error: error.message, data: null };
+        }
+
+        return { success: true, error: null, data };
+    } catch (error) {
+        console.error('Unexpected error:', error);
+        return { success: false, error: 'Failed to reset room answerer', data: null };
+    }
+}

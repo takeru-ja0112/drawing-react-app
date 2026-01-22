@@ -12,6 +12,8 @@ import { IconContext } from "react-icons";
 import { TbArrowBackUp, TbArrowForwardUp, TbTrash } from 'react-icons/tb';
 import { Circle, Rect as KonvaRect, Layer, Line, Stage } from "react-konva";
 import BgObject from "../organisms/BgObject";
+import { TbArrowLeft } from "react-icons/tb";
+import Link from "next/link";
 
 type DrawPageProps = {
     roomId: string;
@@ -48,8 +50,11 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
 
     return (
         <>
-        <BgObject />
+            <BgObject />
             <div className="px-8 pt-2 pb-16">
+                <Link href={`/room/${roomId}`} className='absolute top-13 left-2 hover:text-yellow-600 transition duration-300 p-2 rounded-full'>
+                    <TbArrowLeft size='2em' />
+                </Link>
                 <div className="max-w-lg mx-auto text-center">
                     {/* お題 */}
                     <label className="block mb-1 font-semibold text-gray-600">
@@ -67,8 +72,8 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
                     </motion.h1>
                     <div className="mb-4 flex gap-2 justify-center items-center">
                         <IconContext.Provider value={{ size: '1.5em' }}>
-                            <Button onClick={handleUndo} className="border border-black px-2 py-1 rounded" icon={<TbArrowBackUp />}/>
-                            <Button onClick={handleRedo} className="border border-black px-2 py-1 rounded" icon={<TbArrowForwardUp />}/>
+                            <Button onClick={handleUndo} className="border border-black px-2 py-1 rounded" icon={<TbArrowBackUp />} />
+                            <Button onClick={handleRedo} className="border border-black px-2 py-1 rounded" icon={<TbArrowForwardUp />} />
                             <Button onClick={handleReset} className="border border-black px-2 py-1 rounded" icon={<TbTrash />} value="リセット" />
                         </IconContext.Provider>
                     </div>
@@ -126,7 +131,7 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
                             onTouchStart={(e: KonvaEventObject<TouchEvent>) => handleMouseDown(e)}
                             onTouchMove={(e: KonvaEventObject<TouchEvent>) => handleMouseMove(e)}
                             onTouchEnd={() => handleMouseUp()}
-                            >
+                        >
                             <Layer
                                 tension={0.5}
                                 lineCap="round"
@@ -170,12 +175,12 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
                         <h2 className="text-xl font-semibold mb-4">保存しますか？</h2>
                         <p>保存が完了次第、自動で回答ページに移動します。</p>
                         <div className="flex justify-end gap-4">
-                            <button
+                            <Button
                                 onClick={() => setIsSaveOpen(false)}
                                 className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg mr-2"
-                            >
-                                キャンセル
-                            </button>
+
+                                value="キャンセル"
+                            />
                             <Button
                                 onClick={() => {
                                     handleSave();

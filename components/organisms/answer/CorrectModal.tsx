@@ -3,12 +3,12 @@ import Modal from '@/components/organisms/Modal';
 import { useModalContext } from '@/hooks/useModalContext';
 
 export default function CorrectModal({roomId}: {roomId: string}) {
-    const { modalType, close } = useModalContext();
+    const {open , modalType, close } = useModalContext();
 
     return (
         <Modal isOpen={modalType === 'correct'} onClose={() => {
-            setStatusRoom(roomId, 'FINISHED');
-            close()
+            // setStatusRoom(roomId, 'FINISHED');
+            open('finish');
         }}>
             <div className="p-6">
                 <h2 className="text-2xl font-bold mb-4 text-center">正解です！</h2>

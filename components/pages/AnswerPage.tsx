@@ -5,7 +5,6 @@ import { checkAnswerRole } from '@/app/room/[id]/answer/action';
 import Button from '@/components/atoms/Button';
 import Card from '@/components/atoms/Card';
 import Input from '@/components/atoms/Input';
-import useStatus from '@/hooks/useStatus';
 import { supabase } from '@/lib/supabase';
 import confetti from 'canvas-confetti';
 import { motion } from 'motion/react';
@@ -13,7 +12,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { IconContext } from 'react-icons';
-import { TbArrowBadgeLeftFilled, TbArrowBadgeRightFilled, TbArrowLeft, TbLock , TbGhost2 } from 'react-icons/tb';
+import { TbArrowBadgeLeftFilled, TbArrowBadgeRightFilled, TbArrowLeft, TbLock, TbGhost2 } from 'react-icons/tb';
 import { Circle, Layer, Line, Rect, Stage } from 'react-konva';
 import ChallengeModal from '../organisms/answer/ChallengeModal';
 import CorrectModal from '../organisms/answer/CorrectModal';
@@ -28,6 +27,7 @@ import FinalAnswerModal from '@/components/organisms/answer/FinalAnswerModal';
 import { usePresence } from '@/hooks/usePresence';
 import { getOrCreateUser, type UserInfo } from '@/lib/user';
 import AccessUser from '../organisms/AccessUser';
+import useStatus from '@/hooks/useStatus';
 
 type Drawing = {
     id: string;
@@ -47,7 +47,7 @@ type AnswerPageProps = {
     roomId: string;
     drawings: Drawing[];
     theme: ThemePattern | null;
-    status: 'WATING' | 'DRAWING' | 'ANSWERING' | 'FINISHED' | 'RESETTING';
+    initialStatus: 'WATING' | 'DRAWING' | 'ANSWERING' | 'FINISHED' | 'RESETTING';
 };
 
 interface ThemePattern {
@@ -56,13 +56,11 @@ interface ThemePattern {
     katakana: string;
 }
 
-export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps) {
+export default function AnswerPage({ roomId, drawings, theme , initialStatus }: AnswerPageProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answer, setAnswer] = useState('');
     const [isAnswerRole, setIsAnswerRole] = useState(false);
     const [data, setData] = useState<Drawing[]>(drawings);
-    // const user: UserInfo = (getOrCreateUser());
-    // const { users } = usePresence(roomId, user.id, user.username);
     const currentDrawing = data[currentIndex];
     const { furigana, kanji, katakana }: ThemePattern = theme ? theme : { furigana: '', kanji: '', katakana: '' };
 
@@ -70,7 +68,8 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
     const [mistake, setMistake] = useState<number>(0);
     const { open, close, modalType } = useModalContext();
 
-    const router = useRouter();
+    const { roomStatus } = useStatus(roomId);
+    console.log("初期ステータス:", roomStatus.status);
 
     const handleNext = () => {
         if (currentIndex < data.length - 1) {
@@ -83,11 +82,11 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
             setCurrentIndex(currentIndex - 1);
         }
     }
-
+    
     const handleAnswer = () => {
         if (!isAnswerRole || !theme) return;
 
-        if (roomStatus.status !== 'ANSWERING') { open('pleaseClose'); return; };
+        if (roomStatus.status !== 'ANSWERING' && roomStatus.status !== 'FINISHED') { open('pleaseClose'); return; };
 
 
         const result = isAnswerMatched(answer);
@@ -131,16 +130,11 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
         });
     };
 
-    const handleModify = async () => {
-        await setStatusRoom(roomId, 'DRAWING');
+    const handleModify = () => {
+        setStatusRoom(roomId, 'DRAWING');
         setMistake(0);
         setCurrentIndex(0);
         close();
-    }
-
-    const handleFinish = async () => {
-        await setStatusRoom(roomId, 'FINISHED');
-        router.push(`/lobby`);
     }
 
     useEffect(() => {
@@ -155,6 +149,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
             }
         };
         fetchAnswerRole();
+
     }, [roomId]);
 
     useEffect(() => {
@@ -197,8 +192,6 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
         };
     }, [roomId]);
 
-    const { roomStatus } = useStatus(roomId);
-
     return (
         <>
             <BgObject />
@@ -207,7 +200,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                     <TbArrowLeft size='2em' />
                 </Link>
                 {
-                    roomStatus.status !== 'ANSWERING' &&
+                    roomStatus.status !== 'ANSWERING' && roomStatus.status !== 'FINISHED' &&
                     isAnswerRole &&
                     (
                         <IconContext.Provider value={{ size: '1.5em' }}>
@@ -220,29 +213,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                         </IconContext.Provider>
                     )}
                 {/* ステータスエリア */}
-                <StatusBar roomId={roomId}></StatusBar>
-                {/* <div className="absolute right-2 top-20 bg-blur-sm bg-white/60 border border-white rounded-3xl p-2 z-10">
-                    {users.length > 0 ? (
-                        // <ul>
-                        <div className='grid gap-2'>
-                            {users.map((user, index) => (
-                                <motion.div
-                                    initial={{ opacity: 0, x: 10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: index * 0.2 }}
-                                    key={index}
-                                >
-                                    <div className='w-10 p-2 bg-yellow-400 rounded-full text-center font-bold text-xs whitespace-nowrap overflow-hidden text-ellipsis'>
-                                        {user.user_name.slice(0, 1)}
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </div>
-                        // </ul>
-                    ) : (
-                        <TbGhost2 className='text-gray-500' />
-                    )}
-                </div> */}
+                <StatusBar status={roomStatus.status}></StatusBar>
                 <AccessUser roomId={roomId} />
                 <Card className="max-w-lg w-full">
 
@@ -288,7 +259,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                                 {/* レースカーテンのような表現 */}
                                                 <button
                                                     onClick={() => {
-                                                        if (roomStatus.status !== 'ANSWERING') open('pleaseClose');
+                                                        if ( roomStatus.status !== 'ANSWERING' && roomStatus.status !== 'FINISHED') open('pleaseClose');
                                                         else setIsOpen(!isOpen);
                                                     }}
                                                     className="absolute top-0 left-0 w-full h-full z-20 cursor-pointer"
@@ -369,7 +340,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAnswer(e.target.value)}
                                         placeholder="答えを入力してください"
                                         className="w-full "
-                                        disabled={!roomStatus || roomStatus.status !== 'ANSWERING'}
+                                        disabled={ roomStatus.status !== 'ANSWERING'}
                                     />
                                     <p className='text-gray-400 text-sm'>ひらがな、カタカナ、漢字のいずれでも構いません。</p>
                                 </div>
@@ -382,7 +353,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                         <Button
                                             value="回答する"
                                             onClick={() => open('finalAnswer')}
-                                            disabled={!isAnswerRole}
+                                            disabled={!isAnswerRole || roomStatus.status !== 'ANSWERING'}
                                             className='w-80 mx-auto'
                                         />
                                     </>
@@ -396,15 +367,12 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                 {modalType === 'answerClose' && isAnswerRole && <AnswerCloseModal roomId={roomId} dataLength={data.length} />}
                 {modalType === 'correct' && <CorrectModal roomId={roomId} />}
                 {modalType === 'mistake' && <MistakeModal onClick={() => handleNext()} />}
-                {modalType === 'challenge' && <ChallengeModal
-                    roomId={roomId}
+                {modalType === 'challenge' && <ChallengeModal roomId={roomId}
                     onModify={handleModify}
-                    onFinish={handleFinish}
+                    setIsAnswerRole={setIsAnswerRole}
                 />}
                 {modalType === 'pleaseClose' && <PleaseCloseModal />}
-                {roomStatus.status === "FINISHED" && isAnswerRole &&
-                    <FinishModal roomId={roomId}></FinishModal>
-                }
+                {modalType === 'finish' && <FinishModal roomId={roomId} setIsAnswerRole={setIsAnswerRole}></FinishModal>}
             </div>
         </>
     );

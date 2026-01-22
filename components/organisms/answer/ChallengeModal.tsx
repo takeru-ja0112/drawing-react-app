@@ -1,10 +1,10 @@
 import Modal from '@/components/organisms/Modal';
 import Button from '@/components/atoms/Button';
-import { resetRoomSettings } from '@/app/room/[id]/action';
+import { resetRoomSettings , resetRoomAnswer, setStatusRoom } from '@/app/room/[id]/action';
 import { useRouter } from 'next/navigation';
 import { useModalContext } from '@/hooks/useModalContext';
 
-export default function ChallengeModal({ roomId, onModify , onFinish }: { roomId: string; onModify: () => void; onFinish: () => void; }) {
+export default function ChallengeModal({ roomId, onModify , setIsAnswerRole }: { roomId: string; onModify: () => void; setIsAnswerRole: React.Dispatch<React.SetStateAction<boolean>> }) {
     const router = useRouter();
     const { close } = useModalContext();
     
@@ -14,8 +14,8 @@ export default function ChallengeModal({ roomId, onModify , onFinish }: { roomId
                 <h2 className="text-2xl font-bold mb-4 text-center">ちゃいます！</h2>
                 <h2 className="text-2xl font-bold mb-4 text-center">新しいお題に挑戦しますか？</h2>
                 <Button
-                    onClick={() => {
-                        resetRoomSettings(roomId);
+                    onClick={async () => {
+                        await resetRoomSettings(roomId);
                         close();
                         router.push(`/room/${roomId}`);
                     }}
@@ -31,8 +31,10 @@ export default function ChallengeModal({ roomId, onModify , onFinish }: { roomId
                     className="w-full mt-4"
                 />
                 <Button
-                    onClick={() => {
-                        onFinish()
+                    onClick={async () => {
+                        // onFinish()
+                        await resetRoomAnswer(roomId);
+                        setIsAnswerRole(false);
                         close();
                     }}
                     value="終了する"

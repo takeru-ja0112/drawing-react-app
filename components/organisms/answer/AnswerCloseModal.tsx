@@ -7,7 +7,11 @@ export default function AnswerCloseModal({ roomId, dataLength }: { roomId: strin
     const { modalType, close } = useModalContext();
 
     const handleStatusAnswering = async () => {
-        await setStatusRoom(roomId, 'ANSWERING');
+        const result = await setStatusRoom(roomId, 'ANSWERING');
+        if(result.success){
+            console.log('ルームステータスをANSWERINGに更新しました');
+        } 
+        close();
     };
 
     return (
@@ -27,10 +31,7 @@ export default function AnswerCloseModal({ roomId, dataLength }: { roomId: strin
                                 value="キャンセル"
                             />
                             <Button
-                                onClick={async () => {
-                                    await handleStatusAnswering();
-                                    close();
-                                }}
+                                onClick={handleStatusAnswering}
                                 value="OK"
                             />
                         </div>
