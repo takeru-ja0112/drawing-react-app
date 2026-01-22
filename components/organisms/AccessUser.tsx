@@ -29,7 +29,7 @@ export default function AccessUser({ roomId }: { roomId: string }) {
                 </motion.button>
                 {users.length > 0 ? (
                     <motion.div
-                        initial={{ height: 'auto' }}
+                        initial={{ height: '0px' }}
                         animate={{ height: isOpen ? '0px' : 'auto' }}
                         transition={{ duration: 0.5 , type: 'spring' , bounce: 0.4 }}
                         className='grid gap-2 max-h-50 overflow-y-auto rounded-2xl'
