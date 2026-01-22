@@ -15,6 +15,7 @@ import { IconContext } from 'react-icons';
 import { TbBallBowling, TbPencil } from 'react-icons/tb';
 import BgObject from '../organisms/BgObject';
 import StatusBar from '@/components/organisms/StatusBat';
+import AccessUser from '../organisms/AccessUser';
 
 export default function RoomPage({ title }: { title: string }) {
     const params = useParams();
@@ -55,8 +56,9 @@ export default function RoomPage({ title }: { title: string }) {
                         <p className="text-gray-900 font-bold break-all">{title}</p>
                     </div>
                     <StatusBar roomId={roomId}></StatusBar>
+                    <AccessUser roomId={roomId} />
                     <Card className="mb-4 pb-1 bg-gray-100 rounded-3xl">
-                        <div className="mb-6">
+                        {/* <div className="mb-6">
                             <h2 className="text-lg text-gray-500 font-semibold mb-2">参加者</h2>
                             {users.length > 0 ? (
                                 // <ul>
@@ -80,7 +82,7 @@ export default function RoomPage({ title }: { title: string }) {
                                     参加者がいません。
                                 </p>
                             )}
-                        </div>
+                        </div> */}
                         <div className="text-center">
                             <IconContext.Provider value={{ size: '1.5em' }}>
                                 {/* 書く人用の説明 */}

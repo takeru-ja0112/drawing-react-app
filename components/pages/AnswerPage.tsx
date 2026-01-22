@@ -13,7 +13,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { IconContext } from 'react-icons';
-import { TbArrowBadgeLeftFilled, TbArrowBadgeRightFilled, TbArrowLeft, TbLock } from 'react-icons/tb';
+import { TbArrowBadgeLeftFilled, TbArrowBadgeRightFilled, TbArrowLeft, TbLock , TbGhost2 } from 'react-icons/tb';
 import { Circle, Layer, Line, Rect, Stage } from 'react-konva';
 import ChallengeModal from '../organisms/answer/ChallengeModal';
 import CorrectModal from '../organisms/answer/CorrectModal';
@@ -27,6 +27,7 @@ import PleaseCloseModal from '@/components/organisms/answer/PleaseCloseModal';
 import FinalAnswerModal from '@/components/organisms/answer/FinalAnswerModal';
 import { usePresence } from '@/hooks/usePresence';
 import { getOrCreateUser, type UserInfo } from '@/lib/user';
+import AccessUser from '../organisms/AccessUser';
 
 type Drawing = {
     id: string;
@@ -60,8 +61,8 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
     const [answer, setAnswer] = useState('');
     const [isAnswerRole, setIsAnswerRole] = useState(false);
     const [data, setData] = useState<Drawing[]>(drawings);
-    const user: UserInfo = (getOrCreateUser());
-    const { users } = usePresence(roomId, user.id, user.username);
+    // const user: UserInfo = (getOrCreateUser());
+    // const { users } = usePresence(roomId, user.id, user.username);
     const currentDrawing = data[currentIndex];
     const { furigana, kanji, katakana }: ThemePattern = theme ? theme : { furigana: '', kanji: '', katakana: '' };
 
@@ -220,10 +221,10 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                     )}
                 {/* ステータスエリア */}
                 <StatusBar roomId={roomId}></StatusBar>
-                <div className="absolute right-4 top-30 bg-blur-sm bg-white/60 border border-white rounded-3xl p-2 z-10">
+                {/* <div className="absolute right-2 top-20 bg-blur-sm bg-white/60 border border-white rounded-3xl p-2 z-10">
                     {users.length > 0 ? (
                         // <ul>
-                        <div className=''>
+                        <div className='grid gap-2'>
                             {users.map((user, index) => (
                                 <motion.div
                                     initial={{ opacity: 0, x: 10 }}
@@ -239,11 +240,10 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                         </div>
                         // </ul>
                     ) : (
-                        <p className="text-gray-500">
-                            参加者がいません。
-                        </p>
+                        <TbGhost2 className='text-gray-500' />
                     )}
-                </div>
+                </div> */}
+                <AccessUser roomId={roomId} />
                 <Card className="max-w-lg w-full">
 
                     {data.length === 0 ? (
