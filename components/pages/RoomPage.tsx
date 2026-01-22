@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { IconContext } from 'react-icons';
 import { TbBallBowling, TbPencil } from 'react-icons/tb';
 import BgObject from '../organisms/BgObject';
+import StatusBar from '@/components/organisms/StatusBat';
 
 export default function RoomPage({ title }: { title: string }) {
     const params = useParams();
@@ -44,12 +45,6 @@ export default function RoomPage({ title }: { title: string }) {
         router.push(`/room/${roomId}/answer`);
     }
 
-    // useEffect(() => {
-    //     const userInfo = getOrCreateUser();
-
-    //     setUser(userInfo);
-    // }, []);
-
     return (
         <div>
             <BgObject />
@@ -59,6 +54,7 @@ export default function RoomPage({ title }: { title: string }) {
                         <h2 className="text-lg text-gray-500 font-semibold mb-2">ルーム名</h2>
                         <p className="text-gray-900 font-bold break-all">{title}</p>
                     </div>
+                    <StatusBar roomId={roomId}></StatusBar>
                     <Card className="mb-4 pb-1 bg-gray-100 rounded-3xl">
                         <div className="mb-6">
                             <h2 className="text-lg text-gray-500 font-semibold mb-2">参加者</h2>

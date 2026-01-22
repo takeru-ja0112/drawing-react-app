@@ -1,10 +1,13 @@
 "use client";
 
 import Loading from '@/components/atoms/Loading';
+import useStatus from '@/hooks/useStatus';
 
-export default function StatusBar({ status }: { status: string }) {
+export default function StatusBar({ roomId }: { roomId: string }) {
+    const { roomStatus } = useStatus(roomId);
+    
     let statusValue = "";
-    switch (status) {
+    switch (roomStatus.status) {
         case "WAITING":
             statusValue = "回答者を待っています";
             break;
@@ -27,7 +30,7 @@ export default function StatusBar({ status }: { status: string }) {
     return (
         <div className="mb-3 text-center bg-yellow-400 py-2 rounded-3xl w-full max-w-lg">
             <h1 className='font-bold flex items-center justify-center'>
-                {status === 'DRAWING' && (
+                {roomStatus.status === 'DRAWING' && (
                     <Loading className="mr-2" />
                 )}
                 {statusValue}

@@ -25,6 +25,8 @@ import { useModalContext } from '@/hooks/useModalContext';
 import AnswerCloseModal from '@/components/organisms/answer/AnswerCloseModal';
 import PleaseCloseModal from '@/components/organisms/answer/PleaseCloseModal';
 import FinalAnswerModal from '@/components/organisms/answer/FinalAnswerModal';
+import { usePresence } from '@/hooks/usePresence';
+import { getOrCreateUser, type UserInfo } from '@/lib/user';
 
 type Drawing = {
     id: string;
@@ -58,7 +60,8 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
     const [answer, setAnswer] = useState('');
     const [isAnswerRole, setIsAnswerRole] = useState(false);
     const [data, setData] = useState<Drawing[]>(drawings);
-
+    const user: UserInfo = (getOrCreateUser());
+    const { users } = usePresence(roomId, user.id, user.username);
     const currentDrawing = data[currentIndex];
     const { furigana, kanji, katakana }: ThemePattern = theme ? theme : { furigana: '', kanji: '', katakana: '' };
 
@@ -85,14 +88,14 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
 
         if (roomStatus.status !== 'ANSWERING') { open('pleaseClose'); return; };
 
-        
+
         const result = isAnswerMatched(answer);
         if (result) {
             // 正解時の処理
             open('correct');
             setIsOpen(false);
             fire();
-            
+
         } else {
             // 不正解時の処理
             if (mistake + 1 >= data.length) {
@@ -216,7 +219,31 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                         </IconContext.Provider>
                     )}
                 {/* ステータスエリア */}
-                <StatusBar status={roomStatus.status}></StatusBar>
+                <StatusBar roomId={roomId}></StatusBar>
+                <div className="absolute right-4 top-30 bg-blur-sm bg-white/60 border border-white rounded-3xl p-2 z-10">
+                    {users.length > 0 ? (
+                        // <ul>
+                        <div className=''>
+                            {users.map((user, index) => (
+                                <motion.div
+                                    initial={{ opacity: 0, x: 10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: index * 0.2 }}
+                                    key={index}
+                                >
+                                    <div className='w-10 p-2 bg-yellow-400 rounded-full text-center font-bold text-xs whitespace-nowrap overflow-hidden text-ellipsis'>
+                                        {user.user_name.slice(0, 1)}
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                        // </ul>
+                    ) : (
+                        <p className="text-gray-500">
+                            参加者がいません。
+                        </p>
+                    )}
+                </div>
                 <Card className="max-w-lg w-full">
 
                     {data.length === 0 ? (
@@ -260,9 +287,9 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                                             <div className="border-4 border-gray-300 w-[300px] h-[300px] relative rounded-lg overflow-hidden shadow-lg">
                                                 {/* レースカーテンのような表現 */}
                                                 <button
-                                                    onClick={() => { 
-                                                        if(roomStatus.status !== 'ANSWERING')open('pleaseClose');
-                                                        else setIsOpen(!isOpen); 
+                                                    onClick={() => {
+                                                        if (roomStatus.status !== 'ANSWERING') open('pleaseClose');
+                                                        else setIsOpen(!isOpen);
                                                     }}
                                                     className="absolute top-0 left-0 w-full h-full z-20 cursor-pointer"
                                                 >
@@ -368,7 +395,7 @@ export default function AnswerPage({ roomId, drawings, theme }: AnswerPageProps)
                 {modalType === 'finalAnswer' && <FinalAnswerModal handleAnswer={handleAnswer} />}
                 {modalType === 'answerClose' && isAnswerRole && <AnswerCloseModal roomId={roomId} dataLength={data.length} />}
                 {modalType === 'correct' && <CorrectModal roomId={roomId} />}
-                {modalType === 'mistake' && <MistakeModal onClick={() => handleNext()}/>}
+                {modalType === 'mistake' && <MistakeModal onClick={() => handleNext()} />}
                 {modalType === 'challenge' && <ChallengeModal
                     roomId={roomId}
                     onModify={handleModify}

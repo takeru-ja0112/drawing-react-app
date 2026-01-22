@@ -23,7 +23,7 @@ export default function FinishModal({ roomId}: { roomId: string; }) {
                         setStatusRoom(roomId, 'FINISHED');
                         router.push(`/lobby`);
                     }}
-                    value="終了してロビーに戻る"
+                    value="終了する"
                     className="w-full mt-4"
                 />
             </div>
