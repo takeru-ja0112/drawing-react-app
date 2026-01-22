@@ -5,8 +5,6 @@ import { isCheckAnswer, setdbAnswer } from '@/app/room/[id]/answer/action';
 import Button from '@/components/atoms/Button';
 import Card from '@/components/atoms/Card';
 import Modal from '@/components/organisms/Modal';
-import { getOrCreateUser, type UserInfo } from '@/lib/user';
-import { motion } from 'motion/react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -17,14 +15,19 @@ import StatusBar from '@/components/organisms/StatusBat';
 import AccessUser from '../organisms/AccessUser';
 import { useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import RoomSetting from '../organisms/RoomSetting';
+import type { RoomSettingType } from '@/type/roomType';
+import { useModalContext } from '@/hooks/useModalContext';
+import { changeRoomTheme } from '@/app/room/[id]/action';
 
 export default function RoomPage({ title }: { title: string }) {
     const params = useParams();
     const roomId = params.id as string;
-    const user: UserInfo = (getOrCreateUser());
     const router = useRouter();
     const [isAnswerModalOpen, setIsAnswerModalOpen] = useState(false);
     const [status, setStatus] = useState<string>('WAITING');
+    const [roomSetting, setRoomSetting] = useState<RoomSettingType>({ level: "normal", genre: "ランダム" });
+    const { open, modalType, close } = useModalContext();
 
     const handleCheckAnswer = async () => {
         const { success, data: isAnswerer } = await isCheckAnswer(roomId);
@@ -45,6 +48,18 @@ export default function RoomPage({ title }: { title: string }) {
             // console.error('Failed to set answerer:', result.error);
         }
         router.push(`/room/${roomId}/answer`);
+    }
+
+    const handleChangeRoomTheme = async () => {
+        const result = await changeRoomTheme({
+            roomId,
+            roomSetting
+        });
+        if(!result.success) {
+            console.error('Failed to change room theme:', result.error);
+            return;
+        }
+        close();
     }
 
     useEffect(() => {
@@ -74,8 +89,6 @@ export default function RoomPage({ title }: { title: string }) {
                 { event: 'UPDATE', schema: 'public', table: 'rooms', filter: `id=eq.${roomId}` },
                 (payload) => {
                     const newStatus = payload.new.status;
-                    // setRoomStatus({ status: newStatus });
-                    console.log('ルームステータスが変更されました:', newStatus);
                     setStatus(newStatus);
                 }
             )
@@ -84,7 +97,7 @@ export default function RoomPage({ title }: { title: string }) {
         return () => {
             supabase.removeChannel(subscription);
         };
-    })
+    },[])
 
     return (
         <div>
@@ -98,31 +111,11 @@ export default function RoomPage({ title }: { title: string }) {
                     <StatusBar status={status}></StatusBar>
                     <AccessUser roomId={roomId} />
                     <Card className="mb-4 pb-1 bg-gray-100 rounded-3xl">
-                        {/* <div className="mb-6">
-                            <h2 className="text-lg text-gray-500 font-semibold mb-2">参加者</h2>
-                            {users.length > 0 ? (
-                                // <ul>
-                                <div className='grid grid-cols-3 gap-2'>
-                                    {users.map((user, index) => (
-                                        <motion.div
-                                            initial={{ opacity: 0, x: 10 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: index * 0.2 }}
-                                            key={index}
-                                        >
-                                            <div className='w-full p-2 bg-yellow-400 rounded-sm text-center font-bold text-xs whitespace-nowrap overflow-hidden text-ellipsis'>
-                                                {user.user_name}
-                                            </div>
-                                        </motion.div>
-                                    ))}
-                                </div>
-                                // </ul>
-                            ) : (
-                                <p className="text-gray-500">
-                                    参加者がいません。
-                                </p>
-                            )}
-                        </div> */}
+                        <Button
+                            onClick={()=> open('roomSetting')}
+                            value='お題を変更する'
+                            className='mb-4 w-full'
+                        />
                         <div className="text-center">
                             <IconContext.Provider value={{ size: '1.5em' }}>
                                 {/* 書く人用の説明 */}
@@ -168,6 +161,28 @@ export default function RoomPage({ title }: { title: string }) {
                 </div>
             </Modal>
             }
+            {modalType === 'roomSetting' && (
+                <Modal isOpen={true} onClose={close} className='w-full'>
+                    <div className="p-4">
+                        <h2 className="text-2xl font-bold mb-4 text-center">ルーム設定</h2>
+                        <RoomSetting setRoomData={setRoomSetting} />
+                        <div className='grid grid-cols-2 gap-3 mt-2'>
+                            <Button
+                                onClick={() => {
+                                    close();
+                                }}
+                                value="閉じる"
+                                className="w-full mt-4"
+                            />
+                            <Button
+                                onClick={handleChangeRoomTheme}
+                                value="変更する"
+                                className="w-full mt-4"
+                            />
+                        </div>
+                    </div>
+                </Modal>
+            )}
         </div>
     );
 }

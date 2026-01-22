@@ -9,10 +9,9 @@ import { supabase } from '@/lib/supabase';
 import confetti from 'canvas-confetti';
 import { motion } from 'motion/react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { IconContext } from 'react-icons';
-import { TbArrowBadgeLeftFilled, TbArrowBadgeRightFilled, TbArrowLeft, TbLock, TbGhost2 } from 'react-icons/tb';
+import { TbArrowBadgeLeftFilled, TbArrowBadgeRightFilled, TbArrowLeft, TbLock} from 'react-icons/tb';
 import { Circle, Layer, Line, Rect, Stage } from 'react-konva';
 import ChallengeModal from '../organisms/answer/ChallengeModal';
 import CorrectModal from '../organisms/answer/CorrectModal';
@@ -24,8 +23,6 @@ import { useModalContext } from '@/hooks/useModalContext';
 import AnswerCloseModal from '@/components/organisms/answer/AnswerCloseModal';
 import PleaseCloseModal from '@/components/organisms/answer/PleaseCloseModal';
 import FinalAnswerModal from '@/components/organisms/answer/FinalAnswerModal';
-import { usePresence } from '@/hooks/usePresence';
-import { getOrCreateUser, type UserInfo } from '@/lib/user';
 import AccessUser from '../organisms/AccessUser';
 import useStatus from '@/hooks/useStatus';
 
@@ -70,7 +67,6 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
     const { open, close, modalType } = useModalContext();
 
     const { roomStatus } = useStatus(roomId);
-    console.log("初期ステータス:", roomStatus.status);
 
     const handleNext = () => {
         if (currentIndex < data.length - 1) {
@@ -368,7 +364,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
                 </Card>
                 {modalType === 'finalAnswer' && <FinalAnswerModal handleAnswer={handleAnswer} />}
                 {modalType === 'answerClose' && isAnswerRole && <AnswerCloseModal roomId={roomId} dataLength={data.length} />}
-                {modalType === 'correct' && <CorrectModal roomId={roomId} />}
+                {modalType === 'correct' && <CorrectModal/>}
                 {modalType === 'mistake' && <MistakeModal onClick={() => handleNext()} />}
                 {modalType === 'challenge' && <ChallengeModal roomId={roomId}
                     onModify={handleModify}

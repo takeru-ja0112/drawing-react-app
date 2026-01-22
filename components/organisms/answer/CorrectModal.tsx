@@ -1,13 +1,11 @@
-import { setStatusRoom } from '@/app/room/[id]/action';
 import Modal from '@/components/organisms/Modal';
 import { useModalContext } from '@/hooks/useModalContext';
 
-export default function CorrectModal({roomId}: {roomId: string}) {
-    const {open , modalType, close } = useModalContext();
+export default function CorrectModal() {
+    const {open , modalType } = useModalContext();
 
     return (
         <Modal isOpen={modalType === 'correct'} onClose={() => {
-            // setStatusRoom(roomId, 'FINISHED');
             open('finish');
         }}>
             <div className="p-6">

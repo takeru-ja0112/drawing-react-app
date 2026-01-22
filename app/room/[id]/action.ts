@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import type { RoomSettingType } from "@/type/roomType";
 
 
 /**  ルームのステータスを変更 
@@ -145,5 +146,59 @@ export async function resetRoomAnswer(roomId: string) {
     } catch (error) {
         console.error('Unexpected error:', error);
         return { success: false, error: 'Failed to reset room answerer', data: null };
+    }
+}
+
+/**
+ * ルームのお題を変更する関数
+ * 
+ * @param roomId
+ * @param roomSetting
+ * @returns
+ */
+export async function changeRoomTheme({
+    roomId,
+    roomSetting
+}:{
+    roomId: string;
+    roomSetting: RoomSettingType;
+}) {
+    const { data , error } = await supabase
+        .from('theme')
+        .select('id, theme')
+        .eq('level', roomSetting.level)
+        .eq('genre', roomSetting.genre);
+
+    if (error) {
+        console.error('Failed to fetch themes for change:', error);
+        return { success: false, error: error.message, data: null };
+    }
+
+    if (!data || data.length === 0) {
+        return { success: false, error: "No themes found for the specified settings", data: null };
+    }
+
+    const randomTheme = data[Math.floor(Math.random() * data.length)];
+
+    try {
+        const { data: updateData, error: updateError } = await supabase
+            .from('rooms')
+            .update({
+                current_theme: randomTheme.theme,
+                current_theme_id: randomTheme.id,
+            })
+            .eq('id', roomId)
+            .select()
+            .single();
+
+        if (updateError) {
+            console.error('Failed to update room theme:', updateError);
+            return { success: false, error: updateError.message, data: null };
+        }
+
+        return { success: true, error: null, data: updateData };
+    } catch (error) {
+        console.error('Unexpected error during theme change:', error);
+        return { success: false, error: 'Failed to change room theme', data: null };
     }
 }

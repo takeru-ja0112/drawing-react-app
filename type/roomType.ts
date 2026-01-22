@@ -8,8 +8,13 @@ export interface Room {
 };
 
 export interface CreateRoom {
-    username:string;
-    roomName:string;
-    level:string;
-    genre:string;
+    username: string;
+    roomName: string;
+    level: string;
+    genre: string;
+}
+
+export interface RoomSettingType {
+    level: string;
+    genre: string;
 }

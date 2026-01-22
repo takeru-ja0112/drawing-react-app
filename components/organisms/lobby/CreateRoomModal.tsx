@@ -3,7 +3,8 @@ import Input from "@/components/atoms/Input";
 import Button from "@/components/atoms/Button";
 import Loading from "@/components/atoms/Loading";
 import RoomSetting from "@/components/organisms/RoomSetting";
-import type { CreateRoom } from '@/type/roomType';
+import type { CreateRoom, RoomSettingType  } from '@/type/roomType';
+import { useState } from "react";
 
 
 export default function CreateRoomModal({
@@ -27,6 +28,11 @@ export default function CreateRoomModal({
     createRoom: () => void,
     className?: string,
 }) {
+    const [ settingData , setSettingData ] = useState<RoomSettingType>({
+        level: 'normal',
+        genre: 'ランダム',
+    });
+
     return (
         <>
             <Modal
@@ -46,9 +52,9 @@ export default function CreateRoomModal({
                         <p className="text-red-500 font-semibold text-sm">{roomError}</p>
                     </div>
                 )}
-                <RoomSetting
+                <RoomSetting<RoomSettingType>
                     className="mt-6"
-                    setCreateRoomData={setCreateRoomData}
+                    setRoomData={setSettingData}
                 />
                 <div className='flex space-x-2 mt-6 justify-end'>
                     <Button
@@ -59,7 +65,14 @@ export default function CreateRoomModal({
                     <Button
                         value='作成'
                         icon={loading ? <Loading /> : null}
-                        onClick={createRoom}
+                        onClick={()=>{
+                            setCreateRoomData(prev => ({
+                                ...prev,
+                                level: settingData.level,
+                                genre: settingData.genre,
+                            }))
+                            createRoom();
+                        }}
                         disabled={loading}
                         className='w-30'
                     />

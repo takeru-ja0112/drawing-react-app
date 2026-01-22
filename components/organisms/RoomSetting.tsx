@@ -1,14 +1,16 @@
 import { motion } from 'motion/react';
-import type { CreateRoom } from '@/type/roomType';
+// RoomSettingTypeのimportは不要になるので削除
 import { useState } from 'react';
 
-export default function RoomSetting({
+type RoomSettingProps<T> = {
+    className?: string;
+    setRoomData: React.Dispatch<React.SetStateAction<T>>;
+};
+
+export default function RoomSetting<T>({
     className,
-    setCreateRoomData,
-}: {
-    className?: string,
-    setCreateRoomData: React.Dispatch<React.SetStateAction<CreateRoom>>,
-}) {
+    setRoomData,
+}: RoomSettingProps<T>) {
     const levels = ['easy', 'normal', 'hard'];
     const genres = ['ランダム'];
     const [selectedLevel, setSelectedLevel] = useState<string>('normal');
@@ -34,8 +36,8 @@ export default function RoomSetting({
                             type='radio'
                             name='level'
                             onChange={() => {
-                                setSelectedLevel(level); setCreateRoomData(prev => ({ ...prev, level: level }))
                                 setSelectedLevel(level);
+                                setRoomData(prev => ({ ...prev, level: level }));
                             }}
                             checked={selectedLevel === level}
                             key={level}
@@ -57,7 +59,7 @@ export default function RoomSetting({
                 <motion.select
                     name="genre"
                     id="genre"
-                    onChange={(e) => setCreateRoomData(prev => ({ ...prev, genre: e.target.value }))}
+                    onChange={(e) => setRoomData(prev => ({ ...prev, genre: e.target.value }))}
                     className="w-full col-span-3 p-4 bg-gray-200 rounded-full hover:bg-gray-300 transition-colors cursor-pointer"
                 >
                     {genres.map((genre) => (

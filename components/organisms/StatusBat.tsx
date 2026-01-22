@@ -1,7 +1,6 @@
 "use client";
 
 import Loading from '@/components/atoms/Loading';
-import useStatus from '@/hooks/useStatus';
 
 export default function StatusBar({ status }: { status: string }) {
     

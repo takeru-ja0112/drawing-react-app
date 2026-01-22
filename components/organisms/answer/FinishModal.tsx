@@ -1,6 +1,6 @@
 import Modal from '@/components/organisms/Modal'
 import Button from '@/components/atoms/Button';
-import { resetRoomSettings, resetRoomAnswer, setStatusRoom } from '@/app/room/[id]/action';
+import { resetRoomSettings, resetRoomAnswer } from '@/app/room/[id]/action';
 import { useRouter } from 'next/navigation';
 import { useModalContext } from '@/hooks/useModalContext';
 
