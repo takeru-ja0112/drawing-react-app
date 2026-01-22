@@ -7,7 +7,7 @@ import { TbGhost2, TbUserFilled, TbArrowLeft } from 'react-icons/tb';
 export default function AccessUser({ roomId }: { roomId: string }) {
     const user: UserInfo = (getOrCreateUser());
     const { users } = usePresence(roomId, user.id, user.username);
-    const [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
     const [isfullName, setIsFullName] = useState(false);
 
     return (
