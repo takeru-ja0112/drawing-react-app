@@ -20,6 +20,7 @@
     "dir": "auto",
     "lang": "ja",
     "name": "minimalDrawer",
+    "id":"/",
     "short_name": "minidraw",
     "start_url": "/",
     "scope": "/"
