@@ -1,4 +1,5 @@
 "use client";
+import Button from "@/components/atoms/Button";
 import { useState } from "react";
 
 export default function PushTest() {
@@ -17,10 +18,7 @@ export default function PushTest() {
 
   // ★ ここに提示されたコードを書きます
   const sendTestNotification = async (subscription: any) => {
-    if (!subscription) {
-      alert("先に購読（Subscribe）してください");
-      return;
-    }
+    alert('送信ボタンが押されました。宛先情報'+ JSON.stringify(subscription));
 
     await fetch('/api/push', {
       method: 'POST',
@@ -35,14 +33,14 @@ export default function PushTest() {
   };
 
   return (
-    <div className="p-4 space-y-4">
-      <button onClick={handleSubscribe} className="bg-green-500 p-2 text-white">
-        1. 通知を購読する
-      </button>
+    <div className="p-4 grid grid-cols-2 gap-4">
+      <Button onClick={handleSubscribe} 
+        value="1. 購読（Subscribe）する"
+       />
       
-      <button onClick={() => sendTestNotification(sub)} className="bg-blue-500 p-2 text-white">
-        2. 自分に通知を飛ばす
-      </button>
+      <Button onClick={() => sendTestNotification(sub)} 
+        value="2. テスト通知を送る"
+      />
     </div>
   );
 }
