@@ -1,3 +1,6 @@
+"use client";
+import { useEffect } from "react";
+
 import Header from "@/components/organisms/Header";
 import { SoundProvider } from "@/components/SoundProvider";
 import type { Metadata } from "next";
@@ -15,21 +18,33 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Minimal Draw",
-  description: "Mini app",
-};
+// export const metadata: Metadata = {
+//   title: "Minimal Draw",
+//   description: "Mini app",
+// };
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/sw.js")
+        .then((reg) => console.log("SW registered!", reg))
+        .catch((err) => console.error("SW registration failed!", err));
+    }
+  }, []);
+
   return (
     <html lang="en">
       <head>
         <link rel="icon" href="/minimalDrawIcon.svg" />
-        <link rel="manifest" href="manifest.json"/>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#fbbf24" />
+        <link rel="apple-touch-icon" href="/minimalDrawIcon.svg" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-b from-gray-100 to-gray-200 min-h-screen`}
@@ -38,7 +53,7 @@ export default function RootLayout({
         <SoundProvider>
           {/* ヘッダーの高さ分全体をさげる */}
           <Header />
-            <div className="pt-14">{children}</div>
+          <div className="pt-14">{children}</div>
           <footer className="text-center p-4 text-gray-500 text-sm">
             &copy; 2026, Takeru
           </footer>

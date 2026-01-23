@@ -4,9 +4,13 @@ const nextConfig: NextConfig = {
   /* config options here */
 };
 
-// const withPWA = require("next-pwa")({
-//   dest: "public",
-//   disable: process.env.NODE_ENV === "development",
-// });
+const WITH_PWA = require("@ducanh2912/next-pwa").default({
+  dest: "public",
+  cacheOnFrontEndNav: true,
+  aggressiveFrontEndNavCaching: true,
+  reloadOnOnline: true,
+  swMinify: true,
+  disable: process.env.NODE_ENV === "development",
+});
 
-export default nextConfig;
+export default WITH_PWA(nextConfig);
