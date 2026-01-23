@@ -22,7 +22,7 @@ export default function Top() {
             <div
                 className="min-w-[320px] flex items-center justify-center px-8 overflow-hidden"
             >
-                {/* <BgObject /> */}
+                
                 <div className="max-w-2xl w-90 mt-20 mb-30 z-10">
                     {/* メインコンテンツ */}
                     <motion.div

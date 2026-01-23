@@ -1,7 +1,7 @@
 "use client";
 
 import { IconContext } from "react-icons";
-import { TbHome, TbUsersGroup, TbArrowBackUp, TbPencil } from "react-icons/tb";
+import { TbHome, TbUsersGroup, TbArrowBackUp, TbPencil , TbSettings } from "react-icons/tb";
 import Link from "next/link";
 import Image from "next/image";
 import historyLocalRoom from "@/lib/hitoryLocalRoom";
@@ -40,6 +40,7 @@ export default function AccessMenu({
                         <Link href="/" onClick={onClose}><li className="my-3 flex px-2 py-1 hover:bg-gray-200 transition duration-200 rounded-full"><TbHome />ホーム</li></Link>
                         <Link href="/lobby" onClick={onClose}><li className="my-3 flex px-3 py-1 hover:bg-gray-200 transition duration-200 rounded-full"><TbUsersGroup />ロビー</li></Link>
                         <Link href="/drawing" onClick={onClose}><li className="my-3 flex px-3 py-1 hover:bg-gray-200 transition duration-200 rounded-full"><TbPencil />試し書き</li></Link>
+                        <Link href="/mobile" onClick={onClose}><li className="my-3 flex px-3 py-1 hover:bg-gray-200 transition duration-200 rounded-full"><TbSettings />設定</li></Link>
                         {getLocalRoom() && (
                             <>
                                 <hr className="border-gray-300" />
