@@ -1,3 +1,5 @@
+Lobby action
+
 ### getRooms
 ルーム一覧を取得（作成日時降順）
 
@@ -20,6 +22,7 @@
 お題を設定
 
 ---
+room action
 
 ### setStatusRoom
 ルームのステータスを変更（WATING/DRAWING/ANSWERING/FINISHED/RESETTING）

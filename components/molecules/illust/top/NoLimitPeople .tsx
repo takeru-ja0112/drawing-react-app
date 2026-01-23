@@ -12,8 +12,8 @@ export default function NoLimitPeople() {
             <div className="w-1/2 flex flex-col align-items-center">
                 <h2 className="font-semibold mb-5">Drawer</h2>
                 <Human className="left-1/2 translate-x-[-50%] z-1" colorClass="bg-yellow-500" />
-                <Human className="left-1/2 translate-x-[-75%]" colorClass="bg-yellow-200" />
-                <Human className="left-1/2 translate-x-[-25%]" colorClass="bg-yellow-200" />
+                <Human className="left-1/2 translate-x-[-75%]" colorClass="bg-yellow-500/60" />
+                <Human className="left-1/2 translate-x-[-25%]" colorClass="bg-yellow-500/60" />
             </div>
         </div>
     )

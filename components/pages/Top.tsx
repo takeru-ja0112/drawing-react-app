@@ -93,11 +93,11 @@ export default function Top() {
                         <Card className="mt-10 text-center">
                             {/* イメージ */}
                             <NoLimitPeople />
-                            <h2 className="text-xl text-gray-700 font-semibold mb-2">人数制限なし！</h2>
+                            <h2 className="text-xl text-gray-700 font-semibold mb-2">2人以上で遊べる！</h2>
                             <p className="text-gray-600">
                                 このゲームでは描く人と答える人で分かれます。描く人は何人でも参加可能！
                                 <br />
-                                みんなでわいわい楽しもう！
+                                3〜5人で遊ぶのがおすすめ！
                             </p>
                         </Card>
                     </motion.div>

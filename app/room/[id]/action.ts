@@ -202,3 +202,26 @@ export async function changeRoomTheme({
         return { success: false, error: 'Failed to change room theme', data: null };
     }
 }
+
+/**
+ * 描画データをリセットする関数
+ */
+export async function resetDrawingData(roomId : string ) {
+    try {
+        const { error } = await supabase
+            .from('drawings')
+            .delete()
+            .eq('room_id', roomId);
+            
+        if (error) {
+            console.error('Failed to reset drawing data:', error);
+            return { success: false, error: error.message };
+        }
+
+        return { success: true, error: null };
+    }
+    catch (error) {
+        console.error('Unexpected error during drawing data reset:', error);
+        return { success: false, error: 'Failed to reset drawing data' };
+    }
+}

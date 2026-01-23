@@ -1,24 +1,22 @@
 "use client";
 
-import { setStatusRoom } from '@/app/room/[id]/action';
+import { changeRoomTheme, resetDrawingData, setStatusRoom } from '@/app/room/[id]/action';
 import { isCheckAnswer, setdbAnswer } from '@/app/room/[id]/answer/action';
 import Button from '@/components/atoms/Button';
 import Card from '@/components/atoms/Card';
 import Modal from '@/components/organisms/Modal';
+import StatusBar from '@/components/organisms/StatusBat';
+import { useModalContext } from '@/hooks/useModalContext';
+import { supabase } from '@/lib/supabase';
+import type { RoomSettingType } from '@/type/roomType';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IconContext } from 'react-icons';
 import { TbBallBowling, TbPencil } from 'react-icons/tb';
-import BgObject from '../organisms/BgObject';
-import StatusBar from '@/components/organisms/StatusBat';
 import AccessUser from '../organisms/AccessUser';
-import { useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import BgObject from '../organisms/BgObject';
 import RoomSetting from '../organisms/RoomSetting';
-import type { RoomSettingType } from '@/type/roomType';
-import { useModalContext } from '@/hooks/useModalContext';
-import { changeRoomTheme } from '@/app/room/[id]/action';
 
 export default function RoomPage({ title }: { title: string }) {
     const params = useParams();
@@ -157,7 +155,13 @@ export default function RoomPage({ title }: { title: string }) {
                         あなたがAnswerになりますか？
                     </p>
                     <Button value="いいえ" onClick={() => setIsAnswerModalOpen(false)} />
-                    <Button value="はい" onClick={() => { handleSetAnswer(); setStatusRoom(roomId, 'DRAWING'); setIsAnswerModalOpen(false); }} className="ml-4" />
+                    <Button value="はい" onClick={() => {
+                        resetDrawingData(roomId);
+                        handleSetAnswer(); 
+                        setStatusRoom(roomId, 'DRAWING');
+                        setIsAnswerModalOpen(false);
+                    }} 
+                    className="ml-4" />
                 </div>
             </Modal>
             }
