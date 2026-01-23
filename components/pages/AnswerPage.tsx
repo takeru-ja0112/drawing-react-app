@@ -65,6 +65,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
     const { status, currentTheme } = useStatus(roomId);
     const [themePattern , setThemePattern] = useState<ThemePattern>(initialTheme ? initialTheme : { theme: '', furigana: '', kanji: '', katakana: '' });
 
+    const [ answerError , setAnswerError ] = useState<string | null>(null);
     const [isOpen, setIsOpen] = useState(false);
     const [mistake, setMistake] = useState<number>(0);
     const { open, close, modalType } = useModalContext();
@@ -152,9 +153,13 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
     }
 
     useEffect(() => {
-        const delayDebounceFn = setTimeout(() => {
+        const delayDebounceFn = setTimeout(async () => {
+            setAnswerError(null);
             if (isAnswerRole) {
-                setdbAnswerInput(roomId, answer);
+                const result = await setdbAnswerInput(roomId, answer);
+                if(!result.success){
+                    setAnswerError("文字は30文字以内で入力してください");
+                }
             }
         }, 500)
         return () => clearTimeout(delayDebounceFn);
@@ -382,6 +387,9 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
                                         className="w-full "
                                         disabled={status !== 'ANSWERING'}
                                     />
+                                    { answerError && (
+                                        <p className="text-red-500 text-sm font-semibold mt-1">{answerError}</p>
+                                    )}
                                     <p className='text-gray-400 text-sm'>ひらがな、カタカナ、漢字のいずれでも構いません。</p>
                                 </div>
                             )}
@@ -402,7 +410,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
                             </div>
                             {!isAnswerRole && (
                                 <>
-                                    <Card className='mt-6'>
+                                    <Card className='mt-6 rounded-xl'>
                                         <h1 className='text-center font-bold'>回答</h1>
                                         <hr className='my-2 text-gray-300' />
                                         <div
@@ -413,7 +421,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
                                                 initial={{ opacity: 0, y: -20 }}
                                                 animate={{ opacity: 1, y: 0 }}
                                                 transition={{ duration: 0.5, ease: 'easeOut', type: 'spring', bounce: 0.5 }}
-                                                className={`font-bold text-3xl text-center ${result === 'CORRECT' ? 'text-green-500' : result === 'MISTAKE' ? 'text-red-500' : 'text-gray-700'}`}
+                                                className={`whitespace-nowrap overflow-y-auto  font-bold text-3xl text-center ${result === 'CORRECT' ? 'text-green-500' : result === 'MISTAKE' ? 'text-red-500' : 'text-gray-700'}`}
                                             >
                                                 {answerInputs ?
                                                     answerInputs
