@@ -14,3 +14,13 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   event.waitUntil(clients.openWindow('/'));
 });
+
+// sw.js の showNotification 部分
+self.registration.showNotification(data.title, {
+  body: data.body,
+  icon: '/icon-192x192.png',
+  badge: '/icon-192x192.png',
+  vibrate: [200, 100, 200], // 振動パターンを追加
+  tag: 'test-notification', // 通知が重ならないようにタグ付け
+  renotify: true
+})
