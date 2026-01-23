@@ -99,7 +99,7 @@ export default function RoomPage({ title }: { title: string }) {
 
     return (
         <div>
-            <BgObject />
+            {/* <BgObject /> */}
             <div className="w-full p-8">
                 <div className="max-w-lg mx-auto">
                     <div className="mb-6 text-center">

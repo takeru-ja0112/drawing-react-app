@@ -50,7 +50,7 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
 
     return (
         <>
-            <BgObject />
+            {/* <BgObject /> */}
             <div className="px-8 pt-2 pb-16">
                 <Link href={`/room/${roomId}`} className='absolute top-13 left-2 hover:text-yellow-600 transition duration-300 p-2 rounded-full'>
                     <TbArrowLeft size='2em' />

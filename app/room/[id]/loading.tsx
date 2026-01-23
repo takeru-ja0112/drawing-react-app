@@ -1,11 +1,5 @@
-import { TbLoaderQuarter } from "react-icons/tb";
+import RoomSkelton from '@/components/pages/skelton/RoomSkelton';
 
 export default function Loading() {
-    return (
-        <div
-            className="h-full flex items-center justify-center"
-        >
-            <TbLoaderQuarter className="animate-spin" />
-        </div>
-    );
+    return <RoomSkelton />;
 }

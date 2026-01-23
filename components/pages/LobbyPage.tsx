@@ -11,9 +11,9 @@ import { supabase } from '@/lib/supabase';
 import { generateUser, getUsername, setUsernameSchema } from '@/lib/user';
 import type { Room } from '@/type/roomType';
 import DOMPurify from 'dompurify';
-import { motion} from 'motion/react';
+import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
-import { TbArrowLeft, TbArrowRight, TbArrowUpRight , TbGhost2 } from 'react-icons/tb';
+import { TbArrowLeft, TbArrowRight, TbArrowUpRight, TbGhost2 } from 'react-icons/tb';
 import { z } from 'zod';
 import BgObject from '../organisms/BgObject';
 import CreateRoomModal from '../organisms/lobby/CreateRoomModal';
@@ -44,9 +44,9 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     const [isPaging, setIsPaging] = useState<boolean>(false);
     const itemsPerPage = 10;
     const [createRoomData, setCreateRoomData] = useState<CreateRoom>({
-        level: 'normal', 
+        level: 'normal',
         genre: 'ランダム',
-        username: user, 
+        username: user,
         roomName: roomName
     });
 
@@ -149,7 +149,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
 
     return (
         <>
-            <BgObject />
+            {/* <BgObject /> */}
             <div className="p-8">
                 <div className="max-w-lg mx-auto">
 
