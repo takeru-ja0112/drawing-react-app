@@ -3,6 +3,11 @@
 import { useEffect , useState } from "react";
 import { supabase } from "@/lib/supabase";
 
+interface UseStatusType {
+    status: string;
+    theme:string;
+}
+
 /**
  * ルームステータスの状態を管理するカスタムフック
  * 
@@ -12,7 +17,7 @@ import { supabase } from "@/lib/supabase";
  * 
  */
 export default function useStatus(roomId: string) {
-    const [ roomStatus , setRoomStatus ] = useState<{ status: string }>({ status: 'WAITING' });
+    const [ roomData , setRoomData ] = useState<UseStatusType>({ status: 'WAITING' , theme: '' });
 
 
     // ステータス変更を検知した処理
@@ -20,7 +25,7 @@ export default function useStatus(roomId: string) {
             const fetchRoomStatus = async () => {
                 const { data, error } = await supabase
                     .from('rooms')
-                    .select('status')
+                    .select('status , current_theme')
                     .eq('id', roomId)
                     .single();
     
@@ -30,7 +35,7 @@ export default function useStatus(roomId: string) {
                 }
     
                 if (data) {
-                    setRoomStatus({ status: data.status });
+                    setRoomData({ status: data.status, theme: data.current_theme } );
                 }
             };
     
@@ -43,7 +48,7 @@ export default function useStatus(roomId: string) {
                     { event: 'UPDATE', schema: 'public', table: 'rooms', filter: `id=eq.${roomId}` },
                     (payload) => {
                         const newStatus = payload.new.status;
-                        setRoomStatus({ status: newStatus });
+                        setRoomData({ status: newStatus , theme: payload.new.current_theme });
                     }
                 )
                 .subscribe();
@@ -53,5 +58,8 @@ export default function useStatus(roomId: string) {
             };
         }, [roomId]);
 
-    return { roomStatus };
+    return { 
+        status : roomData.status,
+        currentTheme: roomData.theme
+     };
 }

@@ -1,5 +1,4 @@
 import Card from '@/components/atoms/Card';
-import Button from '@/components/atoms/Button';
 
 export default function Loading() {
     return (

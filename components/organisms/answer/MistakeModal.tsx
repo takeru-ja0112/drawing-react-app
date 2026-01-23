@@ -1,8 +1,9 @@
 import Modal from '@/components/organisms/Modal';
 import { useModalContext } from '@/hooks/useModalContext';
 import Button from '@/components/atoms/Button';
+import { setdbAnswerResult } from '@/app/room/[id]/answer/action';
 
-export default function MistakeModal({ onClick }: { onClick: () => void }) {
+export default function MistakeModal({ roomId, onClick }: { roomId: string; onClick: () => void }) {
     const { close } = useModalContext();
     
     return (
@@ -12,6 +13,7 @@ export default function MistakeModal({ onClick }: { onClick: () => void }) {
                 <p className="text-center">次のイラストへ移ります</p>
                 <Button
                     onClick={() => {
+                        setdbAnswerResult(roomId, '');
                         onClick();
                         close();
                     }}

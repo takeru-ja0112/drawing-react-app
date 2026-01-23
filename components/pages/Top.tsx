@@ -8,7 +8,6 @@ import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useInView } from "react-intersection-observer";
-import BgObject from "../organisms/BgObject";
 
 export default function Top() {
     const title = "Minimal Drawer";

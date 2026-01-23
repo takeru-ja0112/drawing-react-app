@@ -11,7 +11,6 @@ import { useState } from "react";
 import { IconContext } from "react-icons";
 import { TbArrowBackUp, TbArrowForwardUp, TbTrash } from 'react-icons/tb';
 import { Circle, Rect as KonvaRect, Layer, Line, Stage } from "react-konva";
-import BgObject from "../organisms/BgObject";
 import { TbArrowLeft } from "react-icons/tb";
 import Link from "next/link";
 
@@ -46,13 +45,13 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
     const [isThemeOpen, setIsThemeOpen] = useState(true);
     const [isBlocked, setIsBlocked] = useState(true);
     useBlocker(() => { }, isBlocked);
-    const { roomStatus } = useStatus(roomId);
+    const { status } = useStatus(roomId);
 
     return (
         <>
             {/* <BgObject /> */}
             <div className="px-8 pt-2 pb-16">
-                <Link href={`/room/${roomId}`} className='absolute top-13 left-2 hover:text-yellow-600 transition duration-300 p-2 rounded-full'>
+                <Link href={`/room/${roomId}`} className='absolute top-13 left-2 text-gray-500 hover:text-gray-700 transition duration-300 p-2 rounded-full'>
                     <TbArrowLeft size='2em' />
                 </Link>
                 <div className="max-w-lg mx-auto text-center">
@@ -205,7 +204,7 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
                 </Modal>
                 }
 
-                {roomStatus.status === 'ANSWERING' && (
+                {status === 'ANSWERING' && (
                     <Modal
                         isOpen={true}
                         onClose={() => {

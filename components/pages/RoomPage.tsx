@@ -1,31 +1,32 @@
 "use client";
 
 import { changeRoomTheme, resetDrawingData, setStatusRoom } from '@/app/room/[id]/action';
-import { isCheckAnswer, setdbAnswer } from '@/app/room/[id]/answer/action';
+import { isCheckAnswer, setdbAnswer, setdbAnswerInput, setdbAnswerResult } from '@/app/room/[id]/answer/action';
 import Button from '@/components/atoms/Button';
 import Card from '@/components/atoms/Card';
 import Modal from '@/components/organisms/Modal';
 import StatusBar from '@/components/organisms/StatusBat';
 import { useModalContext } from '@/hooks/useModalContext';
-import { supabase } from '@/lib/supabase';
 import type { RoomSettingType } from '@/type/roomType';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { IconContext } from 'react-icons';
 import { TbBallBowling, TbPencil } from 'react-icons/tb';
 import AccessUser from '../organisms/AccessUser';
-import BgObject from '../organisms/BgObject';
 import RoomSetting from '../organisms/RoomSetting';
+import useStatus from '@/hooks/useStatus';
 
 export default function RoomPage({ title }: { title: string }) {
     const params = useParams();
     const roomId = params.id as string;
     const router = useRouter();
     const [isAnswerModalOpen, setIsAnswerModalOpen] = useState(false);
-    const [status, setStatus] = useState<string>('WAITING');
+    // const [status, setStatus] = useState<string>('WAITING');
     const [roomSetting, setRoomSetting] = useState<RoomSettingType>({ level: "normal", genre: "ランダム" });
     const { open, modalType, close } = useModalContext();
+
+    const { status } = useStatus(roomId);
 
     const handleCheckAnswer = async () => {
         const { success, data: isAnswerer } = await isCheckAnswer(roomId);
@@ -59,43 +60,6 @@ export default function RoomPage({ title }: { title: string }) {
         }
         close();
     }
-
-    useEffect(() => {
-        const fetchRoomStatus = async () => {
-            const { data, error } = await supabase
-                .from('rooms')
-                .select('status')
-                .eq('id', roomId)
-                .single();
-
-            if (error) {
-                console.error('Failed to fetch room status:', error);
-                return;
-            }
-
-            if (data) {
-                setStatus(data.status);
-            }
-        };
-
-        fetchRoomStatus();
-
-        const subscription = supabase
-            .channel('public:rooms')
-            .on(
-                'postgres_changes',
-                { event: 'UPDATE', schema: 'public', table: 'rooms', filter: `id=eq.${roomId}` },
-                (payload) => {
-                    const newStatus = payload.new.status;
-                    setStatus(newStatus);
-                }
-            )
-            .subscribe();
-
-        return () => {
-            supabase.removeChannel(subscription);
-        };
-    },[])
 
     return (
         <div>
@@ -157,7 +121,9 @@ export default function RoomPage({ title }: { title: string }) {
                     <Button value="いいえ" onClick={() => setIsAnswerModalOpen(false)} />
                     <Button value="はい" onClick={() => {
                         resetDrawingData(roomId);
-                        handleSetAnswer(); 
+                        handleSetAnswer();
+                        setdbAnswerInput(roomId, '');
+                        setdbAnswerResult(roomId, '');
                         setStatusRoom(roomId, 'DRAWING');
                         setIsAnswerModalOpen(false);
                     }} 

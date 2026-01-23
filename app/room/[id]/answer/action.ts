@@ -171,3 +171,48 @@ export async function getThemePatternByRoomId(roomId : string ) {
         return { success: false, error: 'Failed to fetch theme patterns', data: null };
     }
 }
+
+/**
+ * 回答の登録
+ */
+export async function setdbAnswerInput(roomId: string, answer: string) {
+    try {
+        const { data, error } = await supabase
+            .from('answer_inputs')
+            .upsert({ text: answer , room_id:roomId })
+            .eq('room_id', roomId)
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Failed to set answer input:', error);
+            return { success: false, error: error.message, data: null };
+        }
+        return { success: true, error: null, data };
+    } catch (error) {
+        console.error('Unexpected error:', error);
+        return { success: false, error: 'Failed to set answer input', data: null };
+    }
+}
+/**
+ * 回答結果の記録
+ */
+export async function setdbAnswerResult(roomId: string, result: string) {
+    try {
+        const { data, error } = await supabase
+            .from('answer_inputs')
+            .upsert({ result: result , room_id:roomId })
+            .eq('room_id', roomId)
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Failed to set answer result:', error);
+            return { success: false, error: error.message, data: null };
+        }
+        return { success: true, error: null, data };
+    } catch (error) {
+        console.error('Unexpected error:', error);
+        return { success: false, error: 'Failed to set answer result', data: null };
+    }
+}

@@ -1,23 +1,22 @@
 "use client";
 
 import { setStatusRoom } from '@/app/room/[id]/action';
-import { checkAnswerRole } from '@/app/room/[id]/answer/action';
+import { checkAnswerRole, setdbAnswerInput, setdbAnswerResult } from '@/app/room/[id]/answer/action';
 import Button from '@/components/atoms/Button';
 import Card from '@/components/atoms/Card';
 import Input from '@/components/atoms/Input';
 import { supabase } from '@/lib/supabase';
 import confetti from 'canvas-confetti';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { IconContext } from 'react-icons';
-import { TbArrowBadgeLeftFilled, TbArrowBadgeRightFilled, TbArrowLeft, TbLock} from 'react-icons/tb';
+import { TbArrowBadgeLeftFilled, TbArrowBadgeRightFilled, TbArrowLeft, TbLock, TbGhost2 } from 'react-icons/tb';
 import { Circle, Layer, Line, Rect, Stage } from 'react-konva';
 import ChallengeModal from '../organisms/answer/ChallengeModal';
 import CorrectModal from '../organisms/answer/CorrectModal';
 import FinishModal from '../organisms/answer/FinishModal';
 import MistakeModal from '../organisms/answer/MistakeModal';
-import BgObject from '../organisms/BgObject';
 import StatusBar from '../organisms/StatusBat';
 import { useModalContext } from '@/hooks/useModalContext';
 import AnswerCloseModal from '@/components/organisms/answer/AnswerCloseModal';
@@ -25,6 +24,9 @@ import PleaseCloseModal from '@/components/organisms/answer/PleaseCloseModal';
 import FinalAnswerModal from '@/components/organisms/answer/FinalAnswerModal';
 import AccessUser from '../organisms/AccessUser';
 import useStatus from '@/hooks/useStatus';
+import useAnswerInputs from '@/hooks/useAnswerInputs';
+import { getThemePatternByRoomId } from '@/app/room/[id]/answer/action';
+import { validateText } from '@/lib/validation';
 
 type Drawing = {
     id: string;
@@ -60,13 +62,16 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
     const [isAnswerRole, setIsAnswerRole] = useState(false);
     const [data, setData] = useState<Drawing[]>(drawings);
     const currentDrawing = data[currentIndex];
-    const { theme, furigana, kanji, katakana }: ThemePattern = initialTheme ? initialTheme : { theme: '', furigana: '', kanji: '', katakana: '' };
+    const { status, currentTheme } = useStatus(roomId);
+    const [themePattern , setThemePattern] = useState<ThemePattern>(initialTheme ? initialTheme : { theme: '', furigana: '', kanji: '', katakana: '' });
 
     const [isOpen, setIsOpen] = useState(false);
     const [mistake, setMistake] = useState<number>(0);
     const { open, close, modalType } = useModalContext();
 
-    const { roomStatus } = useStatus(roomId);
+    // 回答者の内容を取得
+    const { answerInputs, result } = useAnswerInputs(roomId);
+
 
     const handleNext = () => {
         if (currentIndex < data.length - 1) {
@@ -79,11 +84,11 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
             setCurrentIndex(currentIndex - 1);
         }
     }
-    
-    const handleAnswer = () => {
-        if (!isAnswerRole || !theme) return;
 
-        if (roomStatus.status !== 'ANSWERING' && roomStatus.status !== 'FINISHED') { open('pleaseClose'); return; };
+    const handleAnswer = () => {
+        if (!isAnswerRole || !themePattern.theme) return;
+
+        if (status !== 'ANSWERING' && status !== 'FINISHED') { open('pleaseClose'); return; };
 
 
         const result = isAnswerMatched(answer);
@@ -92,14 +97,17 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
             open('correct');
             setIsOpen(false);
             fire();
+            setdbAnswerResult(roomId, 'CORRECT');
 
         } else {
             // 不正解時の処理
             if (mistake + 1 >= data.length) {
                 open('challenge');
+                setdbAnswerResult(roomId, 'MISTAKE');
             } else {
                 setMistake(currentIndex + 1);
                 open('mistake');
+                setdbAnswerResult(roomId, 'MISTAKE');
             }
             setIsOpen(false);
         }
@@ -108,10 +116,11 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
     const isAnswerMatched = (userAnswer: string) => {
         if (userAnswer === null) return false;
 
-        const formTheme = theme.split('・').join('');
-        const formFurigana = furigana.split('・').join('');
-        const formKanji = kanji.split('・').join('');
-        const formKatakana = katakana.split('・').join('');
+
+        const formTheme = themePattern.theme.split('・').join('');
+        const formFurigana = themePattern.furigana.split('・').join('');
+        const formKanji = themePattern.kanji.split('・').join('');
+        const formKatakana = themePattern.katakana.split('・').join('');
 
         if (userAnswer === formTheme) return true;
         if (userAnswer === formFurigana) return true;
@@ -129,12 +138,39 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
         });
     };
 
+    useEffect(() => {
+        if (result === 'CORRECT') {
+            fire();
+        }
+    }, [result]);
+
     const handleModify = () => {
         setStatusRoom(roomId, 'DRAWING');
         setMistake(0);
         setCurrentIndex(0);
         close();
     }
+
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            if (isAnswerRole) {
+                setdbAnswerInput(roomId, answer);
+            }
+        }, 500)
+        return () => clearTimeout(delayDebounceFn);
+    }, [answer , isAnswerRole , roomId]);
+
+    useEffect(() => {
+        const fetchThemePattern = async () => {
+            const themeResult = await getThemePatternByRoomId(roomId);
+            if (themeResult.success && themeResult.data) {
+                setThemePattern(themeResult.data);
+            } else {
+                console.error('Failed to fetch theme pattern:', themeResult.error);
+            }
+        };
+        fetchThemePattern();
+    }, [currentTheme , roomId])
 
     useEffect(() => {
         const userId = localStorage.getItem('drawing_app_user_id');
@@ -195,11 +231,11 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
         <>
             {/* <BgObject /> */}
             <div className="flex flex-col items-center justify-center p-8">
-                <Link href={`/room/${roomId}`} className='absolute top-13 left-2 hover:text-yellow-600 transition duration-300 p-2 rounded-full'>
+                <Link href={`/room/${roomId}`} className='absolute top-13 left-2 text-gray-500 hover:text-gray-700 transition duration-300 p-2 rounded-full'>
                     <TbArrowLeft size='2em' />
                 </Link>
                 {
-                    roomStatus.status !== 'ANSWERING' && roomStatus.status !== 'FINISHED' &&
+                    status !== 'ANSWERING' && status !== 'FINISHED' &&
                     isAnswerRole &&
                     (
                         <IconContext.Provider value={{ size: '1.5em' }}>
@@ -212,7 +248,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
                         </IconContext.Provider>
                     )}
                 {/* ステータスエリア */}
-                <StatusBar status={roomStatus.status}></StatusBar>
+                <StatusBar status={status}></StatusBar>
                 <AccessUser roomId={roomId} />
                 <Card className="max-w-lg w-full">
 
@@ -258,7 +294,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
                                                 {/* レースカーテンのような表現 */}
                                                 <button
                                                     onClick={() => {
-                                                        if ( roomStatus.status !== 'ANSWERING' && roomStatus.status !== 'FINISHED') open('pleaseClose');
+                                                        if (status !== 'ANSWERING' && status !== 'FINISHED') open('pleaseClose');
                                                         else setIsOpen(!isOpen);
                                                     }}
                                                     className="absolute top-0 left-0 w-full h-full z-20 cursor-pointer"
@@ -336,10 +372,15 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
                                     <Input
                                         type="text"
                                         value={answer}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAnswer(e.target.value)}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                            const isValid = validateText(e.target.value).success;
+                                            if (isValid) {
+                                                setAnswer(e.target.value);
+                                            }
+                                        }}
                                         placeholder="答えを入力してください"
                                         className="w-full "
-                                        disabled={ roomStatus.status !== 'ANSWERING'}
+                                        disabled={status !== 'ANSWERING'}
                                     />
                                     <p className='text-gray-400 text-sm'>ひらがな、カタカナ、漢字のいずれでも構いません。</p>
                                 </div>
@@ -352,20 +393,49 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
                                         <Button
                                             value="回答する"
                                             onClick={() => open('finalAnswer')}
-                                            disabled={!isAnswerRole || roomStatus.status !== 'ANSWERING'}
+                                            disabled={!isAnswerRole || status !== 'ANSWERING'}
                                             className='w-80 mx-auto'
                                         />
                                     </>
                                 )}
 
                             </div>
+                            {!isAnswerRole && (
+                                <>
+                                    <Card className='mt-6'>
+                                        <h1 className='text-center font-bold'>回答</h1>
+                                        <hr className='my-2 text-gray-300' />
+                                        <div
+                                            className='flex justify-center items-center min-h-[40px]'
+                                        >
+                                            <motion.h1
+                                                key={answerInputs}
+                                                initial={{ opacity: 0, y: -20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ duration: 0.5, ease: 'easeOut', type: 'spring', bounce: 0.5 }}
+                                                className={`font-bold text-3xl text-center ${result === 'CORRECT' ? 'text-green-500' : result === 'MISTAKE' ? 'text-red-500' : 'text-gray-700'}`}
+                                            >
+                                                {answerInputs ?
+                                                    answerInputs
+                                                    :
+                                                    <>
+                                                        <div className='flex items-center text-gray-400 animate-pulse'>
+                                                            <TbGhost2 className='mr-2 ' /><span className='block text-xl'>回答者の記入がまだだよ！</span>
+                                                        </div>
+                                                    </>
+                                                }
+                                            </motion.h1>
+                                        </div>
+                                    </Card>
+                                </>
+                            )}
                         </>
                     )}
                 </Card>
                 {modalType === 'finalAnswer' && <FinalAnswerModal handleAnswer={handleAnswer} />}
                 {modalType === 'answerClose' && isAnswerRole && <AnswerCloseModal roomId={roomId} dataLength={data.length} />}
-                {modalType === 'correct' && <CorrectModal/>}
-                {modalType === 'mistake' && <MistakeModal onClick={() => handleNext()} />}
+                {modalType === 'correct' && <CorrectModal />}
+                {modalType === 'mistake' && <MistakeModal roomId={roomId} onClick={() => handleNext()} />}
                 {modalType === 'challenge' && <ChallengeModal roomId={roomId}
                     onModify={handleModify}
                     setIsAnswerRole={setIsAnswerRole}

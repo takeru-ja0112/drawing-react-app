@@ -15,10 +15,10 @@ import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
 import { TbArrowLeft, TbArrowRight, TbArrowUpRight, TbGhost2 } from 'react-icons/tb';
 import { z } from 'zod';
-import BgObject from '../organisms/BgObject';
 import CreateRoomModal from '../organisms/lobby/CreateRoomModal';
 import SetUserModal from '../organisms/lobby/SetUserModal';
 import type { CreateRoom } from '@/type/roomType';
+import { validateText } from '@/lib/validation';
 
 const forbiddenChars = /[<>&\/\\'"]/;
 const roomNameSchema = z.string().max(10).refine((val) => !forbiddenChars.test(val), {
@@ -197,7 +197,12 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                             <Input
                                 name="search"
                                 value={searchName}
-                                onChange={(e) => { setSearchName(e.target.value); }}
+                                onChange={(e) => { 
+                                    const isValid = validateText(e.target.value).success;
+                                    if (isValid) {
+                                        setSearchName(e.target.value);
+                                    }
+                                 }}
                                 placeholder="検索したいルーム名を入力してください"
                                 className={`w-full ${searchError ? 'border-red-500 border-2' : ''}`}
                             />
