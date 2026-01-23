@@ -25,8 +25,8 @@ export default function PushTest() {
       method: 'POST',
       body: JSON.stringify({
         subscription, 
-        title: 'こんにちは！',
-        body: 'PWAからのプッシュ通知テストです。'
+        title: 'イラストが届いているよ！',
+        body: '確認してね！'
       }),
       headers: { 'Content-Type': 'application/json' }
     });
