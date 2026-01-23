@@ -29,6 +29,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="icon" href="/minimalDrawIcon.svg" />
+        <link rel="manifest" href="manifest.json"/>
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-b from-gray-100 to-gray-200 min-h-screen`}
