@@ -9,16 +9,17 @@ webpush.setVapidDetails(
 );
 
 export async function POST(request: Request) {
+  console.log('プッシュ通知リクエストを受信しました');
   const { subscription, title, body } = await request.json();
-
   try {
     await webpush.sendNotification(
       subscription,
       JSON.stringify({ title, body })
     );
+    console.log('送信しました！', NextResponse.json({ success: true }));
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Push error:', error);
+    console.error('送信エラー:', error);
     return NextResponse.json({ success: false }, { status: 500 });
   }
 }
