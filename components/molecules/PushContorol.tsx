@@ -34,7 +34,7 @@ export default function PushTest() {
 
   return (
     <div className="p-4 grid grid-cols-2 gap-4">
-      <Button onClick={handleSubscribe} 
+      <Button onClick={handleSubscribe}
         value="1. 購読（Subscribe）する"
        />
       

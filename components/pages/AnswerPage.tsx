@@ -1,32 +1,32 @@
 "use client";
 
 import { setStatusRoom } from '@/app/room/[id]/action';
-import { checkAnswerRole, setdbAnswerInput, setdbAnswerResult } from '@/app/room/[id]/answer/action';
+import { checkAnswerRole, getThemePatternByRoomId, setdbAnswerInput, setdbAnswerResult } from '@/app/room/[id]/answer/action';
 import Button from '@/components/atoms/Button';
 import Card from '@/components/atoms/Card';
 import Input from '@/components/atoms/Input';
+import AnswerCloseModal from '@/components/organisms/answer/AnswerCloseModal';
+import FinalAnswerModal from '@/components/organisms/answer/FinalAnswerModal';
+import PleaseCloseModal from '@/components/organisms/answer/PleaseCloseModal';
+import useAnswerInputs from '@/hooks/useAnswerInputs';
+import { useModalContext } from '@/hooks/useModalContext';
+import usePushControle from '@/hooks/usePushControle';
+import useStatus from '@/hooks/useStatus';
 import { supabase } from '@/lib/supabase';
+import { validateText } from '@/lib/validation';
 import confetti from 'canvas-confetti';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { IconContext } from 'react-icons';
-import { TbArrowBadgeLeftFilled, TbArrowBadgeRightFilled, TbArrowLeft, TbLock, TbGhost2 } from 'react-icons/tb';
+import { TbArrowBadgeLeftFilled, TbArrowBadgeRightFilled, TbArrowLeft, TbGhost2, TbLock } from 'react-icons/tb';
 import { Circle, Layer, Line, Rect, Stage } from 'react-konva';
+import AccessUser from '../organisms/AccessUser';
 import ChallengeModal from '../organisms/answer/ChallengeModal';
 import CorrectModal from '../organisms/answer/CorrectModal';
 import FinishModal from '../organisms/answer/FinishModal';
 import MistakeModal from '../organisms/answer/MistakeModal';
 import StatusBar from '../organisms/StatusBat';
-import { useModalContext } from '@/hooks/useModalContext';
-import AnswerCloseModal from '@/components/organisms/answer/AnswerCloseModal';
-import PleaseCloseModal from '@/components/organisms/answer/PleaseCloseModal';
-import FinalAnswerModal from '@/components/organisms/answer/FinalAnswerModal';
-import AccessUser from '../organisms/AccessUser';
-import useStatus from '@/hooks/useStatus';
-import useAnswerInputs from '@/hooks/useAnswerInputs';
-import { getThemePatternByRoomId } from '@/app/room/[id]/answer/action';
-import { validateText } from '@/lib/validation';
 
 type Drawing = {
     id: string;
@@ -62,6 +62,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
     const [isAnswerRole, setIsAnswerRole] = useState(false);
     const [data, setData] = useState<Drawing[]>(drawings);
     const currentDrawing = data[currentIndex];
+    const { sub, sendTestNotification } = usePushControle();
     const { status, currentTheme } = useStatus(roomId);
     const [themePattern , setThemePattern] = useState<ThemePattern>(initialTheme ? initialTheme : { theme: '', furigana: '', kanji: '', katakana: '' });
 
@@ -213,6 +214,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
                     setCurrentIndex(0);
                     setAnswer('');
                     fetchData();
+                    sendTestNotification(sub);
                 }
             )
             .on(
