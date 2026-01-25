@@ -36,8 +36,8 @@ export default function useDraw(roomId: string) {
     const circlesHistory = useRef<Array<Array<{ x: number; y: number; radius: number }>>>([[...circles]]);
     const rectsHistory = useRef<Array<Array<{ x: number; y: number; width: number; height: number; rotation: number }>>>([[...rects]]);
     const router = useRouter();
-
-
+    const lastEventType = useRef<string | null>(null);
+    
     // デバウンス用タイマーref
     const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [tool, setTool] = useState<'line' | 'circle' | 'rect'>('line');
@@ -47,7 +47,9 @@ export default function useDraw(roomId: string) {
 
     const handleMouseDown = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
         console.log('handleMouseDown');
-        // setCount((prev) => prev + 1);
+        if( lastEventType.current === e.evt.type ) return;
+        lastEventType.current = e.evt.type;
+
         const point = e.target.getStage()?.getPointerPosition();
         isDrawing.current = true;
         if (!point) return;
@@ -100,7 +102,10 @@ export default function useDraw(roomId: string) {
         }
     };
 
-    const handleMouseUp = () => {
+    const handleMouseUp = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
+        if( lastEventType.current === e.evt.type ) return;
+        lastEventType.current = e.evt.type;
+
         setCount((prev) => prev + 1);
         isDrawing.current = false;
 

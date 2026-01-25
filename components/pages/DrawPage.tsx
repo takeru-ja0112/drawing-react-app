@@ -5,10 +5,10 @@ import Modal from "@/components/organisms/Modal";
 import useDraw from '@/hooks/DrawPage/handleDraw';
 import { useBlocker } from "@/hooks/useBlocker";
 import useStatus from "@/hooks/useStatus";
-import { KonvaEventObject } from "konva/lib/Node";
+import { KonvaEventObject } from 'konva/lib/Node';
 import { motion } from "motion/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IconContext } from "react-icons";
 import { TbArrowBackUp, TbArrowForwardUp, TbArrowLeft, TbTrash } from 'react-icons/tb';
 import { Circle, Rect as KonvaRect, Layer, Line, Stage } from "react-konva";
@@ -45,6 +45,11 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
     const [isBlocked, setIsBlocked] = useState(true);
     useBlocker(() => { }, isBlocked);
     const { status } = useStatus(roomId);
+    const [ isMobile , setIsMobile ] = useState( false );
+
+    useEffect(()=>{
+        setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) )
+    }, []);
 
     return (
         <>
@@ -126,12 +131,15 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
                         <Stage
                             width={w}
                             height={h}
-                            onMouseDown={handleMouseDown}
-                            onMouseMove={handleMouseMove}
-                            onMouseUp={handleMouseUp}
-                            onTouchStart={(e: KonvaEventObject<TouchEvent>) => handleMouseDown(e)}
-                            onTouchMove={(e: KonvaEventObject<TouchEvent>) => handleMouseMove(e)}
-                            onTouchEnd={() => handleMouseUp()}
+                            {...isMobile ? {
+                                onTouchStart: (e: KonvaEventObject<TouchEvent>) => handleMouseDown(e),
+                                onTouchMove: (e: KonvaEventObject<TouchEvent>) => handleMouseMove(e),
+                                onTouchEnd: (e: KonvaEventObject<TouchEvent>) => handleMouseUp(e),
+                            } : {
+                                onMouseDown: handleMouseDown,
+                                onMouseMove: handleMouseMove,
+                                onMouseUp: handleMouseUp,
+                            }}
                         >
                             <Layer
                                 tension={0.5}
