@@ -116,6 +116,8 @@ export async function createRoomByUsername(createRoomData: CreateRoom) {
         room_name: sanitizedRoomName,
         current_theme: randomTheme.theme,
         current_theme_id: randomTheme.id,
+        level: sanitizedLevel,
+        genre: sanitizedGenre,
       })
       .select()
       .single();

@@ -1,11 +1,12 @@
 "use client"
 
-import { useEffect , useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useEffect, useState } from "react";
 
 interface UseStatusType {
     status: string;
     theme:string;
+    answerId: string;
 }
 
 /**
@@ -17,7 +18,7 @@ interface UseStatusType {
  * 
  */
 export default function useStatus(roomId: string) {
-    const [ roomData , setRoomData ] = useState<UseStatusType>({ status: 'WAITING' , theme: '' });
+    const [ roomData , setRoomData ] = useState<UseStatusType>({ status: 'WAITING' , theme: '', answerId: '' });
 
 
     // ステータス変更を検知した処理
@@ -25,7 +26,7 @@ export default function useStatus(roomId: string) {
             const fetchRoomStatus = async () => {
                 const { data, error } = await supabase
                     .from('rooms')
-                    .select('status , current_theme')
+                    .select('status , current_theme, answer_id')
                     .eq('id', roomId)
                     .single();
     
@@ -35,7 +36,7 @@ export default function useStatus(roomId: string) {
                 }
     
                 if (data) {
-                    setRoomData({ status: data.status, theme: data.current_theme } );
+                    setRoomData({ status: data.status, theme: data.current_theme, answerId: data.answer_id } );
                 }
             };
     
@@ -48,7 +49,7 @@ export default function useStatus(roomId: string) {
                     { event: 'UPDATE', schema: 'public', table: 'rooms', filter: `id=eq.${roomId}` },
                     (payload) => {
                         const newStatus = payload.new.status;
-                        setRoomData({ status: newStatus , theme: payload.new.current_theme });
+                        setRoomData({ status: newStatus , theme: payload.new.current_theme, answerId: payload.new.answer_id });
                     }
                 )
                 .subscribe();
@@ -60,6 +61,7 @@ export default function useStatus(roomId: string) {
 
     return { 
         status : roomData.status,
-        currentTheme: roomData.theme
+        currentTheme: roomData.theme,
+        answerId: roomData.answerId
      };
 }

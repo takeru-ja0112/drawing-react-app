@@ -49,11 +49,43 @@ export async function getInfoRoom(roomId: string) {
     }
 }
 
-async function getRandomTheme() {
+async function getRandomTheme(roomId?:string) {
+    if (roomId) {
+        const roomInfoResult = await getInfoRoom(roomId);
+        if (roomInfoResult.success && roomInfoResult.data) {
+            const roomInfo = roomInfoResult.data;
+            try {
+                const { data, error } = await supabase
+                    .from('theme')
+                    .select('id, theme')
+                    .eq('level', roomInfo.level)
+                    .eq('genre', roomInfo.genre);
+
+                if (error) {
+                    console.error('Failed to fetch themes for specific room settings:', error);
+                    return { success: false, error: error.message, data: null };
+                }
+
+                if (!data || data.length === 0) {
+                    return { success: false, error: "No themes found for the specified settings", data: null };
+                }
+
+                const randomTheme = data[Math.floor(Math.random() * data.length)];
+                return { success: true, error: null, data: randomTheme };
+            } catch (error) {
+                console.error('Unexpected error:', error);
+                return { success: false, error: 'Failed to fetch random theme', data: null };
+            }
+        }
+    }
+
+     // ルームIDが提供されていない場合、またはルーム情報の取得に失敗した場合は全体からランダムに取得
+
     try {
         const { data, error } = await supabase
             .from('theme')
             .select('id, theme')
+            
 
         if (error) {
             console.error('Failed to fetch random theme:', error);
@@ -76,7 +108,7 @@ async function getRandomTheme() {
  * その際にお題を再取得する
  */
 export async function resetRoomSettings(roomId: string) {
-    const themeResult = await getRandomTheme();
+    const themeResult = await getRandomTheme(roomId);
     const newTheme = themeResult.success && themeResult.data ? themeResult.data : null;
 
     try {
@@ -186,6 +218,8 @@ export async function changeRoomTheme({
             .update({
                 current_theme: randomTheme.theme,
                 current_theme_id: randomTheme.id,
+                level: roomSetting.level,
+                genre: roomSetting.genre,
             })
             .eq('id', roomId)
             .select()

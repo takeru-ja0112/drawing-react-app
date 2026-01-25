@@ -9,7 +9,8 @@ import Input from '@/components/atoms/Input';
 import historyLocalRoom from '@/lib/hitoryLocalRoom';
 import { supabase } from '@/lib/supabase';
 import { generateUser, getUsername, setUsernameSchema } from '@/lib/user';
-import type { Room } from '@/type/roomType';
+import { validateText } from '@/lib/validation';
+import type { CreateRoom, Room } from '@/type/roomType';
 import DOMPurify from 'dompurify';
 import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
@@ -17,8 +18,6 @@ import { TbArrowLeft, TbArrowRight, TbArrowUpRight, TbGhost2 } from 'react-icons
 import { z } from 'zod';
 import CreateRoomModal from '../organisms/lobby/CreateRoomModal';
 import SetUserModal from '../organisms/lobby/SetUserModal';
-import type { CreateRoom } from '@/type/roomType';
-import { validateText } from '@/lib/validation';
 
 const forbiddenChars = /[<>&\/\\'"]/;
 const roomNameSchema = z.string().max(10).refine((val) => !forbiddenChars.test(val), {
@@ -182,6 +181,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                         )}
                         <div>
                             <Button
+                                icon={<span className="text-xl font-bold">+</span>}
                                 value='ルームを作成'
                                 onClick={handleCreateRoom}
                                 disabled={loading}

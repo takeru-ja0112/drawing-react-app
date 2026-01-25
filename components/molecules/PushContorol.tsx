@@ -14,7 +14,6 @@ export default function PushTest() {
     });
     setSub(subscription); // 取得した情報をステートに保存
     console.log("Subscribed:", subscription);
-    alert(`購読が完了しました！次にテスト通知を送信してください。 ${JSON.stringify(subscription)}`);
   };
 
   // ★ ここに提示されたコードを書きます

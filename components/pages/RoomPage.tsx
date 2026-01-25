@@ -2,31 +2,32 @@
 
 import { changeRoomTheme, resetDrawingData, setStatusRoom } from '@/app/room/[id]/action';
 import { isCheckAnswer, setdbAnswer, setdbAnswerInput, setdbAnswerResult } from '@/app/room/[id]/answer/action';
+import Human from '@/components/atoms//Human';
 import Button from '@/components/atoms/Button';
 import Card from '@/components/atoms/Card';
 import Modal from '@/components/organisms/Modal';
 import StatusBar from '@/components/organisms/StatusBat';
 import { useModalContext } from '@/hooks/useModalContext';
+import useStatus from '@/hooks/useStatus';
 import type { RoomSettingType } from '@/type/roomType';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { IconContext } from 'react-icons';
-import { TbBallBowling, TbPencil } from 'react-icons/tb';
+import { TbArrowLeft, TbBallBowling, TbPencil } from 'react-icons/tb';
 import AccessUser from '../organisms/AccessUser';
 import RoomSetting from '../organisms/RoomSetting';
-import useStatus from '@/hooks/useStatus';
 
 export default function RoomPage({ title }: { title: string }) {
     const params = useParams();
     const roomId = params.id as string;
     const router = useRouter();
     const [isAnswerModalOpen, setIsAnswerModalOpen] = useState(false);
-    // const [status, setStatus] = useState<string>('WAITING');
     const [roomSetting, setRoomSetting] = useState<RoomSettingType>({ level: "normal", genre: "ランダム" });
     const { open, modalType, close } = useModalContext();
 
-    const { status } = useStatus(roomId);
+    const { status , answerId } = useStatus(roomId);
 
     const handleCheckAnswer = async () => {
         const { success, data: isAnswerer } = await isCheckAnswer(roomId);
@@ -64,6 +65,9 @@ export default function RoomPage({ title }: { title: string }) {
     return (
         <div>
             {/* <BgObject /> */}
+            <Link href={`/lobby`} className='absolute top-13 left-2 text-gray-500 hover:text-gray-700 transition duration-300 p-2 rounded-full'>
+                <TbArrowLeft size='2em' />
+            </Link>
             <div className="w-full p-8">
                 <div className="max-w-lg mx-auto">
                     <div className="mb-6 text-center">
@@ -82,26 +86,37 @@ export default function RoomPage({ title }: { title: string }) {
                             <IconContext.Provider value={{ size: '1.5em' }}>
                                 {/* 書く人用の説明 */}
                                 <Card className="mb-4">
-                                    <div className='my-4'>
-                                        <p>
-                                            <span className='font-bold'>Drawer</span>はお題を描こう
-                                        </p>
+                                    <div className='my-5 h-20 grid grid-cols-3 gap-0 relative'>
+                                        <Human colorClass='bg-yellow-400/50' className='left-1/2'/>
+                                        <Human colorClass='bg-yellow-400' className=''/>
+                                        <Human colorClass='bg-yellow-400/50' className='-left-1/2'/>
                                     </div>
 
-                                    <Link href={`/room/${roomId}/drawing`}>
-                                        <Button value="Drawページへ" icon={<TbPencil />} />
-                                    </Link>
+                                    <div className='flex items-center justify-between gap-2'>
+                                        <p className='font-bold text-lg'><span className=''>1</span>人以上</p>
+                                        <Link href={`/room/${roomId}/drawing`}>
+                                            <Button value="お題を描く" icon={<TbPencil />} />
+                                        </Link>
+                                    </div>
                                 </Card>
 
                                 {/* 回答者用の説明 */}
                                 <Card className="mb-4">
-                                    <div className='my-4'>
-                                        <p>
-                                            <span className='font-bold'>Answer</span>はDrawerの描いた絵を見てお題を当てよう
-                                        </p>
+                                    <motion.div 
+                                        className={`absolute right-3 px-4 py-2 rounded-full font-bold text-sm font-bold
+                                        ${answerId ? 'bg-green-200 text-green-600' : 'bg-gray-200 text-gray-600'}`}
+                                    >
+                                        {answerId ? '決定済' : '未決定'}
+                                    </motion.div>
+                                    <div className='mt-2  h-25 relative'>
+                                        <Human 
+                                            colorClass={answerId ? 'bg-yellow-400' : 'bg-yellow-400/70'} 
+                                            className='top-0'/>
                                     </div>
-
-                                    <Button value="Answerページへ" icon={<TbBallBowling />} onClick={handleCheckAnswer} />
+                                    <div className='flex items-center justify-between gap-2'>
+                                        <p className='font-bold text-lg'><span className=''>1</span>人まで </p>
+                                        <Button value="回答ページへ" icon={<TbBallBowling />} onClick={handleCheckAnswer} />
+                                    </div>
                                 </Card>
                             </IconContext.Provider>
                         </div>
