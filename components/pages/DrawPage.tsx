@@ -7,12 +7,11 @@ import { useBlocker } from "@/hooks/useBlocker";
 import useStatus from "@/hooks/useStatus";
 import { KonvaEventObject } from "konva/lib/Node";
 import { motion } from "motion/react";
+import Link from "next/link";
 import { useState } from "react";
 import { IconContext } from "react-icons";
-import { TbArrowBackUp, TbArrowForwardUp, TbTrash } from 'react-icons/tb';
+import { TbArrowBackUp, TbArrowForwardUp, TbArrowLeft, TbTrash } from 'react-icons/tb';
 import { Circle, Rect as KonvaRect, Layer, Line, Stage } from "react-konva";
-import { TbArrowLeft } from "react-icons/tb";
-import Link from "next/link";
 
 type DrawPageProps = {
     roomId: string;
@@ -51,7 +50,10 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
         <>
             {/* <BgObject /> */}
             <div className="px-8 pt-2 pb-16">
-                <Link href={`/room/${roomId}`} className='absolute top-13 left-2 text-gray-500 hover:text-gray-700 transition duration-300 p-2 rounded-full'>
+                <Link href={
+                    mode === 'demo' ? `/` :
+                    `/room/${roomId}`
+                    } className='fixed top-13 left-2 text-gray-500 hover:text-gray-700 transition duration-300 p-2 rounded-full'>
                     <TbArrowLeft size='2em' />
                 </Link>
                 <div className="max-w-lg mx-auto text-center">

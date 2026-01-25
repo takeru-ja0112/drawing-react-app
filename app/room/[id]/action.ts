@@ -28,7 +28,7 @@ export async function setStatusRoom(roomId: string, status: 'WATING' | 'DRAWING'
     }
 }
 
-// ルームのステータスを取得
+// ルームのを情報を取得
 export async function getInfoRoom(roomId: string) {
     try {
         const { data, error } = await supabase

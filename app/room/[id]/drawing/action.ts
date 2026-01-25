@@ -39,7 +39,7 @@ export async function saveDrawing(
   userId: string,
   canvasData: CanvasData,
   userName : string,
-  theme?: string
+  theme: string
 ) {
   try {
     // 要素数を計算

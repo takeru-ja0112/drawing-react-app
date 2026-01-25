@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef, useState } from 'react';
+import { getInfoRoom } from '@/app/room/[id]/action';
 import { saveDrawing } from '@/app/room/[id]/drawing/action';
 import { getOrCreateUser, getUsername } from '@/lib/user';
-import { useRouter } from 'next/navigation';
 import { KonvaEventObject } from 'konva/lib/Node';
+import { useRouter } from 'next/navigation';
+import { useRef, useState } from 'react';
 
 export default function useDraw(roomId: string) {
     const canvasData = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem(`drawing_${roomId}`) || 'null') : null;
@@ -169,6 +170,9 @@ export default function useDraw(roomId: string) {
     }
 
     const handleSave = async () => {
+        const info = await getInfoRoom(roomId);
+        if(!info.success)return  setSaveMessage('データの保存に失敗しました'); 
+        const theme = info.data?.current_theme || '';
         setIsSaving(true);
         setSaveMessage('');
 
@@ -182,7 +186,7 @@ export default function useDraw(roomId: string) {
                 rects
             };
 
-            const result = await saveDrawing(roomId, user.id, canvasData, userName);
+            const result = await saveDrawing(roomId, user.id, canvasData, userName , theme);
 
             if (result.success) {
                 router.push(`/room/${roomId}/answer`);
