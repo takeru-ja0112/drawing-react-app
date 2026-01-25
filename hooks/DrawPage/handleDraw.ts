@@ -46,7 +46,8 @@ export default function useDraw(roomId: string) {
     const h = 300;
 
     const handleMouseDown = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
-        setCount((prev) => prev + 1);
+        console.log('handleMouseDown');
+        // setCount((prev) => prev + 1);
         const point = e.target.getStage()?.getPointerPosition();
         isDrawing.current = true;
         if (!point) return;
@@ -61,11 +62,11 @@ export default function useDraw(roomId: string) {
         }
     }
 
-    const handleMouseMove = (event: KonvaEventObject<MouseEvent | TouchEvent>) => {
+    const handleMouseMove = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
 
         if (isDrawing.current === false) return;
 
-        const point = event.target.getStage()?.getPointerPosition();
+        const point = e.target.getStage()?.getPointerPosition();
         if (!point) return;
 
         if (tool === 'line') {
@@ -100,6 +101,7 @@ export default function useDraw(roomId: string) {
     };
 
     const handleMouseUp = () => {
+        setCount((prev) => prev + 1);
         isDrawing.current = false;
 
         const newLinesHistory = linesHistory.current.slice(0, historyStep.current + 1);
