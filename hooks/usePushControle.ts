@@ -29,7 +29,7 @@ export default function usePushControle() {
       await fetch('/api/push', {
         method: 'POST',
         body: JSON.stringify({
-          subscription, 
+          subscription:sub?.toJSON(), 
           title: 'イラストが届いているよ！',
           body: '確認してね！'
         }),
