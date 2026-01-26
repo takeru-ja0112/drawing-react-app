@@ -16,7 +16,6 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/minimalDrawIcon.svg" />
       </head>
       <body>
-        <BgObject />
         <SoundProvider>
           {/* ヘッダーの高さ分全体をさげる */}
           <Header />

@@ -87,8 +87,8 @@ export default function RoomPage({ title }: { title: string }) {
                                 {/* 書く人用の説明 */}
                                 <Card className="mb-4">
                                     <div className='my-5 h-20 grid grid-cols-3 gap-0 relative'>
-                                        <Human colorClass='bg-yellow-400/50' className='left-1/2'/>
-                                        <Human colorClass='bg-yellow-400' className=''/>
+                                        <Human colorClass='bg-yellow-400' className='left-1/2'/>
+                                        <Human colorClass='bg-yellow-400/70' className=''/>
                                         <Human colorClass='bg-yellow-400/50' className='-left-1/2'/>
                                     </div>
 

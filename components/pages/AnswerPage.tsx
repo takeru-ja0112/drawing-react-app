@@ -62,14 +62,15 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
     const [isAnswerRole, setIsAnswerRole] = useState(false);
     const [data, setData] = useState<Drawing[]>(drawings);
     const currentDrawing = data[currentIndex];
-    const { sub, sendTestNotification } = usePushControle();
+    const { sub, sendNotification, handleSubscribe, handleDeleteSubscription } = usePushControle();
     const { status, currentTheme } = useStatus(roomId);
-    const [themePattern , setThemePattern] = useState<ThemePattern>(initialTheme ? initialTheme : { theme: '', furigana: '', kanji: '', katakana: '' });
+    const [themePattern, setThemePattern] = useState<ThemePattern>(initialTheme ? initialTheme : { theme: '', furigana: '', kanji: '', katakana: '' });
 
-    const [ answerError , setAnswerError ] = useState<string | null>(null);
+    const [answerError, setAnswerError] = useState<string | null>(null);
     const [isOpen, setIsOpen] = useState(false);
     const [mistake, setMistake] = useState<number>(0);
     const { open, close, modalType } = useModalContext();
+    const [ isNoti , setIsNoti ] = useState(false);
 
     // 回答者の内容を取得
     const { answerInputs, result } = useAnswerInputs(roomId);
@@ -158,13 +159,13 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
             setAnswerError(null);
             if (isAnswerRole) {
                 const result = await setdbAnswerInput(roomId, answer);
-                if(!result.success){
+                if (!result.success) {
                     setAnswerError("文字は30文字以内で入力してください");
                 }
             }
         }, 500)
         return () => clearTimeout(delayDebounceFn);
-    }, [answer , isAnswerRole , roomId]);
+    }, [answer, isAnswerRole, roomId]);
 
     useEffect(() => {
         const fetchThemePattern = async () => {
@@ -176,7 +177,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
             }
         };
         fetchThemePattern();
-    }, [currentTheme , roomId])
+    }, [currentTheme, roomId])
 
     useEffect(() => {
         const userId = localStorage.getItem('drawing_app_user_id');
@@ -211,10 +212,10 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
                 'postgres_changes',
                 { event: 'INSERT', schema: 'public', table: 'drawings', filter: `room_id=eq.${roomId}` },
                 () => {
+                    sendNotification(sub);
                     setCurrentIndex(0);
                     setAnswer('');
                     fetchData();
-                    sendTestNotification(sub);
                 }
             )
             .on(
@@ -258,6 +259,29 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
                 <StatusBar status={status}></StatusBar>
                 <AccessUser roomId={roomId} />
                 <Card className="max-w-lg w-full">
+                    <div className='absolute left-3 top-3'>
+                        <p className='text-xs text-gray-500 font-semibold'>イラストを通知する</p>
+                        <motion.button
+                            whileHover={{scale:1.05}}
+                            onClick={() => {
+                                setIsNoti(!isNoti)
+                                if (!isNoti) {
+                                    handleSubscribe();
+                                } else {
+                                    handleDeleteSubscription();
+                                }
+                            }}
+                            animate={{ backgroundColor: isNoti ? '#fbbf24' : '#999999ff' }}
+                            className='relative w-11 h-6 bg-yellow-600 rounded-full cursor-pointer'
+                        >
+                            <motion.div
+                                animate={isNoti ? { x: 20 } : { x: 0 }}
+                                transition={{ type: 'spring', stiffness: 700, damping: 30 }}
+                                className='absolute top-1 left-1 w-4 h-4 bg-white rounded-full'
+                            >
+                            </motion.div>
+                        </motion.button>
+                    </div>
 
                     {data.length === 0 ? (
                         <div className="text-center py-12">
@@ -389,7 +413,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
                                         className="w-full "
                                         disabled={status !== 'ANSWERING'}
                                     />
-                                    { answerError && (
+                                    {answerError && (
                                         <p className="text-red-500 text-sm font-semibold mt-1">{answerError}</p>
                                     )}
                                     <p className='text-gray-400 text-sm'>ひらがな、カタカナ、漢字のいずれでも構いません。</p>
