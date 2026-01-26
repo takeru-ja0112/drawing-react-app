@@ -11,6 +11,7 @@ webpush.setVapidDetails(
 export async function POST(request: Request) {
   console.log('プッシュ通知リクエストを受信しました');
   const { subscription, title, body } = await request.json();
+  console.log('Subscription:', subscription);
   try {
     await webpush.sendNotification(
       subscription,
