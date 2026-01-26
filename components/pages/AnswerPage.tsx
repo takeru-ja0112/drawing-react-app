@@ -27,6 +27,7 @@ import CorrectModal from '../organisms/answer/CorrectModal';
 import FinishModal from '../organisms/answer/FinishModal';
 import MistakeModal from '../organisms/answer/MistakeModal';
 import StatusBar from '../organisms/StatusBat';
+import { subscribePush, unsubscribePush } from '@/app/room/[id]/answer/action';
 
 type Drawing = {
     id: string;
@@ -70,7 +71,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
     const [isOpen, setIsOpen] = useState(false);
     const [mistake, setMistake] = useState<number>(0);
     const { open, close, modalType } = useModalContext();
-    const [ isNoti , setIsNoti ] = useState(false);
+    const [isNoti, setIsNoti] = useState(false);
 
     // 回答者の内容を取得
     const { answerInputs, result } = useAnswerInputs(roomId);
@@ -141,6 +142,19 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
         });
     };
 
+    const handleToggleSubscribe = async () => {
+        const userId = localStorage.getItem('drawing_app_user_id');
+        if(!sub) return;
+        if (!userId) return;
+
+        console.log("handleToggleSubscribe時のsubscription:", sub)
+        if (isNoti) {
+            await subscribePush(userId , sub);
+        } else {
+            await unsubscribePush(userId);
+        }
+    }
+
     useEffect(() => {
         if (result === 'CORRECT') {
             fire();
@@ -195,7 +209,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
     }, [roomId]);
 
     useEffect(() => {
-        console.log("useEffect時のsubscription:",sub)
+        console.log("useEffect時のsubscription:", sub)
         // 初回データ取得
         const fetchData = async () => {
             const { data } = await supabase
@@ -235,7 +249,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
             supabase.removeChannel(subscription
             )
         };
-    }, [roomId , sub]);
+    }, [roomId, sub]);
 
     return (
         <>
@@ -261,29 +275,33 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
                 <StatusBar status={status}></StatusBar>
                 <AccessUser roomId={roomId} />
                 <Card className="max-w-lg w-full">
-                    <div className='absolute left-3 top-3'>
-                        <p className='text-xs text-gray-500 font-semibold'>イラストを通知する</p>
-                        <motion.button
-                            whileHover={{scale:1.05}}
-                            onClick={() => {
-                                setIsNoti(!isNoti)
-                                if (!isNoti) {
-                                    handleSubscribe();
-                                } else {
-                                    handleDeleteSubscription();
-                                }
-                            }}
-                            animate={{ backgroundColor: isNoti ? '#fbbf24' : '#999999ff' }}
-                            className='relative w-11 h-6 bg-yellow-600 rounded-full cursor-pointer'
-                        >
-                            <motion.div
-                                animate={isNoti ? { x: 20 } : { x: 0 }}
-                                transition={{ type: 'spring', stiffness: 700, damping: 30 }}
-                                className='absolute top-1 left-1 w-4 h-4 bg-white rounded-full'
+                    {isAnswerRole &&
+                        <div className='absolute left-3 top-3'>
+                            <p className='text-xs text-gray-500 font-semibold'>イラストを通知する</p>
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                onClick={() => {
+                                    setIsNoti(!isNoti)
+                                    if (!isNoti) {
+                                        handleSubscribe();
+                                        handleToggleSubscribe();
+                                    } else {
+                                        handleDeleteSubscription();
+                                        handleToggleSubscribe();
+                                    }
+                                }}
+                                animate={{ backgroundColor: isNoti ? '#fbbf24' : '#999999ff' }}
+                                className='relative w-11 h-6 bg-yellow-600 rounded-full cursor-pointer'
                             >
-                            </motion.div>
-                        </motion.button>
-                    </div>
+                                <motion.div
+                                    animate={isNoti ? { x: 20 } : { x: 0 }}
+                                    transition={{ type: 'spring', stiffness: 700, damping: 30 }}
+                                    className='absolute top-1 left-1 w-4 h-4 bg-white rounded-full'
+                                >
+                                </motion.div>
+                            </motion.button>
+                        </div>
+                    }
 
                     {data.length === 0 ? (
                         <div className="text-center py-12">

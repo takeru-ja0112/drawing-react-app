@@ -216,3 +216,47 @@ export async function setdbAnswerResult(roomId: string, result: string) {
         return { success: false, error: 'Failed to set answer result', data: null };
     }
 }
+
+/**
+ * サブスクリプションテーブルに登録
+ */
+export async function subscribePush(userId: string, subscription: any) {
+    try {
+        const { data, error } = await supabase
+            .from('subscriptions')
+            .upsert({ user_id: userId, subscription: subscription })
+            .eq('user_id', userId)
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Failed to subscribe push:', error);
+            return { success: false, error: error.message, data: null };
+        }
+        return { success: true, error: null, data };
+    } catch (error) {
+        console.error('Unexpected error:', error);
+        return { success: false, error: 'Failed to subscribe push', data: null };
+    }
+}
+
+/**
+ * サブスクリプションテーブルから削除
+ */
+export async function unsubscribePush(userId: string) {
+    try {
+        const { data, error } = await supabase
+            .from('subscriptions')
+            .delete()
+            .eq('user_id', userId);
+
+        if (error) {
+            console.error('Failed to unsubscribe push:', error);
+            return { success: false, error: error.message, data: null };
+        }
+        return { success: true, error: null, data };
+    } catch (error) {
+        console.error('Unexpected error:', error);
+        return { success: false, error: 'Failed to unsubscribe push', data: null };
+    }
+}
