@@ -10,7 +10,7 @@ import FinalAnswerModal from '@/components/organisms/answer/FinalAnswerModal';
 import PleaseCloseModal from '@/components/organisms/answer/PleaseCloseModal';
 import useAnswerInputs from '@/hooks/useAnswerInputs';
 import { useModalContext } from '@/hooks/useModalContext';
-import usePushControle from '@/hooks/usePushControle';
+import usePushControl from '@/hooks/usePushControle';
 import useStatus from '@/hooks/useStatus';
 import { supabase } from '@/lib/supabase';
 import { validateText } from '@/lib/validation';
@@ -62,7 +62,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
     const [isAnswerRole, setIsAnswerRole] = useState(false);
     const [data, setData] = useState<Drawing[]>(drawings);
     const currentDrawing = data[currentIndex];
-    const { sub, sendNotification, handleSubscribe, handleDeleteSubscription } = usePushControle();
+    const { sub, sendNotification, handleSubscribe, handleDeleteSubscription } = usePushControl();
     const { status, currentTheme } = useStatus(roomId);
     const [themePattern, setThemePattern] = useState<ThemePattern>(initialTheme ? initialTheme : { theme: '', furigana: '', kanji: '', katakana: '' });
 
@@ -195,6 +195,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
     }, [roomId]);
 
     useEffect(() => {
+        console.log("useEffect時のsubscription:",sub)
         // 初回データ取得
         const fetchData = async () => {
             const { data } = await supabase
@@ -212,6 +213,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
                 'postgres_changes',
                 { event: 'INSERT', schema: 'public', table: 'drawings', filter: `room_id=eq.${roomId}` },
                 () => {
+                    console.log(sub);
                     sendNotification(sub);
                     setCurrentIndex(0);
                     setAnswer('');
@@ -233,7 +235,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
             supabase.removeChannel(subscription
             )
         };
-    }, [roomId]);
+    }, [roomId , sub]);
 
     return (
         <>

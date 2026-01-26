@@ -17,8 +17,7 @@ export default function PushTest() {
   };
 
   // ★ ここに提示されたコードを書きます
-  const sendTestNotification = async (subscription: any) => {
-    alert('送信ボタンが押されました。宛先情報'+ JSON.stringify(subscription));
+  const sendNotification = async (subscription: any) => {
 
     await fetch('/api/push', {
       method: 'POST',
@@ -38,7 +37,7 @@ export default function PushTest() {
         value="1. 購読（Subscribe）する"
        />
       
-      <Button onClick={() => sendTestNotification(sub)} 
+      <Button onClick={() => sendNotification(sub)} 
         value="2. テスト通知を送る"
       />
     </div>

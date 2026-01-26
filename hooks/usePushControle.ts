@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 /**
  * PWA対応用のフックス
  */
-export default function usePushControle() {
+export default function usePushControl() {
   const [sub, setSub] = useState<PushSubscription | null>(null);
 
   const handleSubscribe = async () => {
