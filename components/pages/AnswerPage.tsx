@@ -151,8 +151,10 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
         if (!userId) return;
 
         if (isNoti) {
+            await handleSubscribe();
             await subscribePush(userId , sub);
         } else {
+            await handleDeleteSubscription();
             await unsubscribePush(userId);
         }
     }
