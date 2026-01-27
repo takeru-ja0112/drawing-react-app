@@ -5,11 +5,13 @@ import Loading from "@/components/atoms/Loading";
 import RoomSetting from "@/components/organisms/RoomSetting";
 import type { CreateRoom, RoomSettingType  } from '@/type/roomType';
 import { useState } from "react";
+import { setRoomSchema } from "@/lib/room";
 
 
 export default function CreateRoomModal({
     isOpen,
     roomError,
+    setRoomError,
     loading,
     createRoomData,
     setIsOpen,
@@ -20,6 +22,7 @@ export default function CreateRoomModal({
     isOpen: boolean,
     roomName: string,
     roomError: string,
+    setRoomError: React.Dispatch<React.SetStateAction<string>>,
     loading: boolean,
     createRoomData: CreateRoom,
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
@@ -43,7 +46,11 @@ export default function CreateRoomModal({
                 <p className="font-semibold mb-2 text-gray-700">ルーム名の入力</p>
                 <Input
                     value={createRoomData.roomName}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCreateRoomData(prev => ({ ...prev, roomName: e.target.value }))}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>{ setRoomSchema({
+                        roomName: e.target.value,
+                        setRoomError,
+                        setCreateRoomData
+                    })}}
                     className={`w-full ${roomError ? 'border-red-500 border-2' : ''}`}
                     placeholder='ルーム名を入力してください'
                 />

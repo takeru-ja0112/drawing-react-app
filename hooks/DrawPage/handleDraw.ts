@@ -215,7 +215,9 @@ export default function useDraw(roomId: string) {
             rects: rectsHistory.current[historyStep.current],
             element: lines.length + circles.length + rects.length,
         };
-        sessionStorage.setItem(`drawing_${roomId}`, JSON.stringify(canvasData));
+        if (typeof window !== "undefined" && typeof sessionStorage !== "undefined") {
+            sessionStorage.setItem(`drawing_${roomId}`, JSON.stringify(canvasData));
+        }
     }
 
     return {

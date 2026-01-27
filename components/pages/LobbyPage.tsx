@@ -18,6 +18,7 @@ import { TbArrowLeft, TbArrowRight, TbArrowUpRight, TbGhost2 } from 'react-icons
 import { z } from 'zod';
 import CreateRoomModal from '../organisms/lobby/CreateRoomModal';
 import SetUserModal from '../organisms/lobby/SetUserModal';
+import { setRoomSchema } from '@/lib/room';
 
 const forbiddenChars = /[<>&\/\\'"]/;
 const roomNameSchema = z.string().max(10).refine((val) => !forbiddenChars.test(val), {
@@ -49,6 +50,14 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
         roomName: roomName
     });
 
+    // userが変わったらcreateRoomData.usernameも更新
+    useEffect(() => {
+        setCreateRoomData(prev => ({
+            ...prev,
+            username: user
+        }));
+    }, [user]);
+
     const handleCreateRoom = () => {
         if (!user) {
             setNameError('ユーザー名は必須です');
@@ -59,17 +68,13 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     }
 
     const createRoom = async () => {
-        const isValid = validateRoomName(createRoomData.roomName);
-        const sanitizedRoomName = DOMPurify.sanitize(createRoomData.roomName);
-
-        if (!sanitizedRoomName) {
-            setRoomError('ルーム名は必須です');
+        const result = setRoomSchema({
+            roomName: createRoomData.roomName,
+            setRoomError,
+            setCreateRoomData
+        });
+        if(!result || !result.success) {
             return;
-        } else if (!isValid) {
-            setRoomError('ルーム名は10文字以内です。');
-            return;
-        } else {
-            setRoomError('');
         }
 
         setLoading(true);
@@ -97,11 +102,6 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
         }
         setLocalRoom(roomId);
         router.push(`/room/${roomId}`);
-    }
-
-    const validateRoomName = (name: string) => {
-        const parseResult = roomNameSchema.safeParse(name);
-        return parseResult.success;
     }
 
     useEffect(() => {
@@ -278,6 +278,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                     isOpen={isOpen}
                     roomName={roomName}
                     roomError={roomError}
+                    setRoomError={setRoomError}
                     loading={loading}
                     createRoomData={createRoomData}
                     setCreateRoomData={setCreateRoomData}
