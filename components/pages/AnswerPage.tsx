@@ -63,7 +63,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
     const [isAnswerRole, setIsAnswerRole] = useState(false);
     const [data, setData] = useState<Drawing[]>(drawings);
     const currentDrawing = data[currentIndex];
-    const { sub, sendNotification, handleSubscribe, handleDeleteSubscription } = usePushControl();
+    const { sub, handleSubscribe, handleDeleteSubscription } = usePushControl();
     const { status, currentTheme } = useStatus(roomId);
     const [themePattern, setThemePattern] = useState<ThemePattern>(initialTheme ? initialTheme : { theme: '', furigana: '', kanji: '', katakana: '' });
 
@@ -228,7 +228,6 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
                 { event: 'INSERT', schema: 'public', table: 'drawings', filter: `room_id=eq.${roomId}` },
                 () => {
                     console.log(sub);
-                    sendNotification(sub);
                     setCurrentIndex(0);
                     setAnswer('');
                     fetchData();

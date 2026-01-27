@@ -11,7 +11,7 @@ export default function usePushControl() {
     const registration = await navigator.serviceWorker.ready;
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!
+      applicationServerKey: process.env.VAPID_PUBLIC_KEY!
     });
     setSub(subscription); // 取得した情報をステートに保存
     console.log("Subscribed:", subscription);
@@ -27,25 +27,25 @@ export default function usePushControl() {
     }
   }
 
-  // ★ ここに提示されたコードを書きます
-  const sendNotification = async (subscription: any) => {
-    //   alert('送信ボタンが押されました。宛先情報'+ JSON.stringify(subscription));
-    console.log('送信されました。宛先情報' + JSON.stringify(subscription));
-    await fetch('/api/push', {
-      method: 'POST',
-      body: JSON.stringify({
-        subscription,
-        title: 'イラストが届いているよ！',
-        body: '確認してね！'
-      }),
-      headers: { 'Content-Type': 'application/json' }
-    });
-    //   alert("通知リクエストを送信しました！アプリを閉じて待ってください。");
-  };
+  // // ★ ここに提示されたコードを書きます
+  // const sendNotification = async (subscription: any) => {
+  //   //   alert('送信ボタンが押されました。宛先情報'+ JSON.stringify(subscription));
+  //   console.log('送信されました。宛先情報' + JSON.stringify(subscription));
+  //   await fetch('/api/push', {
+  //     method: 'POST',
+  //     body: JSON.stringify({
+  //       subscription,
+  //       title: 'イラストが届いているよ！',
+  //       body: '確認してね！'
+  //     }),
+  //     headers: { 'Content-Type': 'application/json' }
+  //   });
+  //   //   alert("通知リクエストを送信しました！アプリを閉じて待ってください。");
+  // };
 
   return {
     sub,
-    sendNotification,
+    // sendNotification,
     handleSubscribe,
     handleDeleteSubscription,
 
