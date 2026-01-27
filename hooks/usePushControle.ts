@@ -1,4 +1,5 @@
 "use client";
+import { urlBase64ToUint8Array } from "@/lib/urlBase64ToUnit8Array";
 import { useState } from "react";
 
 /**
@@ -11,7 +12,7 @@ export default function usePushControl() {
     const registration = await navigator.serviceWorker.ready;
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!
+      applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!)
     });
     setSub(subscription); // 取得した情報をステートに保存
     console.log("Subscribed:", subscription);
