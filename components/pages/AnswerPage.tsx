@@ -285,7 +285,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
         <>
             {/* <BgObject /> */}
             <div className="flex flex-col items-center justify-center p-8">
-                <Link href={`/room/${roomId}`} className='absolute top-13 left-2 text-gray-500 hover:text-gray-700 transition duration-300 p-2 rounded-full'>
+                <Link href={`/room/${roomId}`} className='z-50 fixed top-13 left-2 text-gray-500 hover:text-gray-700 transition duration-300 p-2 rounded-full'>
                     <TbArrowLeft size='2em' />
                 </Link>
                 {

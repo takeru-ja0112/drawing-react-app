@@ -60,7 +60,7 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
                 <Link href={
                     mode === 'demo' ? `/` :
                     `/room/${roomId}`
-                    } className='fixed top-13 left-2 text-gray-500 hover:text-gray-700 transition duration-300 p-2 rounded-full'>
+                    } className='z-50 fixed top-13 left-2 text-gray-500 hover:text-gray-700 transition duration-300 p-2 rounded-full'>
                     <TbArrowLeft size='2em' />
                 </Link>
                 {mode === 'demo' ? null : <AccessUser roomId={roomId} />}
