@@ -27,7 +27,7 @@ export default function RoomPage({ title }: { title: string }) {
     const [roomSetting, setRoomSetting] = useState<RoomSettingType>({ level: "normal", genre: "ランダム" });
     const { open, modalType, close } = useModalContext();
 
-    const { status , answerId } = useStatus(roomId);
+    const { status, answerId } = useStatus(roomId);
 
     const handleCheckAnswer = async () => {
         const { success, data: isAnswerer } = await isCheckAnswer(roomId);
@@ -55,7 +55,7 @@ export default function RoomPage({ title }: { title: string }) {
             roomId,
             roomSetting
         });
-        if(!result.success) {
+        if (!result.success) {
             console.error('Failed to change room theme:', result.error);
             return;
         }
@@ -78,7 +78,7 @@ export default function RoomPage({ title }: { title: string }) {
                     <AccessUser roomId={roomId} />
                     <Card className="mb-4 pb-1 bg-gray-100 rounded-3xl">
                         <Button
-                            onClick={()=> open('roomSetting')}
+                            onClick={() => open('roomSetting')}
                             value='お題を変更する'
                             className='mb-4 w-full'
                         />
@@ -87,13 +87,31 @@ export default function RoomPage({ title }: { title: string }) {
                                 {/* 書く人用の説明 */}
                                 <Card className="mb-4">
                                     <div className='my-5 h-20 grid grid-cols-3 gap-0 relative'>
-                                        <Human colorClass='bg-yellow-400' className='left-1/2'/>
-                                        <Human colorClass='bg-yellow-400/70' className=''/>
-                                        <Human colorClass='bg-yellow-400/50' className='-left-1/2'/>
+                                        <motion.div
+                                            animate={{ scaleY: [0.9, 1] }}
+                                            transition={{ duration: 1, repeatType: "reverse", type: 'spring', bounce: 0.5, repeat: Infinity, ease: "easeOut" }}
+                                        >
+                                            <Human colorClass='bg-yellow-400' className='left-1/2' />
+                                        </motion.div>
+                                        <motion.div
+                                            animate={{ scaleY: [0.9, 1] }}
+                                            transition={{ delay: 0.2, duration: 1, repeatType: "reverse", type: 'spring', bounce: 0.5, repeat: Infinity, ease: "easeOut" }}
+                                        >
+                                            <Human colorClass='bg-yellow-400/70' className='' />
+                                        </motion.div>
+                                        <motion.div
+                                            animate={{ scaleY: [0.9, 1] }}
+                                            transition={{ delay: 0.4, duration: 1, repeatType: "reverse", type: 'spring', bounce: 0.5, repeat: Infinity, ease: "easeOut" }}
+                                        >
+                                            <Human colorClass='bg-yellow-400/50' className='-left-1/2' />
+                                        </motion.div>
                                     </div>
 
                                     <div className='flex items-center justify-between gap-2'>
-                                        <p className='font-bold text-lg'><span className=''>1</span>人以上</p>
+                                        <div>
+                                            <p className='text-xs text-left text-gray-500 font-semibold'>描く人</p>
+                                            <p className='font-bold text-lg'><span className=''>1</span>人以上</p>
+                                        </div>
                                         <Link href={`/room/${roomId}/drawing`}>
                                             <Button value="お題を描く" icon={<TbPencil />} />
                                         </Link>
@@ -102,19 +120,28 @@ export default function RoomPage({ title }: { title: string }) {
 
                                 {/* 回答者用の説明 */}
                                 <Card className="mb-4">
-                                    <motion.div 
+                                    <motion.div
                                         className={`absolute right-3 px-4 py-2 rounded-full font-bold text-sm font-bold
                                         ${answerId ? 'bg-green-200 text-green-600' : 'bg-gray-200 text-gray-600'}`}
                                     >
                                         {answerId ? '決定済' : '未決定'}
                                     </motion.div>
                                     <div className='mt-2  h-25 relative'>
-                                        <Human 
-                                            colorClass={answerId ? 'bg-yellow-400' : 'bg-yellow-400/70'} 
-                                            className='top-0'/>
+                                        <motion.div
+                                            initial={{originY: 'bottom'}}
+                                            animate={{ scaleY: [0.9, 1] }}
+                                            transition={{ duration: 1, repeatType: "reverse", type: 'spring', bounce: 0.5, repeat: Infinity, ease: "easeOut" }}
+                                        >
+                                            <Human
+                                                colorClass={answerId ? 'bg-yellow-400' : 'bg-yellow-400/70'}
+                                                className='top-0' />
+                                        </motion.div>
                                     </div>
                                     <div className='flex items-center justify-between gap-2'>
-                                        <p className='font-bold text-lg'><span className=''>1</span>人まで </p>
+                                        <div>
+                                            <p className='text-xs text-left text-gray-500 font-semibold'>回答者</p>
+                                            <p className='font-bold text-lg'><span className=''>1</span>人まで </p>
+                                        </div>
                                         <Button value="回答ページへ" icon={<TbBallBowling />} onClick={handleCheckAnswer} />
                                     </div>
                                 </Card>
@@ -141,8 +168,8 @@ export default function RoomPage({ title }: { title: string }) {
                         setdbAnswerResult(roomId, '');
                         setStatusRoom(roomId, 'DRAWING');
                         setIsAnswerModalOpen(false);
-                    }} 
-                    className="ml-4" />
+                    }}
+                        className="ml-4" />
                 </div>
             </Modal>
             }
