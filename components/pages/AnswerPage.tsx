@@ -142,12 +142,14 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
         });
     };
 
+    /**
+     * プッシュ通知用のデータをsupabaseに保存
+     */
     const handleToggleSubscribe = async () => {
         const userId = localStorage.getItem('drawing_app_user_id');
         if(!sub) return;
         if (!userId) return;
 
-        console.log("handleToggleSubscribe時のsubscription:", sub)
         if (isNoti) {
             await subscribePush(userId , sub);
         } else {
@@ -281,13 +283,8 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
                                 whileHover={{ scale: 1.05 }}
                                 onClick={() => {
                                     setIsNoti(!isNoti)
-                                    if (!isNoti) {
-                                        handleSubscribe();
-                                        handleToggleSubscribe();
-                                    } else {
-                                        handleDeleteSubscription();
-                                        handleToggleSubscribe();
-                                    }
+                                    handleToggleSubscribe();
+                                    alert(sub);
                                 }}
                                 animate={{ backgroundColor: isNoti ? '#fbbf24' : '#999999ff' }}
                                 className='relative w-11 h-6 bg-yellow-600 rounded-full cursor-pointer'

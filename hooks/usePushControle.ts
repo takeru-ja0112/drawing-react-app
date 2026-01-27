@@ -8,6 +8,9 @@ import { useState } from "react";
 export default function usePushControl() {
   const [sub, setSub] = useState<PushSubscription | null>(null);
 
+  /**
+   * プッシュ通知の購読
+   */
   const handleSubscribe = async () => {
     const registration = await navigator.serviceWorker.ready;
     const subscription = await registration.pushManager.subscribe({
