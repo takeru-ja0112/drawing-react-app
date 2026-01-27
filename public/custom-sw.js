@@ -32,6 +32,13 @@
 //   );
 // });
 self.addEventListener('push', function (event) {
+    // クライアント（PWA画面）へメッセージ送信
+  self.clients.matchAll().then(clients => {
+    clients.forEach(client => {
+      client.postMessage({ type: 'push', data });
+    });
+  });
+
   event.waitUntil(
     self.registration.showNotification("強制表示テスト", { body: "届いています！" })
   );

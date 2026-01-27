@@ -77,6 +77,21 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
     const { answerInputs, result } = useAnswerInputs(roomId);
 
 
+    /**
+     * プッシュ通知受信用
+     */
+    useEffect(() => {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', event => {
+                if (event.data.type === 'push') {
+                    alert('Push受信: ' + JSON.stringify(event.data.data));
+                    // setStateで画面に表示もOK
+                }
+            });
+        }
+    }, []);
+
+
     const handleNext = () => {
         if (currentIndex < data.length - 1) {
             setCurrentIndex(currentIndex + 1);
@@ -159,9 +174,9 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
 
     useEffect(() => {
         const userId = localStorage.getItem('drawing_app_user_id');
-        if(!sub || !userId)return;
-        subscribePush(userId , sub); 
-    }, [sub]);  
+        if (!sub || !userId) return;
+        subscribePush(userId, sub);
+    }, [sub]);
 
     useEffect(() => {
         if (result === 'CORRECT') {
@@ -287,9 +302,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 onClick={() => {
-                                    setIsNoti(!isNoti)
-                                    handleToggleSubscribe();
-                                    alert(sub);
+                                    setIsNoti(!isNoti);
                                 }}
                                 animate={{ backgroundColor: isNoti ? '#fbbf24' : '#999999ff' }}
                                 className='relative w-11 h-6 bg-yellow-600 rounded-full cursor-pointer'
