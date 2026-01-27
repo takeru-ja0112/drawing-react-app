@@ -147,7 +147,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
      */
     const handleToggleSubscribe = async () => {
         const userId = localStorage.getItem('drawing_app_user_id');
-        if(!sub) return;
+        // if(!sub) return;
         if (!userId) return;
 
         if (isNoti) {
