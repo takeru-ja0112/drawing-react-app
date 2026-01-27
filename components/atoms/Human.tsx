@@ -4,12 +4,12 @@ export default function Human({ className, colorClass }: { className?: string, c
             <div className={`flex justify-center relative ${className}`}>
 
                 {/* 正円 */}
-                <div className={`w-[25px] h-[25px] absolute rounded-full 
+                <div className={`w-[25px] h-[25px] absolute rounded-full
                                     left-1/2 -translate-x-1/2
                                     ${colorClass}
                                     `}></div>
                 {/* 長方形 */}
-                <div className={`w-[30px] h-[50px] absolute rounded-t-full rounded-b-md
+                <div className={`w-[30px] h-[50px] absolute rounded-b-lg rounded-t-full
                                     left-1/2 -translate-x-1/2
                                     top-7
                                     ${colorClass}`}

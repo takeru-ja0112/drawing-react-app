@@ -128,7 +128,6 @@ export default function RoomPage({ title }: { title: string }) {
                                     </motion.div>
                                     <div className='mt-2  h-25 relative'>
                                         <motion.div
-                                            initial={{originY: 'bottom'}}
                                             animate={{ scaleY: [0.9, 1] }}
                                             transition={{ duration: 1, repeatType: "reverse", type: 'spring', bounce: 0.5, repeat: Infinity, ease: "easeOut" }}
                                         >

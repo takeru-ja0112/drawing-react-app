@@ -19,6 +19,7 @@ import { z } from 'zod';
 import CreateRoomModal from '../organisms/lobby/CreateRoomModal';
 import SetUserModal from '../organisms/lobby/SetUserModal';
 import { setRoomSchema } from '@/lib/room';
+import Link from 'next/link';
 
 const forbiddenChars = /[<>&\/\\'"]/;
 const roomNameSchema = z.string().max(10).refine((val) => !forbiddenChars.test(val), {
@@ -73,7 +74,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
             setRoomError,
             setCreateRoomData
         });
-        if(!result || !result.success) {
+        if (!result || !result.success) {
             return;
         }
 
@@ -149,6 +150,9 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     return (
         <>
             {/* <BgObject /> */}
+            <Link href={`/`} className='z-50 fixed top-13 left-2 text-gray-500 hover:text-gray-700 transition duration-300 p-2 rounded-full'>
+                <TbArrowLeft size='2em' />
+            </Link>
             <div className="p-8">
                 <div className="max-w-lg mx-auto">
 
@@ -197,12 +201,12 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                             <Input
                                 name="search"
                                 value={searchName}
-                                onChange={(e) => { 
+                                onChange={(e) => {
                                     const isValid = validateText(e.target.value).success;
                                     if (isValid) {
                                         setSearchName(e.target.value);
                                     }
-                                 }}
+                                }}
                                 placeholder="検索したいルーム名を入力してください"
                                 className={`w-full ${searchError ? 'border-red-500 border-2' : ''}`}
                             />
