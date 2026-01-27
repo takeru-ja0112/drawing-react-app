@@ -19,6 +19,7 @@ export default function usePushControl() {
     });
     setSub(subscription); // 取得した情報をステートに保存
     console.log("Subscribed:", subscription);
+    alert("プッシュ通知の購読に成功しました！");
   };
 
   const handleDeleteSubscription = async () => {
@@ -27,6 +28,7 @@ export default function usePushControl() {
     if (subscription) {
       await subscription.unsubscribe();
       setSub(null);
+      alert("プッシュ通知の購読を解除しました。");
       console.log("Unsubscribed");
     }
   }
