@@ -4,9 +4,9 @@
 
 // Setup type definitions for built-in Supabase Runtime APIs
 
-import { serve } from "std/server";
-import { createClient } from "@supabase/supabase-js";
-import webpush from "web-push";
+import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+import { createClient } from "npm:@supabase/supabase-js@^2.93.1";
+import webpush from "npm:web-push@^3.6.7";
 
 // 環境変数の取得
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;

@@ -18,12 +18,12 @@ self.addEventListener('push', function (event) {
 
   const options = {
     body: data.body,
-    icon: '/icon-192x192.png', // あなたのアプリのアイコンパス
-    badge: '/icon-192x192.png',
-    vibrate: [100, 50, 100],   // 振動パターン
-    data: {
-      dateOfArrival: Date.now(),
-    },
+    // icon: '/icon-192x192.png', // あなたのアプリのアイコンパス
+    // badge: '/icon-192x192.png',
+    // vibrate: [100, 50, 100],   // 振動パターン
+    // data: {
+    //   dateOfArrival: Date.now(),
+    // },
   };
 
   // ★重要：iOSで通知を出すための必須命令
