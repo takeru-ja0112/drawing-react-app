@@ -163,20 +163,21 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
     const handleToggleSubscribe = async () => {
         const userId = localStorage.getItem('drawing_app_user_id');
         if (!userId) return;
+
         alert(isNoti ? "プッシュ通知を有効にします。" : "プッシュ通知を無効にします。");
 
-        if (isNoti) {
-            await handleSubscribe();
+        if (!isNoti) {
+            const res = await handleSubscribe();
+            if(res.success){
+                await subscribePush(userId, sub);
+            }
         } else {
-            await handleDeleteSubscription();
+            const res = await handleDeleteSubscription();
+            if(res && res.success){
+                await unsubscribePush(userId);
+            }
         }
     }
-
-    useEffect(() => {
-        const userId = localStorage.getItem('drawing_app_user_id');
-        if (!sub || !userId) return;
-        subscribePush(userId, sub);
-    }, [sub]);
 
     useEffect(() => {
         if (result === 'CORRECT') {
