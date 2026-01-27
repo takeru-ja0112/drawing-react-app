@@ -148,6 +148,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
     const handleToggleSubscribe = async () => {
         const userId = localStorage.getItem('drawing_app_user_id');
         if (!userId) return;
+        alert(isNoti ? "プッシュ通知を有効にします。" : "プッシュ通知を無効にします。");
 
         if (isNoti) {
             await handleSubscribe();
