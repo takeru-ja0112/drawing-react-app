@@ -147,17 +147,20 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
      */
     const handleToggleSubscribe = async () => {
         const userId = localStorage.getItem('drawing_app_user_id');
-        // if(!sub) return;
         if (!userId) return;
 
         if (isNoti) {
             await handleSubscribe();
-            await subscribePush(userId , sub);
         } else {
             await handleDeleteSubscription();
-            await unsubscribePush(userId);
         }
     }
+
+    useEffect(() => {
+        const userId = localStorage.getItem('drawing_app_user_id');
+        if(!sub || !userId)return;
+        subscribePush(userId , sub); 
+    }, [sub]);  
 
     useEffect(() => {
         if (result === 'CORRECT') {
@@ -213,7 +216,6 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
     }, [roomId]);
 
     useEffect(() => {
-        console.log("useEffect時のsubscription:", sub)
         // 初回データ取得
         const fetchData = async () => {
             const { data } = await supabase
@@ -252,7 +254,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
             supabase.removeChannel(subscription
             )
         };
-    }, [roomId, sub]);
+    }, [roomId]);
 
     return (
         <>
