@@ -244,11 +244,13 @@ export async function subscribePush(userId: string, subscription: any) {
  * サブスクリプションテーブルから削除
  */
 export async function unsubscribePush(userId: string) {
+    const cleanUserId = userId.trim();
+    console.log("Unsubscribe push for user:", cleanUserId);
     try {
         const { data, error } = await supabase
             .from('subscriptions')
             .delete()
-            .eq('user_id', userId);
+            .eq('user_id', cleanUserId)
 
         if (error) {
             console.error('Failed to unsubscribe push:', error);

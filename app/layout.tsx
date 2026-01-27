@@ -32,7 +32,7 @@ export default function RootLayout({
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
         .register("/custom-sw.js")
-        .then((reg) =>{ console.log("SW registered!", reg); alert("Service Worker登録成功しました！プッシュ通知が有効になります。"); })
+        .then((reg) =>{ console.log("SW registered!", reg); })
         .catch((err) =>{ console.error("SW registration failed!", err); alert("Service Worker登録に失敗しました。プッシュ通知は利用できません。"); });
     }
   }, []);
