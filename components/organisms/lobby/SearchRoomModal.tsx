@@ -24,15 +24,13 @@ export default function SearchRoomModal({
      */
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         const result = searchRoomSchema(e.target.value);
+        const upperValue = e.target.value.toUpperCase();
 
         if(!result)return;
         if (!result.success) {
             setError(result.error);
-        } else {
-            setRoomId(e.target.value);
-            setError(null);
         }
-        const upperValue = e.target.value.toUpperCase();
+        setError(null);
         setRoomId(upperValue);
     }
 
