@@ -26,17 +26,19 @@ export default function SearchRoomModal({
         const result = searchRoomSchema(e.target.value);
         const upperValue = e.target.value.toUpperCase();
 
-        if(!result)return;
+        if (!result) return;
         if (!result.success) {
             setError(result.error);
+        } else {
+            setError(null);
         }
-        setError(null);
+        setRoomId("");
         setRoomId(upperValue);
     }
 
     const submitSearch = async () => {
         const result = searchRoomSchema(roomId);
-        if(!result)return;
+        if (!result) return;
         if (!result.success) {
             setError(result.error);
             return;
@@ -46,7 +48,7 @@ export default function SearchRoomModal({
         setError(null);
         // 検索処理
         const dbResult = await getRoomByShortId(roomId);
-        if(!dbResult)return;
+        if (!dbResult) return;
         if (!dbResult.success) {
             setError(dbResult.error || 'ルームの検索に失敗しました。');
         } else {
