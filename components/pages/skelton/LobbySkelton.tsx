@@ -22,18 +22,20 @@ export default function Loading() {
                     </div>
                 </Card>
 
-                <Card className='mb-4 h-[500px] animate-pulse'>
+                <Card className='mb-4 h-[400px] animate-pulse'>
                     <div className='mb-2'>
-                        <label htmlFor="username" className='font-semibold text-gray-700'>ルーム検索</label>
+                        <h2 className='font-semibold text-gray-700'>ルーム</h2>
                     </div>
-                    <div className='mb-5'>
-                        <Input
-                            name="skelton"
-                            className={`w-full `}
+                    <div className='grid gap-3 sm:grid-cols-2 mb-4'>
+                        <div className='h-12 bg-gray-300 rounded-full animate-pulse'
+                        />
+                        <div className='h-12 bg-gray-300 rounded-full animate-pulse'
                         />
                     </div>
                     <div className='mb-2'>
-                        <label htmlFor="username" className='font-semibold text-gray-700'>参加可能なルーム</label>
+                        <h2 className='font-semibold text-gray-700'>最後に入ったルーム</h2>
+                    </div>
+                    <div className='h-32 bg-gray-300 rounded-lg animate-pulse'>
                     </div>
                 </Card>
             </div>
