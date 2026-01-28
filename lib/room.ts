@@ -50,7 +50,7 @@ export function setRoomSchema({
 /**
  * ショートIDのバリデーションスキーマ
  */
-const allowedShortIdChars = /^[A-Z0-9]+$/;
+const allowedShortIdChars = /^[A-Za-z0-9]+$/;
 const shortIdSchema =
   z
     .string()

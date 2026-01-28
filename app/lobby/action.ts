@@ -208,11 +208,13 @@ function generateShortId(length = 6): string {
 
 //ショートIDにて検索
 export async function getRoomByShortId(shortId: string) {
+  const upperShortId = shortId.toUpperCase();
+
   try {
     const { data , error } = await supabase
       .from('rooms')
       .select('*')
-      .eq('short_id', shortId)
+      .eq('short_id', upperShortId)
       .single();
 
     if(!data || data.length === 0) {

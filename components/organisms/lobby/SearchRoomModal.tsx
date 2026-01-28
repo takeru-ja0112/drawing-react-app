@@ -31,7 +31,7 @@ export default function SearchRoomModal({
         } else {
             setError(null);
         }
-        setRoomId(e.target.value.toUpperCase());
+        setRoomId(e.target.value);
     }
 
     const submitSearch = async () => {
@@ -62,8 +62,8 @@ export default function SearchRoomModal({
             onClose={onClose}
         >
             <p className="font-semibold mb-2 text-gray-700">ルームIDの入力</p>
-            <p className="font-semibold text-gray-700 text-sm">大文字と数字の6桁でIDを入力してください。</p>
-            <p className="font-semibold mb-4 text-gray-400 text-sm">※小文字は自動で大文字に変換されます。</p>
+            <p className="font-semibold text-gray-700 text-sm">英数字の6桁でIDを入力してください。</p>
+            <p className="font-semibold mb-4 text-gray-400 text-sm">※大文字でも小文字でも構いません。</p>
 
             <div className="h-15">
                 <Input
