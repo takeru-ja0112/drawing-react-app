@@ -122,7 +122,6 @@ export default function useDraw(roomId: string) {
         rectsHistory.current = newRectsHistory;
         historyStep.current = newLinesHistory.length - 1;
     }
-    console.log('linesHistory:', historyStep.current);
     // デバウンス保存処理
     if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
