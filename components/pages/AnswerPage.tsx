@@ -178,11 +178,11 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
         const unsubscription = async () => {
             const res = await unsubscribePush(userId);
             return res.data;
-        } 
+        }
 
-        if(sub){
+        if (sub) {
             subscribePush(userId, sub);
-        }else{
+        } else {
             unsubscription();
         }
     }, [sub]);
@@ -292,14 +292,18 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
                     status !== 'ANSWERING' && status !== 'FINISHED' &&
                     isAnswerRole &&
                     (
-                        <IconContext.Provider value={{ size: '1.5em' }}>
-                            <Button
-                                value='締め切る'
-                                icon={<TbLock />}
-                                onClick={() => open('answerClose')}
-                                className='mb-4'
-                            />
-                        </IconContext.Provider>
+                        <Card className="max-w-lg w-full mt-6 mb-6 p-5 bg-yellow-50 border-yellow-200">
+                            <h2 className='text-lg font-bold text-yellow-700'>回答者のみ表示</h2>
+                            <p className='text-sm font-semibold text-yellow-600 mb-4'>参加者のイラスト全てが届いたら締め切るボタンを押してください</p>
+                            <IconContext.Provider value={{ size: '1.5em' }}>
+                                <Button
+                                    value='締め切る'
+                                    icon={<TbLock />}
+                                    onClick={() => open('answerClose')}
+                                    className='text-yellow-800 hover:bg-yellow-100 transition-colors duration-300 w-full'
+                                />
+                            </IconContext.Provider>
+                        </Card>
                     )}
                 {/* ステータスエリア */}
                 <StatusBar status={status}></StatusBar>
