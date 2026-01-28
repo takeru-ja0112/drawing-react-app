@@ -7,9 +7,6 @@ export default async function Page() {
     // const roomResult = await getRoomByPageSearch(1, 10, '');
     // const rooms: Room[] = roomResult.success ? roomResult.data as Room[] : [];
 
-    //遅延処理
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
     return (
         <>
             <LobbyPage />
