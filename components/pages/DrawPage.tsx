@@ -14,6 +14,7 @@ import { TbArrowBackUp, TbArrowForwardUp, TbArrowLeft, TbTrash } from 'react-ico
 import { Circle, Rect as KonvaRect, Layer, Line, Stage } from "react-konva";
 import AccessUser from '@/components/organisms/AccessUser';
 
+
 type DrawPageProps = {
     roomId: string;
     theme?: string;
@@ -46,11 +47,11 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
     const [isBlocked, setIsBlocked] = useState(true);
     useBlocker(() => { }, isBlocked);
     const { status } = useStatus(roomId);
-    const [ isMobile , setIsMobile ] = useState( false );
+    const [isMobile, setIsMobile] = useState(false);
 
 
-    useEffect(()=>{
-        setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) )
+    useEffect(() => {
+        setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent))
     }, []);
 
     return (
@@ -59,18 +60,17 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
             <div className="px-8 pt-5 pb-16">
                 <Link href={
                     mode === 'demo' ? `/` :
-                    `/room/${roomId}`
-                    } className='z-50 fixed top-13 left-2 text-gray-500 hover:text-gray-700 transition duration-300 p-2 rounded-full'>
+                        `/room/${roomId}`
+                } className='z-50 fixed top-13 left-2 text-gray-500 hover:text-gray-700 transition duration-300 p-2 rounded-full'>
                     <TbArrowLeft size='2em' />
                 </Link>
                 {mode === 'demo' ? null : <AccessUser roomId={roomId} />}
-                <div className="max-w-lg mx-auto text-center">
+                <div className="max-w-lg mx-auto text-center relative">
                     {/* お題 */}
                     <label className="block mb-1 font-semibold text-gray-600">
                         お題
                     </label>
                     <h1 className="text-xl font-bold">{isThemeOpen ? '' : theme}</h1>
-
                     <motion.h1
                         key={count}
                         initial={{ opacity: 0, y: -10 }}
@@ -206,9 +206,11 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
                         </div>
                     </Modal>
                 )}
-                {mode === 'demo' ? null : <Modal isOpen={isThemeOpen} onClose={() => setIsThemeOpen(false)}>
+                {mode === 'demo' ? null : 
+                <Modal isOpen={isThemeOpen} onClose={() => setIsThemeOpen(false)} className='text-center'>
                     <h2 >お題</h2>
-                    <p className="font-bold text-xl my-4">{theme}</p>
+                    <p className="font-bold text-2xl my-2">{theme}</p>
+                    <p className='font-semibold text-gray-500 text-xl my-2'>できるだけ少ない数で描こう！</p>
                     <Button
                         onClick={() => setIsThemeOpen(false)}
                         className="mt-2"

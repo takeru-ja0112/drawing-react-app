@@ -305,7 +305,8 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
                 <StatusBar status={status}></StatusBar>
                 <AccessUser roomId={roomId} />
                 <Card className="max-w-lg w-full">
-                    {isAnswerRole &&
+                    {/* PWA用の通知許可コンポーネントのため一旦コメントアウト */}
+                    {/* {isAnswerRole &&
                         <div className='absolute left-3 top-3'>
                             <p className='text-xs text-gray-500 font-semibold'>イラストを通知する</p>
                             <motion.button
@@ -325,7 +326,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
                                 </motion.div>
                             </motion.button>
                         </div>
-                    }
+                    } */}
 
                     {data.length === 0 ? (
                         <div className="text-center py-12">

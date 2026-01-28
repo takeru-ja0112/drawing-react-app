@@ -122,6 +122,7 @@ export default function useDraw(roomId: string) {
         rectsHistory.current = newRectsHistory;
         historyStep.current = newLinesHistory.length - 1;
     }
+    console.log('linesHistory:', historyStep.current);
     // デバウンス保存処理
     if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
@@ -129,20 +130,7 @@ export default function useDraw(roomId: string) {
     saveTimeoutRef.current = setTimeout(() => {
         saveToSessionStorage();
     }, 500); // 0.5秒後に保存
-
-    const handleUndo = () => {
-        if (historyStep.current === 0) return;
-        setCount((prev) => prev - 1);
-
-        historyStep.current -= 1;
-        const previousLines = linesHistory.current[historyStep.current];
-        const previousCircles = circlesHistory.current[historyStep.current];
-        const previousRects = rectsHistory.current[historyStep.current];
-        setLines(previousLines);
-        setCircles(previousCircles);
-        setRects(previousRects);
-    }
-
+    
     // 初期読み込みしてから履歴も更新する
     const handleInitializeHistory = () => {
         linesHistory.current = [[...lines]];
@@ -151,6 +139,20 @@ export default function useDraw(roomId: string) {
         historyStep.current = 0;
     }
 
+    const handleUndo = () => {
+        // if (historyStep.current === 0) return;
+        if ( historyStep.current === 0 ) return;
+        // setCount((prev) => prev - 1);
+
+        historyStep.current -= 1;
+        const previousLines = linesHistory.current[historyStep.current];
+        const previousCircles = circlesHistory.current[historyStep.current];
+        const previousRects = rectsHistory.current[historyStep.current];
+        setLines(previousLines);
+        setCircles(previousCircles);
+        setRects(previousRects);
+        setCount(previousCircles.length + previousLines.length + previousRects.length);
+    }
 
     const handleRedo = () => {
         if (historyStep.current === linesHistory.current.length - 1) return;
@@ -163,17 +165,22 @@ export default function useDraw(roomId: string) {
         setLines(nextLines);
         setCircles(nextCircles);
         setRects(nextRects);
+        setCount(nextCircles.length + nextLines.length + nextRects.length);
     }
 
     const handleReset = () => {
+        if(count === 0) return;
         setCount(0);
-        linesHistory.current = [[]];
-        circlesHistory.current = [[]];
-        rectsHistory.current = [[]];
-        historyStep.current = 0;
-        setLines([]);
-        setCircles([]);
-        setRects([]);
+        historyStep.current += 1;
+        const resetLines : any = [];
+        const resetCircles  : any = [];
+        const resetRects  : any = [];
+        linesHistory.current.push(resetLines);
+        circlesHistory.current.push(resetCircles);
+        rectsHistory.current.push(resetRects);
+        setLines(resetLines);
+        setCircles(resetCircles);
+        setRects(resetRects);
     }
 
     const handleSave = async () => {
