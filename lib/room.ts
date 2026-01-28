@@ -46,3 +46,35 @@ export function setRoomSchema({
     }
   }
 }
+
+/**
+ * ショートIDのバリデーションスキーマ
+ */
+const allowedShortIdChars = /^[A-Z0-9]+$/;
+const shortIdSchema =
+  z
+    .string()
+    .length(6, "IDは6文字で入力してください。")
+    .refine((val) => allowedShortIdChars.test(val), {
+      message: 'IDは半角大文字英字と数字のみ使用できます。',
+    });
+
+export function validateShortId(id: string) {
+  const parseResult = shortIdSchema.safeParse(id);
+  return parseResult as { success: boolean; error?: z.ZodError };
+}
+
+export function searchRoomSchema(id: string) {
+    const result = validateShortId(id);
+    if (result.success) {
+      return { success: true, error: null };
+    } else {
+      // IDが空の場合処理
+      if (id.length === 0) {
+        return { success: false, error: 'IDは必須です。' };
+      }
+      if(id.length <= 6) {
+        return { success: false, error: 'IDは6文字で入力してください。' };
+      }
+    }
+}

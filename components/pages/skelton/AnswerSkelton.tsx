@@ -3,10 +3,11 @@ import Card from '@/components/atoms/Card';
 export default function Loading() {
     return (
         <div className="flex flex-col items-center justify-center p-8 animate-pulse">
+            <div className='w-full h-10 bg-gray-300 rounded-full animate-pulse mb-3'></div>
             <Card className="max-w-lg w-full">
-                    <div className="text-center py-12">
-                        <p className="text-xl text-gray-500">まだ描画データがありません</p>
-                    </div>
+                <div className="text-center py-12">
+                    <p className="text-xl text-gray-500">まだ描画データがありません</p>
+                </div>
             </Card>
         </div>
     )

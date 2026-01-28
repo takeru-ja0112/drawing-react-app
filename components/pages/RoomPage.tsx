@@ -19,7 +19,7 @@ import { TbArrowLeft, TbBallBowling, TbPencil } from 'react-icons/tb';
 import AccessUser from '../organisms/AccessUser';
 import RoomSetting from '../organisms/RoomSetting';
 
-export default function RoomPage({ title }: { title: string }) {
+export default function RoomPage({ title , shortId }: { title: string , shortId: string}) {
     const params = useParams();
     const roomId = params.id as string;
     const router = useRouter();
@@ -73,6 +73,7 @@ export default function RoomPage({ title }: { title: string }) {
                     <div className="mb-6 text-center">
                         <h2 className="text-lg text-gray-500 font-semibold mb-2">ルーム名</h2>
                         <p className="text-gray-900 font-bold break-all">{title}</p>
+                        <p className="text-gray-900 font-bold break-all">{shortId}</p>
                     </div>
                     <StatusBar status={status}></StatusBar>
                     <AccessUser roomId={roomId} />

@@ -205,3 +205,28 @@ function generateShortId(length = 6): string {
   }
   return result;
 }
+
+//ショートIDにて検索
+export async function getRoomByShortId(shortId: string) {
+  try {
+    const { data , error } = await supabase
+      .from('rooms')
+      .select('*')
+      .eq('short_id', shortId)
+      .single();
+
+    if(!data || data.length === 0) {
+      return { success: false, error: 'ルームが見つかりません。', data: null };
+    }
+
+    if (error) {
+      console.error('Failed to fetch room by short ID:', error);
+      return { success: false, error: error.message, data: null };
+    }
+
+    return { success: true, error: null, data };
+  }catch (error) {
+    console.error('Unexpected error:', error);
+    return { success: false, error: 'Failed to fetch room by short ID', data: null };
+  }
+}

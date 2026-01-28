@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 // サニタイズ用
 import { createRoomByUsername, getRoomByPageSearch } from '@/app/lobby/action';
 import Button from '@/components/atoms/Button';
@@ -14,29 +14,28 @@ import type { CreateRoom, Room } from '@/type/roomType';
 import DOMPurify from 'dompurify';
 import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
-import { TbArrowLeft, TbArrowRight, TbArrowUpRight, TbGhost2 } from 'react-icons/tb';
+import { TbArrowLeft, TbArrowRight, TbArrowUpRight, TbGhost2, TbSearch } from 'react-icons/tb';
 import { z } from 'zod';
-import CreateRoomModal from '../organisms/lobby/CreateRoomModal';
-import SetUserModal from '../organisms/lobby/SetUserModal';
+import CreateRoomModal from '@/components/organisms/lobby/CreateRoomModal';
+import SetUserModal from '@/components/organisms/lobby/SetUserModal';
 import { setRoomSchema } from '@/lib/room';
 import Link from 'next/link';
+import SearchRoomModal from '@/components/organisms/lobby/SearchRoomModal';
+import { getRoom } from '@/app/lobby/action';
 
 const forbiddenChars = /[<>&\/\\'"]/;
-const roomNameSchema = z.string().max(10).refine((val) => !forbiddenChars.test(val), {
-    message: 'ルーム名に使用できない文字が含まれています。',
-});
 
-export default function LobbyPage({ rooms }: { rooms: Room[] }) {
+export default function LobbyPage() {
     const [loading, setLoading] = useState(false);
     const username = getUsername();
-    const [roomsList, setRoomsList] = useState<Room[]>(rooms);
+    const [latestRoom, setLatestRoom] = useState<Room>({} as Room);
     const router = useRouter();
     const [user, setUser] = useState(username || '');
     const [nameError, setNameError] = useState<string>('');
     const [searchName, setSearchName] = useState('');
     const [searchQuery, setSearchQuery] = useState(searchName);
     const [searchError] = useState<string>('');
-    const { setLocalRoom } = historyLocalRoom();
+    const { setLocalRoom, getLocalRoom } = historyLocalRoom();
     const [roomName, setRoomName] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [roomError, setRoomError] = useState<string>('');
@@ -50,6 +49,7 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
         username: user,
         roomName: roomName
     });
+    const [isOpenSearchRoom, setIsOpenSearchRoom] = useState<boolean>(false);
 
     // userが変わったらcreateRoomData.usernameも更新
     useEffect(() => {
@@ -58,15 +58,6 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
             username: user
         }));
     }, [user]);
-
-    const handleCreateRoom = () => {
-        if (!user) {
-            setNameError('ユーザー名は必須です');
-            return;
-        }
-
-        setIsOpen(true);
-    }
 
     const createRoom = async () => {
         const result = setRoomSchema({
@@ -106,46 +97,61 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
     }
 
     useEffect(() => {
-        const delayDebounceFn = setTimeout(() => {
-            setSearchQuery(searchName);
-            // デバウンス後はページ番号を1にリセット
-            setCurrentPage(1);
-        }, 300);
-        return () => clearTimeout(delayDebounceFn);
-    }, [searchName]);
+        const latestRoomID = getLocalRoom();
 
-    useEffect(() => {
-        // 初回ユーザー生成
-        generateUser();
+        if (latestRoomID) {
+            const fetchLatestRoom = async () => {
+                const res = await getRoom(latestRoomID);
+                if (res.success && res.data) {
+                    console.log('Latest room data:', res.data);
+                    setLatestRoom(res.data);
+                }
+            };
+            fetchLatestRoom();
+        }
     }, []);
 
+    // useEffect(() => {
+    //     const delayDebounceFn = setTimeout(() => {
+    //         setSearchQuery(searchName);
+    //         // デバウンス後はページ番号を1にリセット
+    //         setCurrentPage(1);
+    //     }, 300);
+    //     return () => clearTimeout(delayDebounceFn);
+    // }, [searchName]);
 
-    useEffect(() => {
-        const fetchRooms = async () => {
-            setIsPaging(true);
-            const res = await getRoomByPageSearch(currentPage, itemsPerPage, searchQuery);
-            if (res.success && res.data) {
-                setRoomsList(res.data);
-            }
-            setIsPaging(false);
-        };
-        fetchRooms();
+    // useEffect(() => {
+    //     // 初回ユーザー生成
+    //     generateUser();
+    // }, []);
 
-        const subscription = supabase
-            .channel('public:rooms')
-            .on(
-                'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'rooms' },
-                () => {
-                    fetchRooms();
-                }
-            )
-            .subscribe();
 
-        return () => {
-            supabase.removeChannel(subscription);
-        }
-    }, [currentPage, searchQuery]);
+    // useEffect(() => {
+    //     const fetchRooms = async () => {
+    //         setIsPaging(true);
+    //         const res = await getRoomByPageSearch(currentPage, itemsPerPage, searchQuery);
+    //         if (res.success && res.data) {
+    //             setRoomsList(res.data);
+    //         }
+    //         setIsPaging(false);
+    //     };
+    //     fetchRooms();
+
+    //     const subscription = supabase
+    //         .channel('public:rooms')
+    //         .on(
+    //             'postgres_changes',
+    //             { event: 'INSERT', schema: 'public', table: 'rooms' },
+    //             () => {
+    //                 fetchRooms();
+    //             }
+    //         )
+    //         .subscribe();
+
+    //     return () => {
+    //         supabase.removeChannel(subscription);
+    //     }
+    // }, [currentPage, searchQuery]);
 
     return (
         <>
@@ -183,97 +189,72 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                                 <p className="text-red-500 font-semibold text-sm">{nameError}</p>
                             </div>
                         )}
-                        <div>
-                            <Button
-                                icon={<span className="text-xl font-bold">+</span>}
-                                value='ルームを作成'
-                                onClick={handleCreateRoom}
-                                disabled={loading}
-                            />
-                        </div>
                     </Card>
 
                     <Card className='mb-4'>
                         <div className='mb-2'>
-                            <label htmlFor="username" className='font-semibold text-gray-700'>ルーム検索</label>
+                            <h2 className='font-semibold text-gray-700'>ルーム</h2>
                         </div>
-                        <div className='mb-5'>
-                            <Input
-                                name="search"
-                                value={searchName}
-                                onChange={(e) => {
-                                    const isValid = validateText(e.target.value).success;
-                                    if (isValid) {
-                                        setSearchName(e.target.value);
+                        <div className='grid gap-3 sm:grid-cols-2 mb-4'>
+                            <Button
+                                icon={<span className="text-xl font-bold">+</span>}
+                                value='ルームをつくる'
+                                onClick={() => {
+                                    if (!user) {
+                                        setNameError('ルームを作成するにはユーザー名が必要です。');
+                                        return;
+                                    }
+                                    setIsOpen(true)
+                                }}
+                                disabled={loading}
+                            />
+                            <Button
+                                icon={<TbSearch size={20} />}
+                                value='ルームをさがす'
+                                onClick={() => {
+                                    if (!user) {
+                                        setNameError('ルームを探すにはユーザー名が必要です。');
+                                        return false;
+                                    } else {
+                                        setIsOpenSearchRoom(true)
                                     }
                                 }}
-                                placeholder="検索したいルーム名を入力してください"
-                                className={`w-full ${searchError ? 'border-red-500 border-2' : ''}`}
+                                disabled={loading}
                             />
                         </div>
                         <div className='mb-2'>
-                            <label htmlFor="username" className='font-semibold text-gray-700'>参加可能なルーム</label>
+                            <h2 className='font-semibold text-gray-700'>最後に入ったルーム</h2>
                         </div>
-                        <div className="space-y-4">
-                            {rooms.length === 0 ? (
-                                <p className="text-gray-500">まだルームがありません</p>
-                            ) : (
-                                <div className="sm:grid sm:grid-cols-2 gap-3">
-                                    {roomsList.length > 0 ? roomsList.map((room, index) => (
-                                        <motion.div
-                                            key={room.id}
-                                            initial={{ opacity: 0, y: 40 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.4, ease: "easeOut", delay: index * 0.1 }}
-                                            className="relative border border-yellow-500 bg-white/50 mb-4 border-3 rounded-3xl p-4 hover:shadow-md transition-shadow cursor-pointer"
-                                            onClick={() => handleIntoRoom({ roomId: room.id })}
-                                        >
-                                            <div className="flex justify-between items-center">
-                                                <TbArrowUpRight className="text-yellow-600  text-xl absolute right-3 top-3" />
-                                                <div className='overflow-hidden text-ellipsis whitespace-nowrap'>
-                                                    <label className="block text-gray-700 text-xs">ルーム名</label>
-                                                    <h3 className='font-semibold text-sm truncate'>{room.room_name}</h3>
-                                                    <p className="font-mono text-sm text-gray-600 text-xs truncate">作成者：{room.created_by_name}</p>
-                                                </div>
-                                            </div>
-                                        </motion.div>
-                                    )) : (
-                                        <div className='py-5 text-center col-span-2'>
-                                            <TbGhost2 className="text-gray-400 mx-auto mb-2" size={50} />
-                                            <p className="text-gray-500">該当するルームが見つかりません。</p>
+                        {latestRoom && latestRoom.id ? (
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className='cursor-pointer'
+                                onClick={() => handleIntoRoom({ roomId: latestRoom.id })}
+                                whileHover={{ scale: 1.02 }}
+                            >
+                                <div className='relative p-3 border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden'>
+                                    <span className='absolute -right-8 -top-8 w-15 h-15 bg-yellow-500 rotate-45'></span>
+                                    <div className='w-full font-bold'>
+                                        <h3 className='text-lg'>{latestRoom.room_name}</h3>
+                                        <div className='text-sm text-gray-500'>
+                                            ID: <span className='font-semibold'>{latestRoom.short_id}</span>
                                         </div>
-                                    )}
-                                    {/* ページネーション */}
-                                    <div className="flex justify-center space-x-4 mt-4 col-span-2">
-                                        <Button
-                                            icon={<TbArrowLeft size={20} />}
-                                            onClick={() => {
-                                                if (currentPage > 1 && !isPaging) {
-                                                    setIsPaging(true);
-                                                    setCurrentPage(prev => prev - 1);
-                                                }
-                                            }}
-                                            disabled={currentPage === 1 || isPaging}
-                                            className='disabled:opacity-50 disabled:cursor-not-allowed'
-                                        />
-                                        <motion.div
-                                            className="flex font-bold border-3 border-dotted border-yellow-600 items-center bg-yellow-400 px-4 rounded"
-                                        >{currentPage}</motion.div>
-                                        <Button
-                                            icon={<TbArrowRight size={20} />}
-                                            onClick={() => {
-                                                if (!isPaging) {
-                                                    setIsPaging(true);
-                                                    setCurrentPage(prev => prev + 1);
-                                                }
-                                            }}
-                                            disabled={roomsList.length < itemsPerPage || isPaging}
-                                            className='disabled:opacity-50 disabled:cursor-not-allowed'
-                                        />
+                                    </div>
+                                    <hr className='border-gray-300'/>
+                                    <div className='text-gray-500 text-sm mt-2'>
+                                        作成者: {latestRoom.created_by_name || '不明'}<br />
+                                        作成日時: {new Date(latestRoom.created_at).toLocaleString()}
                                     </div>
                                 </div>
-                            )}
-                        </div>
+                            </motion.div>
+                        ) : (
+                            <div>
+                                <TbGhost2 size={40} className='mx-auto text-gray-300' />
+                                <div className='text-center text-gray-400 font-semibold mt-2'>最後に入ったルームはありません</div>
+                            </div>
+                        )}
                     </Card>
                 </div>
             </div>
@@ -303,6 +284,13 @@ export default function LobbyPage({ rooms }: { rooms: Room[] }) {
                     setNameError={setNameError}
                     setIsSetUserModal={setIsSetUserModal}
                     className='w-full'
+                />
+            )}
+
+            {isOpenSearchRoom && (
+                <SearchRoomModal
+                    isOpen={isOpenSearchRoom}
+                    onClose={() => setIsOpenSearchRoom(false)}
                 />
             )}
         </>
