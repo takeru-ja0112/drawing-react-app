@@ -32,7 +32,8 @@ export default function SearchRoomModal({
         } else {
             setError(null);
         }
-        setRoomId("");
+        console.log("upper:",upperValue);
+        console.log("roomId",roomId);
         setRoomId(upperValue);
     }
 
