@@ -24,7 +24,6 @@ export default function SearchRoomModal({
      */
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         const result = searchRoomSchema(e.target.value);
-        const upperValue = e.target.value.toUpperCase();
 
         if (!result) return;
         if (!result.success) {
@@ -32,10 +31,7 @@ export default function SearchRoomModal({
         } else {
             setError(null);
         }
-        console.log("input:",e.target.value);
-        console.log("upper:",upperValue);
-        console.log("roomId",roomId);
-        setRoomId(upperValue);
+        setRoomId(e.target.value.toUpperCase());
     }
 
     const submitSearch = async () => {
