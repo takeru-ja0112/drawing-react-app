@@ -14,8 +14,6 @@ import { TbArrowBackUp, TbArrowForwardUp, TbArrowLeft, TbTrash } from 'react-ico
 import { Circle, Rect as KonvaRect, Layer, Line, Stage } from "react-konva";
 import AccessUser from '@/components/organisms/AccessUser';
 
-import Countdown from 'react-countdown';
-
 type DrawPageProps = {
     roomId: string;
     theme?: string;
