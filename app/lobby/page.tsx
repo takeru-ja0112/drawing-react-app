@@ -1,6 +1,4 @@
 import LobbyPage from '@/components/pages/LobbyPage';
-import type { Room } from '@/type/roomType';
-import { getRoomByPageSearch } from './action';
 
 export default async function Page() {
     // // Server Actionsを呼び出し

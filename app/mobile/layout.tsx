@@ -1,4 +1,3 @@
-import BgObject from "@/components/organisms/BgObject";
 import Header from "@/components/organisms/Header";
 import { SoundProvider } from "@/components/SoundProvider";
 

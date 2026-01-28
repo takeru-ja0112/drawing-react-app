@@ -46,7 +46,6 @@ export default function useDraw(roomId: string) {
     const h = 300;
 
     const handleMouseDown = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
-        console.log('handleMouseDown');
         if( lastEventType.current === e.evt.type ) return;
         lastEventType.current = e.evt.type;
 

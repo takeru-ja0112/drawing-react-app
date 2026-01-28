@@ -23,8 +23,6 @@ import Link from 'next/link';
 import SearchRoomModal from '@/components/organisms/lobby/SearchRoomModal';
 import { getRoom } from '@/app/lobby/action';
 
-const forbiddenChars = /[<>&\/\\'"]/;
-
 export default function LobbyPage() {
     const [loading, setLoading] = useState(false);
     const username = getUsername();
@@ -32,17 +30,11 @@ export default function LobbyPage() {
     const router = useRouter();
     const [user, setUser] = useState(username || '');
     const [nameError, setNameError] = useState<string>('');
-    const [searchName, setSearchName] = useState('');
-    const [searchQuery, setSearchQuery] = useState(searchName);
-    const [searchError] = useState<string>('');
     const { setLocalRoom, getLocalRoom } = historyLocalRoom();
     const [roomName, setRoomName] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [roomError, setRoomError] = useState<string>('');
     const [isSetUserModal, setIsSetUserModal] = useState<boolean>(!username);
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const [isPaging, setIsPaging] = useState<boolean>(false);
-    const itemsPerPage = 10;
     const [createRoomData, setCreateRoomData] = useState<CreateRoom>({
         level: 'normal',
         genre: 'ランダム',
@@ -103,7 +95,6 @@ export default function LobbyPage() {
             const fetchLatestRoom = async () => {
                 const res = await getRoom(latestRoomID);
                 if (res.success && res.data) {
-                    console.log('Latest room data:', res.data);
                     setLatestRoom(res.data);
                 }
             };

@@ -245,7 +245,6 @@ export async function subscribePush(userId: string, subscription: any) {
  */
 export async function unsubscribePush(userId: string) {
     const cleanUserId = userId.trim();
-    console.log("Unsubscribe push for user:", cleanUserId);
     try {
         const { data, error } = await supabase
             .from('subscriptions')

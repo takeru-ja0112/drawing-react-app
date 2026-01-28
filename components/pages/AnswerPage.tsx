@@ -157,19 +157,19 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
         });
     };
 
-    /**
-     * プッシュ通知用のデータをsupabaseに保存
-     */
-    const handleToggleSubscribe = async () => {
-        const userId = localStorage.getItem('drawing_app_user_id');
-        if (!userId) return;
+    // /**
+    //  * プッシュ通知用のデータをsupabaseに保存
+    //  */
+    // const handleToggleSubscribe = async () => {
+    //     const userId = localStorage.getItem('drawing_app_user_id');
+    //     if (!userId) return;
 
-        if (!isNoti) {
-            await handleSubscribe();
-        } else {
-            await handleDeleteSubscription();
-        }
-    }
+    //     if (!isNoti) {
+    //         await handleSubscribe();
+    //     } else {
+    //         await handleDeleteSubscription();
+    //     }
+    // }
 
     useEffect(() => {
         const userId = localStorage.getItem('drawing_app_user_id');
