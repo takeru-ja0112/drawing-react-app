@@ -1,6 +1,7 @@
 "use server";
 import { supabase } from '@/lib/supabase';
 import type { CreateRoom } from '@/type/roomType';
+import { create } from 'domain';
 
 // ルーム一覧を取得
 export async function getRooms() {
@@ -73,12 +74,40 @@ export async function getRoom(roomId: string) {
   }
 }
 
+/**
+ * ユーザーIDからルーム一覧を取得
+ * 
+ * @param userId 
+ * @returns 
+ */
+export async function getRoomsByUserId(userId: string) {
+  try {
+    const { data, error } = await supabase
+      .from('rooms')
+      .select('*')
+      .eq('created_by_userId', userId)
+      .order('created_at', { ascending: false });
+
+      console.log('Rooms fetched by user ID:', data);
+    if (error) {
+      console.error('Failed to fetch rooms by user ID:', error);
+      return { success: false, error: error.message, data: null };
+    }
+
+    return { success: true, error: null, data };
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return { success: false, error: 'Failed to fetch rooms by user ID', data: null };
+  }
+}
+
 // ルームを作成
 export async function createRoomByUsername(createRoomData: CreateRoom) {
   const sanitizedRoomName = createRoomData.roomName;
   const sanitizedUsername = createRoomData.username;
   const sanitizedLevel = createRoomData.level;
   const sanitizedGenre = createRoomData.genre;
+  const userId = createRoomData.userId || null;
   let randomTheme;
 
   try {
@@ -113,6 +142,7 @@ export async function createRoomByUsername(createRoomData: CreateRoom) {
       .insert({
         short_id: shortId,
         created_by_name: sanitizedUsername,
+        created_by_userId: userId,
         room_name: sanitizedRoomName,
         current_theme: randomTheme.theme,
         current_theme_id: randomTheme.id,

@@ -21,6 +21,7 @@ export interface Room {
 
 export interface CreateRoom {
     username: string;
+    userId: string;
     roomName: string;
     level: string;
     genre: string;

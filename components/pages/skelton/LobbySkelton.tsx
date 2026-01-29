@@ -35,6 +35,8 @@ export default function Loading() {
                     <div className='mb-2'>
                         <h2 className='font-semibold text-gray-700'>最後に入ったルーム</h2>
                     </div>
+                    <div className='bg-gray-300 animate-pulse h-30 w-full rounded-lg shadow-sm transition-shadow'>
+                    </div>
                     <div className='h-32 bg-gray-300 rounded-lg animate-pulse'>
                     </div>
                 </Card>

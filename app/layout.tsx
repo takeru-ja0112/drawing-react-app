@@ -39,21 +39,6 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <svg height="56" className="hidden">
-        <defs>
-          <filter id="liquid-filter">
-            <feTurbulence type="turbulence" baseFrequency="20" numOctaves="5" seed="0" result="turb" />
-            <feDisplacementMap in2="turb" in="SourceGraphic" scale="20" xChannelSelector="A" yChannelSelector="A" />
-            <feGaussianBlur stdDeviation="3" />
-            <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0" />
-            <feComponentTransfer>
-              <feFuncR type="linear" slope="1.2" />
-              <feFuncG type="linear" slope="1.2" />
-              <feFuncB type="linear" slope="1.2" />
-            </feComponentTransfer>
-          </filter>
-        </defs>
-      </svg>
       <head>
         <link rel="icon" href="/minimalDrawIcon.svg" />
         <link rel="manifest" href="/manifest.json" />

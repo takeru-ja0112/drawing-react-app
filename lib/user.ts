@@ -86,6 +86,13 @@ export function clearUser(): void {
 // ユーザーIDのみ取得
 export function getUserId(): string | null {
   if (typeof window === 'undefined') return null;
+  const id = localStorage.getItem(USER_ID_KEY);
+  
+  if(!id){
+    const newId = generateUUID();
+    localStorage.setItem(USER_ID_KEY, newId);
+  }
+  
   return localStorage.getItem(USER_ID_KEY);
 }
 
