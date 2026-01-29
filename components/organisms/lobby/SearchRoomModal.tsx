@@ -5,6 +5,7 @@ import Loading from "@/components/atoms/Loading";
 import Input from "@/components/atoms/Input";
 import { searchRoomSchema } from "@/lib/room";
 import { getRoomByShortId } from "@/app/lobby/action";
+import historyLocalRoom from '@/lib/hitoryLocalRoom';
 
 export default function SearchRoomModal({
     isOpen,
@@ -13,6 +14,7 @@ export default function SearchRoomModal({
     isOpen: boolean;
     onClose: () => void;
 }) {
+    const { setLocalRoom } = historyLocalRoom();
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [roomId, setRoomId] = useState<string>('');
@@ -51,6 +53,7 @@ export default function SearchRoomModal({
             setError(dbResult.error || 'ルームの検索に失敗しました。');
         } else {
             // ルームが見つかった場合、ルームページへ遷移
+            setLocalRoom(dbResult.data.id);
             window.location.href = `/room/${dbResult.data.id}`;
         }
         setLoading(false);
