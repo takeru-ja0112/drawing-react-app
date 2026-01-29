@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useState } from "react";
 import HamburgerMenu from "../molecules/HamburgerMenu";
 import AccessMenu from "./AccessMenu";
+import React from 'react';
+import LiquidGlass from 'liquid-glass-react';
 
 
 export default function Header() {
