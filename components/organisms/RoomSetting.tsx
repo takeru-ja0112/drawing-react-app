@@ -12,7 +12,7 @@ export default function RoomSetting<T>({
     setRoomData,
 }: RoomSettingProps<T>) {
     const levels = ['easy', 'normal', 'hard'];
-    const genres = ['ランダム','動物','料理','雑貨'];
+    const genres = ['ランダム', '動物', '料理', '雑貨'];
     const [selectedLevel, setSelectedLevel] = useState<string>('normal');
 
     return (
@@ -59,22 +59,21 @@ export default function RoomSetting<T>({
                 <motion.select
                     name="genre"
                     id="genre"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     onChange={(e) => setRoomData(prev => ({ ...prev, genre: e.target.value }))}
-                    className="w-full col-span-3 p-4 bg-gray-200 rounded-full hover:bg-gray-300 transition-colors cursor-pointer"
+                    className="w-full col-span-3 p-3 bg-yellow-400 font-bold rounded-full hover:bg-amber-500 transition-colors cursor-pointer"
                 >
                     {genres.map((genre) => (
                         <motion.option
                             key={genre}
                             value={genre}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition-colors text-center"
+                            className='text-center'
                         >
                             {genre}
                         </motion.option>
                     ))}
                 </motion.select>
-                <p className='mt-2 text-xs text-gray-500'>※ジャンルはまだ拡張していません</p>
             </div>
         </div>
     );
