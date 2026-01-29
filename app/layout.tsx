@@ -1,6 +1,7 @@
-"use client";
-import { useEffect } from "react";
+// "use client";
+// import { useEffect } from "react";
 
+import type { Metadata } from "next";
 import BgObject from "@/components/organisms/BgObject";
 import Header from "@/components/organisms/Header";
 import { SoundProvider } from "@/components/SoundProvider";
@@ -17,10 +18,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// export const metadata: Metadata = {
-//   title: "Minimal Draw",
-//   description: "Mini app",
-// };
+export const metadata: Metadata = {
+  title: "Minimal Draw",
+  description: "Mini app",
+};
 
 export default function RootLayout({
   children,
@@ -28,14 +29,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  useEffect(() => {
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker
-        .register("/custom-sw.js")
-        .then((reg) => { console.log("SW registered!", reg); })
-        .catch((err) => { console.error("SW registration failed!", err); alert("Service Worker登録に失敗しました。プッシュ通知は利用できません。"); });
-    }
-  }, []);
+  // useEffect(() => {
+  //   if ("serviceWorker" in navigator) {
+  //     navigator.serviceWorker
+  //       .register("/custom-sw.js")
+  //       .then((reg) => { console.log("SW registered!", reg); })
+  //       .catch((err) => { console.error("SW registration failed!", err); alert("Service Worker登録に失敗しました。プッシュ通知は利用できません。"); });
+  //   }
+  // }, []);
 
   return (
     <html lang="en">
@@ -44,6 +45,11 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#fbbf24" />
         <link rel="apple-touch-icon" href="/minimalDrawIcon.svg" />
+        <meta property="og:title" content="Minimal Draw" />
+        <meta property="og:description" content="お題を線と丸と長方形で表現するボードゲーム！" />
+        <meta property="og:image" content="/minimalDrawIcon.svg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-b from-gray-100 to-gray-200 min-h-screen`}
