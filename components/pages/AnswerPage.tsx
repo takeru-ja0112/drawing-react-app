@@ -292,7 +292,7 @@ export default function AnswerPage({ roomId, drawings, initialTheme }: AnswerPag
                     status !== 'ANSWERING' && status !== 'FINISHED' &&
                     isAnswerRole &&
                     (
-                        <Card className="max-w-lg w-full mt-6 mb-6 p-5 bg-yellow-50 border-yellow-200">
+                        <Card className="max-w-lg w-full mt-6 mb-6 p-5 bg-yellow-50 border-dotted border-4 border-yellow-200">
                             <h2 className='text-lg font-bold text-yellow-700'>回答者のみ表示</h2>
                             <p className='text-sm font-semibold text-yellow-600 mb-4'>参加者のイラスト全てが届いたら締め切るボタンを押してください</p>
                             <IconContext.Provider value={{ size: '1.5em' }}>

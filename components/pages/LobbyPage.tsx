@@ -221,7 +221,7 @@ export default function LobbyPage() {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.3 }}
-                                className='cursor-pointer'
+                                className='cursor-pointer mb-4'
                                 onClick={() => handleIntoRoom({ roomId: latestRoom.id })}
                                 whileHover={{ scale: 1.02 }}
                             >
@@ -233,7 +233,7 @@ export default function LobbyPage() {
                                             ID: <span className='font-semibold'>{latestRoom.short_id}</span>
                                         </div>
                                     </div>
-                                    <hr className='border-gray-300'/>
+                                    <hr className='border-gray-300' />
                                     <div className='text-gray-500 text-sm mt-2'>
                                         作成者: {latestRoom.created_by_name || '不明'}<br />
                                         作成日時: {new Date(latestRoom.created_at).toLocaleString()}
@@ -246,6 +246,9 @@ export default function LobbyPage() {
                                 <div className='text-center text-gray-400 font-semibold mt-2'>最後に入ったルームはありません</div>
                             </div>
                         )}
+                        <div className='mb-2'>
+                            <h2 className='font-semibold text-gray-700'>自分がつくったルーム</h2>
+                        </div>
                     </Card>
                 </div>
             </div>
