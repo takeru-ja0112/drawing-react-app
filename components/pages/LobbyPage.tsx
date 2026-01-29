@@ -66,7 +66,6 @@ export default function LobbyPage() {
         }
 
         setLoading(true);
-        console.log('CreateRoomData before creation:', createRoomData);
         try {
             const result = await createRoomByUsername(createRoomData);
             if (result.success && result.data) {
