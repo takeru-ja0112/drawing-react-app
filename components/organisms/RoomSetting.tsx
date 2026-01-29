@@ -12,7 +12,7 @@ export default function RoomSetting<T>({
     setRoomData,
 }: RoomSettingProps<T>) {
     const levels = ['easy', 'normal', 'hard'];
-    const genres = ['ランダム'];
+    const genres = ['ランダム','動物','料理','雑貨'];
     const [selectedLevel, setSelectedLevel] = useState<string>('normal');
 
     return (

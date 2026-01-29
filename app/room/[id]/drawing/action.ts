@@ -129,3 +129,41 @@ export async function getTheme(roomId: string) {
     return { success: false, error: 'Failed to fetch theme', data: null };
   }
 }
+
+export async function getFurigana(roomId: string) {
+  let current_theme_id = '';
+  try{
+    const { data , error } = await supabase
+      .from('rooms')
+      .select('current_theme_id')
+      .eq('id', roomId)
+      .single();
+    if(error){
+      console.error('Failed to fetch current_theme_id:', error);
+      return { success: false, error: error.message, data: null };
+    }
+
+    current_theme_id = data?.current_theme_id;
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return { success: false, error: 'Failed to fetch current_theme_id', data: null };
+  }
+  
+  try{
+    const { data , error } = await supabase
+      .from('theme')
+      .select('furigana')
+      .eq('id', current_theme_id)
+      .single();
+
+    if(error){
+      console.error('Failed to fetch furigana:', error);
+      return { success: false, error: error.message, data: null };
+    }
+
+    return { success: true, error: null, data: data?.furigana };
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return { success: false, error: 'Failed to fetch furigana', data: null };
+  }
+}

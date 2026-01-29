@@ -111,11 +111,15 @@ export async function createRoomByUsername(createRoomData: CreateRoom) {
   let randomTheme;
 
   try {
-    const { data, error } = await supabase
+    let themeQuery = supabase
       .from('theme')
       .select('id, theme')
-      .eq('level', sanitizedLevel)
-      .eq('genre', sanitizedGenre);
+      .eq('level', sanitizedLevel);
+    // ジャンルが "ランダム" の場合は genre で絞り込まない
+    if (sanitizedGenre !== 'ランダム') {
+      themeQuery = themeQuery.eq('genre', sanitizedGenre);
+    }
+    const { data, error } = await themeQuery;
 
     if (error) {
       console.error('Failed to fetch random theme:', error);

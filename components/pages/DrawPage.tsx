@@ -17,10 +17,11 @@ import AccessUser from '@/components/organisms/AccessUser';
 type DrawPageProps = {
     roomId: string;
     theme?: string;
+    furigana?:string;
     mode?: 'demo';
 };
 
-export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
+export default function DrawPage({ roomId, theme, furigana, mode }: DrawPageProps) {
     const {
         count,
         isSaving,
@@ -69,6 +70,7 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
                     <label className="block mb-1 font-semibold text-gray-600">
                         お題
                     </label>
+                    <h2 className="text-md font-bold text-gray-500">{isThemeOpen ? '' : furigana}</h2>
                     <h1 className="text-xl font-bold">{isThemeOpen ? '' : theme}</h1>
                     <motion.h1
                         key={count}
@@ -208,7 +210,8 @@ export default function DrawPage({ roomId, theme, mode }: DrawPageProps) {
                 {mode === 'demo' ? null : 
                 <Modal isOpen={isThemeOpen} onClose={() => setIsThemeOpen(false)} className='text-center'>
                     <h2 >お題</h2>
-                    <p className="font-bold text-2xl my-2">{theme}</p>
+                    <p className="font-bold text-xl text-gray-500">{furigana}</p>
+                    <p className="font-bold text-2xl mb-2">{theme}</p>
                     <p className='font-semibold text-gray-500 text-xl my-2'>できるだけ少ない数で描こう！</p>
                     <Button
                         onClick={() => setIsThemeOpen(false)}
