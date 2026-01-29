@@ -4,7 +4,7 @@ import Button from "@/components/atoms/Button";
 import Loading from "@/components/atoms/Loading";
 import RoomSetting from "@/components/organisms/RoomSetting";
 import type { CreateRoom, RoomSettingType  } from '@/type/roomType';
-import { useState } from "react";
+import { useState , useEffect } from "react";
 import { setRoomSchema } from "@/lib/room";
 
 
@@ -35,6 +35,14 @@ export default function CreateRoomModal({
         level: 'normal',
         genre: 'ランダム',
     });
+
+    useEffect(() => {
+        setCreateRoomData(prev => ({
+            ...prev,
+            level: settingData.level,
+            genre: settingData.genre,
+        }))
+    },[settingData])
 
     return (
         <>
@@ -73,11 +81,6 @@ export default function CreateRoomModal({
                         value='作成'
                         icon={loading ? <Loading /> : null}
                         onClick={()=>{
-                            setCreateRoomData(prev => ({
-                                ...prev,
-                                level: settingData.level,
-                                genre: settingData.genre,
-                            }))
                             createRoom();
                         }}
                         disabled={loading}
