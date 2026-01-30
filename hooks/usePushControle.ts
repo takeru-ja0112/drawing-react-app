@@ -18,7 +18,6 @@ export default function usePushControl() {
       applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!)
     });
     setSub(subscription); // 取得した情報をステートに保存
-    alert("プッシュ通知の購読に成功しました！");
     return { success: true };
   };
 
@@ -28,7 +27,6 @@ export default function usePushControl() {
     if (subscription) {
       await subscription.unsubscribe();
       setSub(null);
-      alert("プッシュ通知の購読を解除しました。");
       return { success: true };
     }
   }
