@@ -13,36 +13,22 @@
 
 ## 3. 画面遷移・UX
 
-1. **トップ/ロビー**: ルーム作成・入室、メンバー待機。
+1. **トップ/ロビー**: ルーム作成・ルーム検索・最後に入ったルーム・自分が作成したルーム
 2. **お題確認/役割分担**: 「回答者」か「描き手」かを決定。描き手にお題を表示。
 3. **描画フェーズ**:
-    - 制限時間内に3種の図形を使って描画。
+    - 3種の図形を使って描画。
     - リアルタイムで要素数をカウント表示。
     - 完了したらデータを送信して待機。
 4. **回答フェーズ（メイン）**:
     - 要素数が少ない順に、1人ずつイラストを公開。
     - 回答者が入力し、正解ならその時点で終了。不正解なら次の描き手の絵を重ねて表示（または並べて表示）。
-5. **リザルト**: スコア表示、MVP（最小要素正解者）の表彰。
+    - 回答者以外は回答者がリアルタイムで何を入力しているかがわかる
 
 ## 4. 技術スタック
 
 - **Frontend**: Next.js (React), Tailwind CSS
-- **Backend/DB**: Supabase (PostgreSQL + Realtime機能)
+- **Backend/DB**: Supabase (PostgreSQL + Realtime機能) supabaseEdgeFunctions web-push Deno
 - **Canvas Library**: Konva.js (React-Konva)
 - **Deployment**: Vercel
 
-## 5. データ構造案 (Supabase)
-
-| **カラム名** | **型** | **説明** |
-| --- | --- | --- |
-| `id` | uuid | 部屋の一意識別子 |
-| `status` | text | WAITING / DRAWING / ANSWERING / RESULT |
-| `current_theme` | text | 出題されているお題 |
-| `answerer_id` | uuid | 現在の回答者のID |
-
-| **カラム名** | **型** | **説明** |
-| --- | --- | --- |
-| `room_id` | uuid | 紐づく部屋のID |
-| `user_id` | uuid | 描き手のユーザーID |
-| `canvas_data` | jsonb | 図形の座標・種類データの配列 |
-| `element_count` | int | 使用した図形の総数（ソート用） |
+## 5. 起動
