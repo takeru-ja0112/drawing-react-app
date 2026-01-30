@@ -9,19 +9,31 @@ import { createClient } from "npm:@supabase/supabase-js@^2.93.1";
 import webpush from "npm:web-push@^3.6.7";
 
 // 環境変数の取得
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const VAPID_PUBLIC_KEY = Deno.env.get("VAPID_PUBLIC_KEY")!;
-const VAPID_PRIVATE_KEY = Deno.env.get("VAPID_PRIVATE_KEY")!;
+const SUPABASE_URL = Deno.env.get(
+    "SUPABASE_URL",
+)!;
+const SUPABASE_SERVICE_ROLE_KEY =
+    Deno.env.get(
+        "SUPABASE_SERVICE_ROLE_KEY",
+    )!;
+const VAPID_PUBLIC_KEY = Deno.env.get(
+    "VAPID_PUBLIC_KEY",
+)!;
+const VAPID_PRIVATE_KEY = Deno.env.get(
+    "VAPID_PRIVATE_KEY",
+)!;
 
 // Supabaseクライアント初期化
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+const supabase = createClient(
+    SUPABASE_URL,
+    SUPABASE_SERVICE_ROLE_KEY,
+);
 
 // web-push初期化
 webpush.setVapidDetails(
-  "mailto:your-email@example.com",
-  VAPID_PUBLIC_KEY,
-  VAPID_PRIVATE_KEY
+    "mailto:your-email@example.com",
+    VAPID_PUBLIC_KEY,
+    VAPID_PRIVATE_KEY,
 );
 
 // "内容受信: {
@@ -38,42 +50,67 @@ webpush.setVapidDetails(
 // \n      { x: 133, y: 145, radius: 63.063460101710255 }\n    ]\n  },
 // \n  element_count: 6\n}\n"
 
-serve(async (req : any) => {
-  // リクエストボディからタイトル・本文取得
-  const { record } = await req.json();
-  
-  // 送信する先
-  let subscription = null;
+serve(async (req: any) => {
+    // リクエストボディからタイトル・本文取得
+    const { record } = await req.json();
 
-  console.log("内容受信:", record);
+    // 送信する先
+    let subscription = null;
 
-  const { room_id } = record;
-  const payload = {
-    title: `新しいお絵かきが追加されました！`,
-    body: `ルームID: ${room_id} に新しいお絵かきが追加されました。`,
-  }
+    console.log("内容受信:", record);
 
-  // DBからサブスクリプション情報取得
-  const { data, error } = await supabase.from("subscriptions").select("*");
-  if (error) {
-    return new Response(JSON.stringify({ success: false, error: error.message }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
+    const { room_id } = record;
+    const payload = {
+        title: `新しいお絵かきが追加されました！`,
+        body: `ルームID: ${room_id} に新しいお絵かきが追加されました。`,
+    };
 
-  // 各サブスクリプションに通知送信
-  let successCount = 0;
-  for (const sub of data ?? []) {
     try {
-      await webpush.sendNotification(sub.subscription, JSON.stringify(payload));
-      successCount++;
-    } catch (e) {
-      console.error("送信エラー:", e);
-    }
-  }
+        const { data, error } =
+            await supabase
+                .from("subscriptions")
+                .select("*")
+                .eq("room_id", room_id);
+                .
 
-  return new Response(JSON.stringify({ success: true, sent: successCount }), {
-    headers: { "Content-Type": "application/json" },
-  });
+        if (error) {
+            console.error(
+                "Failed to get subscription for room:",
+                error,
+            );
+        } else {
+            subscription =
+                data.subscription;
+        }
+    } catch (e) {
+        console.error(
+            "サブスクリプション情報の取得エラー:",
+            e,
+        );
+    }
+
+    // 各サブスクリプションに通知送信
+    let successCount = 0;
+    try {
+        await webpush.sendNotification(
+            subscription,
+            JSON.stringify(payload),
+        );
+        successCount++;
+    } catch (e) {
+        console.error("送信エラー:", e);
+    }
+
+    return new Response(
+        JSON.stringify({
+            success: true,
+            sent: successCount,
+        }),
+        {
+            headers: {
+                "Content-Type":
+                    "application/json",
+            },
+        },
+    );
 });
