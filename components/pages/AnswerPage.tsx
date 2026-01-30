@@ -190,13 +190,7 @@ export default function AnswerPage({
     /**
      * アプリから表示しているかどうか確認
      */
-    if (isBrowser) {
-      alert(
-        "ブラウザでは通知機能の対応をしていません。\nホーム画面にアプリを追加してご利用ください。"
-      );
-      setIsNoti(false);
-      return;
-    }
+    alert(`ブラウザからだと通知機能が動作しません。\nホーム画面にアプリを追加してご利用ください。`);
 
     const userId = localStorage.getItem("drawing_app_user_id");
     if (!userId) return;
