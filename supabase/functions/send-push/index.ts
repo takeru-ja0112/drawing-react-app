@@ -9,58 +9,108 @@ import { createClient } from "npm:@supabase/supabase-js@^2.93.1";
 import webpush from "npm:web-push@^3.6.7";
 
 // 環境変数の取得
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const VAPID_PUBLIC_KEY = Deno.env.get("VAPID_PUBLIC_KEY")!;
-const VAPID_PRIVATE_KEY = Deno.env.get("VAPID_PRIVATE_KEY")!;
+const SUPABASE_URL = Deno.env.get(
+    "SUPABASE_URL",
+)!;
+const SUPABASE_SERVICE_ROLE_KEY =
+    Deno.env.get(
+        "SUPABASE_SERVICE_ROLE_KEY",
+    )!;
+const VAPID_PUBLIC_KEY = Deno.env.get(
+    "VAPID_PUBLIC_KEY",
+)!;
+const VAPID_PRIVATE_KEY = Deno.env.get(
+    "VAPID_PRIVATE_KEY",
+)!;
 
 // Supabaseクライアント初期化
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+const supabase = createClient(
+    SUPABASE_URL,
+    SUPABASE_SERVICE_ROLE_KEY,
+);
 
 // web-push初期化
 webpush.setVapidDetails(
-  "mailto:your-email@example.com",
-  VAPID_PUBLIC_KEY,
-  VAPID_PRIVATE_KEY
+    "mailto:your-email@example.com",
+    VAPID_PUBLIC_KEY,
+    VAPID_PRIVATE_KEY,
 );
 
-serve(async (req : any) => {
-  // リクエストボディからタイトル・本文取得
-  const { title, body } = await req.json();
+// "内容受信: {
+// \n  id: \"987aa4df-de0b-44a8-82c9-4826a605baf6\",
+// \n  theme: \"カメラ\",
+// \n  room_id: \"17dab202-94e7-4b80-a341-e7493d7f2263\",
+// \n  user_id: \"929ebb44-f1ea-470b-a39b-60831ae71dcf\",
+// \n  user_name: \"stagingWin\",
+// \n  created_at: \"2026-01-30T06:36:27.897832+00:00\",
+// \n  canvas_data: {\n    lines: [],\n    rects: [ { x: 65, y: 66, width: 193, height: 141, rotation: 0 } ],\n    circles: [\n      { x: 133, y: 148, radius: 49.648766349225646 },
+// \n      { x: 139, y: 143, radius: 38.897300677553446 },
+// \n      { x: 215, y: 97, radius: 14.7648230602334 },
+// \n      { x: 217, y: 94, radius: 6.4031242374328485 },
+// \n      { x: 133, y: 145, radius: 63.063460101710255 }\n    ]\n  },
+// \n  element_count: 6\n}\n"
 
-  // DBからサブスクリプション情報取得
-  const { data, error } = await supabase.from("subscriptions").select("*");
-  if (error) {
-    return new Response(JSON.stringify({ success: false, error: error.message }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
+serve(async (req: any) => {
+    // リクエストボディからタイトル・本文取得
+    const { record } = await req.json();
 
-  // 各サブスクリプションに通知送信
-  let successCount = 0;
-  for (const sub of data ?? []) {
+    // 送信する先
+    let subscription = null;
+
+    console.log("内容受信:", record);
+
+    const { room_id } = record;
+    const payload = {
+        title: `新しいお絵かきが追加されました！`,
+        body: `ルームID: ${room_id} に新しいお絵かきが追加されました。`,
+    };
+
     try {
-      await webpush.sendNotification(sub.subscription, JSON.stringify({ title, body }));
-      successCount++;
+        const { data, error } =
+            await supabase
+                .from("subscriptions")
+                .select("*")
+                .eq("room_id", room_id);
+                .
+
+        if (error) {
+            console.error(
+                "Failed to get subscription for room:",
+                error,
+            );
+        } else {
+            subscription =
+                data.subscription;
+        }
     } catch (e) {
-      console.error("送信エラー:", e);
+        console.error(
+            "サブスクリプション情報の取得エラー:",
+            e,
+        );
     }
-  }
 
-  return new Response(JSON.stringify({ success: true, sent: successCount }), {
-    headers: { "Content-Type": "application/json" },
-  });
+    // 各サブスクリプションに通知送信
+    let successCount = 0;
+    try {
+        await webpush.sendNotification(
+            subscription,
+            JSON.stringify(payload),
+        );
+        successCount++;
+    } catch (e) {
+        console.error("送信エラー:", e);
+    }
+
+    return new Response(
+        JSON.stringify({
+            success: true,
+            sent: successCount,
+        }),
+        {
+            headers: {
+                "Content-Type":
+                    "application/json",
+            },
+        },
+    );
 });
-
-/* To invoke locally:
-
-  1. Run `supabase start` (see: https://supabase.com/docs/reference/cli/supabase-start)
-  2. Make an HTTP request:
-
-  curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/send-push' \
-    --header 'Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6ImI4MTI2OWYxLTIxZDgtNGYyZS1iNzE5LWMyMjQwYTg0MGQ5MCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjIwODQ3NjM4NTh9.6ToQsfS8rw6dVUOyrYtBMTh3r-S4U62Umt4kFQEQ2vAdp_Xvefw-kant4QRp5BEkjJ_BsUlBIjTFrgc-daQYXw' \
-    --header 'Content-Type: application/json' \
-    --data '{"name":"Functions"}'
-
-*/
