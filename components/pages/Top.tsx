@@ -24,6 +24,7 @@ export default function Top() {
             >
                 
                 <div className="max-w-2xl w-90 mt-20 mb-30 z-10">
+                    <h1>STAGING</h1>
                     {/* メインコンテンツ */}
                     <motion.div
                         className="text-center mb-12 flex flex-col items-center justify-center"
