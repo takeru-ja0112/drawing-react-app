@@ -205,7 +205,7 @@ export default function AnswerPage({
     };
 
     if (sub) {
-      subscribePush(userId, sub);
+      subscribePush(userId, roomId, sub);
     } else {
       unsubscription();
     }

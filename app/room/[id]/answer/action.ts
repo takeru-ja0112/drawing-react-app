@@ -220,11 +220,11 @@ export async function setdbAnswerResult(roomId: string, result: string) {
 /**
  * サブスクリプションテーブルに登録
  */
-export async function subscribePush(userId: string, subscription: any) {
+export async function subscribePush(userId: string, room_id: string, subscription: any) {
     try {
         const { data, error } = await supabase
             .from('subscriptions')
-            .upsert({ user_id: userId, subscription: subscription })
+            .upsert({ user_id: userId, room_id: room_id, subscription: subscription })
             .eq('user_id', userId)
             .select()
             .single();
