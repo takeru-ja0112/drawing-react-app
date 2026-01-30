@@ -56,13 +56,38 @@ serve(async (req: any) => {
 
     // 送信する先
     let subscription = null;
+    let illustCount = 0;
 
     console.log("内容受信:", record);
 
-    const { room_id } = record;
+    try {
+        const { data, error } =
+            await supabase
+                .from("drawings")
+                .select("canvas_data")
+                .eq(
+                    "room_id",
+                    record.room_id,
+                );
+
+        if (error) {
+            console.error(
+                "Failed to get illustrations:",
+                error,
+            );
+        } else {
+            illustCount = data.length;
+        }
+    } catch (e) {
+        console.error(
+            "イラスト取得エラー:",
+            e,
+        );
+    }
+
     const payload = {
-        title: `新しいお絵かきが追加されました！`,
-        body: `ルームID: ${room_id} に新しいお絵かきが追加されました。`,
+        title: `イラストが更新されました！`,
+        body: `${illustCount}枚目のイラストが追加されました！`,
     };
 
     try {
@@ -70,8 +95,11 @@ serve(async (req: any) => {
             await supabase
                 .from("subscriptions")
                 .select("*")
-                .eq("room_id", room_id);
-                .
+                .eq(
+                    "room_id",
+                    record.room_id,
+                )
+                .single();
 
         if (error) {
             console.error(
