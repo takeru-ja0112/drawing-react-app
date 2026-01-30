@@ -99,6 +99,8 @@ export default function AnswerPage({
   const { open, close, modalType } = useModalContext();
   const [isNoti, setIsNoti] = useState(false);
 
+  const isBrowser = typeof window !== "undefined";
+
   // 回答者の内容を取得
   const { answerInputs, result } = useAnswerInputs(roomId);
 
@@ -185,6 +187,11 @@ export default function AnswerPage({
    * プッシュ通知用のデータをsupabaseに保存
    */
   const handleToggleSubscribe = async () => {
+    /**
+     * アプリから表示しているかどうか確認
+     */
+    alert(`ブラウザからだと通知機能が動作しません。\nホーム画面にアプリを追加してご利用ください。`);
+
     const userId = localStorage.getItem("drawing_app_user_id");
     if (!userId) return;
 
