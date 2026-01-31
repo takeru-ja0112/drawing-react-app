@@ -32,9 +32,9 @@ import {
   TbArrowLeft,
   TbGhost2,
   TbLock,
+  TbReload
 } from "react-icons/tb";
 import { Circle, Layer, Line, Rect, Stage } from "react-konva";
-import AccessUser from "../organisms/AccessUser";
 import ChallengeModal from "../organisms/answer/ChallengeModal";
 import CorrectModal from "../organisms/answer/CorrectModal";
 import FinishModal from "../organisms/answer/FinishModal";
@@ -231,6 +231,18 @@ export default function AnswerPage({
     close();
   };
 
+  const handleReload = () => {
+    const fetchData = async () => {
+      const { data } = await supabase
+        .from("drawings")
+        .select("*")
+        .eq("room_id", roomId)
+        .order("element_count", { ascending: true });
+      setData(data || []);
+    };
+    fetchData();
+  };
+
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
       setAnswerError(null);
@@ -350,7 +362,7 @@ export default function AnswerPage({
         )}
         {/* ステータスエリア */}
         <StatusBar status={status}></StatusBar>
-        <AccessUser roomId={roomId} />
+        {/* <AccessUser roomId={roomId} /> */}
         <Card className="max-w-lg w-full">
           {/* PWA用の通知許可コンポーネントのため一旦コメントアウト */}
           {isAnswerRole && (
@@ -375,6 +387,22 @@ export default function AnswerPage({
               </motion.button>
             </div>
           )}
+          <motion.button
+            className="absolute right-3 top-3 justify-center flex-col items-end flex border-2 border-dotted border-green-700 rounded-full p-1 cursor-pointer hover:bg-green-100"
+            initial={{ rotate: 0 }}
+            whileTap={{ rotate: 360 }}
+            onClick={handleReload}
+          >
+            {/* <p className="text-xs text-gray-500 font-semibold">イラストを更新する
+            </p> */}
+            {/* <motion.div
+              initial={{ rotate: 0 }}
+              whileTap={{ rotate: 360 }}
+              transition={{ duration: 0.2 }}
+            > */}
+            <TbReload size={20} className="text-green-700" />
+            {/* </motion.div> */}
+          </motion.button>
 
           {data.length === 0 ? (
             <div className="text-center py-12">
