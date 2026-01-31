@@ -5,9 +5,7 @@ import {
   checkAnswerRole,
   getThemePatternByRoomId,
   setdbAnswerInput,
-  setdbAnswerResult,
-  subscribePush,
-  unsubscribePush,
+  setdbAnswerResult
 } from "@/app/room/[id]/answer/action";
 import Button from "@/components/atoms/Button";
 import Card from "@/components/atoms/Card";
@@ -85,7 +83,7 @@ export default function AnswerPage({
   const [isAnswerRole, setIsAnswerRole] = useState(false);
   const [data, setData] = useState<Drawing[]>(drawings);
   const currentDrawing = data[currentIndex];
-  const { sub, handleSubscribe, handleDeleteSubscription } = usePushControl();
+  const { sub, handleSubscribe, handleDeleteSubscription } = usePushControl(roomId);
   const { status, currentTheme } = useStatus(roomId);
   const [themePattern, setThemePattern] = useState<ThemePattern>(
     initialTheme
@@ -97,7 +95,7 @@ export default function AnswerPage({
   const [isOpen, setIsOpen] = useState(false);
   const [mistake, setMistake] = useState<number>(0);
   const { open, close, modalType } = useModalContext();
-  const [isNoti, setIsNoti] = useState(false);
+  const [isNoti, setIsNoti] = useState<boolean>(sub ? true : false);
 
   const isBrowser = typeof window !== "undefined";
 
@@ -190,33 +188,19 @@ export default function AnswerPage({
     /**
      * アプリから表示しているかどうか確認
      */
-    alert(`ブラウザからだと通知機能が動作しません。\nホーム画面にアプリを追加してご利用ください。`);
 
     const userId = localStorage.getItem("drawing_app_user_id");
     if (!userId) return;
 
     if (!isNoti) {
+      console.log("subscribe");
+      alert(`  ブラウザでは通知機能を利用できません。\n ホーム画面に追加してご利用ください。`);
       await handleSubscribe();
     } else {
+      console.log("unsubscribe");
       await handleDeleteSubscription();
     }
   };
-
-  useEffect(() => {
-    const userId = localStorage.getItem("drawing_app_user_id");
-    if (!userId) return;
-
-    const unsubscription = async () => {
-      const res = await unsubscribePush(userId);
-      return res.data;
-    };
-
-    if (sub) {
-      subscribePush(userId, roomId, sub);
-    } else {
-      unsubscription();
-    }
-  }, [sub]);
 
   useEffect(() => {
     if (result === "CORRECT") {
